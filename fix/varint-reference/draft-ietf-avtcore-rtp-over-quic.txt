@@ -1,0 +1,2176 @@
+
+
+
+
+Audio/Video Transport Core Maintenance                            J. Ott
+Internet-Draft                                              M. Engelbart
+Intended status: Standards Track             Technical University Munich
+Expires: 18 December 2023                                   16 June 2023
+
+
+                             RTP over QUIC
+                draft-ietf-avtcore-rtp-over-quic-latest
+
+Abstract
+
+   This document specifies a minimal mapping for encapsulating Real-time
+   Transport Protocol (RTP) and RTP Control Protocol (RTCP) packets
+   within the QUIC protocol.  It also discusses how to leverage state
+   from the QUIC implementation in the endpoints, in order to reduce the
+   need to exchange RTCP packets and how to implement congestion control
+   and rate adaptation without relying on RTCP feedback.
+
+Discussion Venues
+
+   This note is to be removed before publishing as an RFC.
+
+   Discussion of this document takes place on the Audio/Video Transport
+   Core Maintenance Working Group mailing list (avt@ietf.org), which is
+   archived at https://mailarchive.ietf.org/arch/browse/avt/.
+
+   Source for this draft and an issue tracker can be found at
+   https://github.com/mengelbart/rtp-over-quic-draft.
+
+Status of This Memo
+
+   This Internet-Draft is submitted in full conformance with the
+   provisions of BCP 78 and BCP 79.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF).  Note that other groups may also distribute
+   working documents as Internet-Drafts.  The list of current Internet-
+   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   This Internet-Draft will expire on 18 December 2023.
+
+Copyright Notice
+
+   Copyright (c) 2023 IETF Trust and the persons identified as the
+   document authors.  All rights reserved.
+
+   This document is subject to BCP 78 and the IETF Trust's Legal
+   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+   license-info) in effect on the date of publication of this document.
+   Please review these documents carefully, as they describe your rights
+   and restrictions with respect to this document.  Code Components
+   extracted from this document must include Revised BSD License text as
+   described in Section 4.e of the Trust Legal Provisions and are
+   provided without warranty as described in the Revised BSD License.
+
+Table of Contents
+
+   1.  Introduction
+     1.1.  Background
+     1.2.  What's in Scope for this Specification
+     1.3.  What's Out of Scope for this Specification
+   2.  Terminology and Notation
+   3.  Protocol Overview
+     3.1.  Supported RTP Topologies
+   4.  Connection Establishment and ALPN
+     4.1.  Draft version identification
+   5.  Encapsulation
+     5.1.  Multiplexing
+     5.2.  QUIC Streams
+     5.3.  QUIC Datagrams
+   6.  Congestion Control and Rate Adaptation
+     6.1.  Congestion Control at the Transport Layer
+     6.2.  Congestion Control at the RTP Application Layer
+     6.3.  Resolving Interactions Between QUIC and Application-layer
+           Congestion Control
+     6.4.  Sharing QUIC connections
+   7.  Replacing RTCP and RTP Header Extensions with QUIC Feedback
+     7.1.  RoQ Datagrams
+     7.2.  RoQ Streams
+     7.3.  Transport Layer Feedback
+       7.3.1.  Mapping QUIC Feedback to RTCP Receiver Reports ("RR")
+       7.3.2.  Mapping QUIC Feedback to RTCP Negative Acknowledgments*
+               ("NACK")
+       7.3.3.  Mapping QUIC Feedback to RTCP ECN Feedback ("ECN")
+       7.3.4.  Mapping QUIC Feedback to RTCP Congestion Control
+               Feedback ("CCFB")
+       7.3.5.  Mapping QUIC Feedback to RTCP Extended Report ("XR")
+     7.4.  Application Layer Repair and other Control Messages
+     7.5.  RTCP Control Packet Types
+       7.5.1.  Notes
+     7.6.  Generic RTP Feedback (RTPFB)
+     7.7.  Payload-specific RTP Feedback (PSFB)
+     7.8.  Extended Reports (XR)
+     7.9.  RTP Header extensions
+   8.  API Considerations
+     8.1.  Information to be exported from QUIC
+     8.2.  Functions to be exposed by QUIC
+   9.  Discussion
+     9.1.  Impact of Connection Migration
+     9.2.  0-RTT considerations
+   10. Security Considerations
+   11. IANA Considerations
+     11.1.  Registration of a RoQ Identification String
+   12. References
+     12.1.  Normative References
+     12.2.  Informative References
+   Appendix A.  Experimental Results
+   Acknowledgments
+   Authors' Addresses
+
+1.  Introduction
+
+   This document specifies a minimal mapping for encapsulating Real-time
+   Transport Protocol (RTP) [RFC3550] and RTP Control Protocol (RTCP)
+   [RFC3550] packets within the QUIC protocol ([RFC9000]).  It also
+   discusses how to leverage state from the QUIC implementation in the
+   endpoints, in order to reduce the need to exchange RTCP packets, and
+   how to implement congestion control and rate adaptation without
+   relying on RTCP feedback.  The mapping described in this document is
+   called RTP over QUIC (RoQ).
+
+1.1.  Background
+
+   The Real-time Transport Protocol (RTP) [RFC3550] is generally used to
+   carry real-time media for conversational media sessions, such as
+   video conferences, across the Internet.  Since RTP requires real-time
+   delivery and is tolerant to packet losses, the default underlying
+   transport protocol has been UDP, recently with DTLS on top to secure
+   the media exchange and occasionally TCP (and possibly TLS) as a
+   fallback.
+
+   This specification describes an application usage of QUIC
+   ([RFC9308]).  As a baseline, the specification does not expect more
+   than a standard QUIC implementation as defined in [RFC8999],
+   [RFC9000], [RFC9001], and [RFC9002], providing a secure end-to-end
+   transport that is also expected to work well through NATs and
+   firewalls.  Beyond this baseline, real-time applications can benefit
+   from QUIC extensions such as unreliable QUIC datagrams [RFC9221],
+   which provides additional desirable properties for real-time traffic
+   (e.g., no unnecessary retransmissions, avoiding head-of-line
+   blocking).
+
+   Moreover, with QUIC's multiplexing capabilities, reliable and
+   unreliable transport connections as, e.g., needed for WebRTC, can be
+   established with only a single port used at either end of the
+   connection.
+
+1.2.  What's in Scope for this Specification
+
+   This document defines a mapping for RTP and RTCP over QUIC (this
+   mapping is hereafter referred to as "RTP-over-QUIC"), and describes
+   ways to reduce the amount of RTCP traffic by leveraging state
+   information readily available within a QUIC endpoint.  This document
+   also describes different options for implementing congestion control
+   and rate adaptation for RoQ.
+
+   This specification focuses on providing a secure encapsulation of RTP
+   packets for transmission over QUIC.  The expected usage is wherever
+   RTP is used to carry media packets, allowing QUIC in place of other
+   transport protocols such as TCP, UDP, SCTP, DTLS, etc.  That is, we
+   expect RTP-over-QUIC to be used in contexts in which a signaling
+   protocol is used to announce or negotiate a media encapsulation and
+   the associated transport parameters (such as IP address, port
+   number).  RTP-over-QUIC is not intended as a stand-alone media
+   transport, although QUIC transport parameters could be statically
+   configured.
+
+   The above implies that RTP-over-QUIC is targeted at peer-to-peer
+   operation; but it may also be used in client-server-style settings,
+   e.g., when talking to a conference server as described in RFC 7667
+   ([RFC7667]), or, if RTP-over-QUIC is used to replace RTSP
+   ([RFC7826]), to a media server.
+
+   Moreover, this document describes how a QUIC implementation and its
+   API can be extended to improve efficiency of the RTP-over-QUIC
+   protocol operation.
+
+   RTP-over-QUIC does not impact the usage of RTP Audio Video Profiles
+   (AVP) ([RFC3551]), or any RTP-based mechanisms, even though it may
+   render some of them unnecessary, e.g., Secure Real-Time Transport
+   Prococol (SRTP) ([RFC3711]) might not be needed, because end-to-end
+   security is already provided by QUIC, and double encryption by QUIC
+   and by SRTP might have more costs than benefits.  Nor does RTP-over-
+   QUIC limit the use of RTCP-based mechanisms, even though some
+   information or functions obtained by using RTCP mechanisms may also
+   be available from the underlying QUIC implementation by other means.
+
+   Between two (or more) endpoints, RTP-over-QUIC supports multiplexing
+   multiple RTP-based media streams within a single QUIC connection and
+   thus using a single (destination IP address, destination port number,
+   source IP address, source port number, protocol) 5-tuple..  We note
+   that multiple independent QUIC connections may be established in
+   parallel using the same destination IP address, destination port
+   number, source IP address, source port number, protocol) 5-tuple.,
+   e.g. to carry different media channels.  These connections would be
+   logically independent of one another.
+
+1.3.  What's Out of Scope for this Specification
+
+   This document does not attempt to enhance QUIC for real-time media or
+   define a replacement for, or evolution of, RTP.  Work to map other
+   media transport protocols to QUIC is under way elsewhere in the IETF.
+
+   RTP-over-QUIC is designed for use with point-to-point connections,
+   because QUIC itself is not defined for multicast operation.  The
+   scope of this document is limited to unicast RTP/RTCP, even though
+   nothing would or should prevent its use in multicast setups once QUIC
+   supports multicast.
+
+   RTP-over-QUIC does not define congestion control and rate adaptation
+   algorithms for use with media.  However, Section 6 discusses options
+   for how congestion control and rate adaptation could be performed at
+   the QUIC and/or at the RTP layer, and how information available at
+   the QUIC layer could be exposed via an API for the benefit of RTP
+   layer implementation.
+
+      *Editor's note:* Need to check whether Section 6 will also
+      describe the QUIC interface that's being exposed, or if that ends
+      up somewhere else in the document.
+
+   RTP-over-QUIC does not define prioritization mechanisms when handling
+   different media as those would be dependent on the media themselves
+   and their relationships.  Prioritization is left to the application
+   using RTP-over-QUIC.
+
+   This document does not cover signaling for session setup.  SDP for
+   RTP-over-QUIC is defined in separate documents such as
+   [I-D.draft-dawkins-avtcore-sdp-rtp-quic], and can be carried in any
+   signaling protocol that can carry SDP, including the Session
+   Initiation Protocol (SIP) ([RFC3261]), Real-Time Protocols for
+   Browser-Based Applications (RTCWeb) ([RFC8825]), or WebRTC-HTTP
+   Ingestion Protocol (WHIP) ([I-D.draft-ietf-wish-whip]).
+
+2.  Terminology and Notation
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+   "OPTIONAL" in this document are to be interpreted as described in BCP
+   14 [RFC2119] [RFC8174] when, and only when, they appear in all
+   capitals, as shown here.
+
+      *Editor's note:* the list of terms below will almost certainly
+      grow in size as the specification matures.
+
+   The following terms are used:
+
+   Congestion Control:  A mechanism to limit the aggregate amount of
+      data that has been sent over a path to a receiver, but has not
+      been acknowledged by the receiver.  This prevents a sender from
+      overwhelming the capacity of a path between a sender and a
+      receiver, causing some outstanding data to be discarded before the
+      receiver can receive the data and acknowledge it to the sender.
+
+   Datagram:  Datagrams exist in UDP as well as in QUIC's unreliable
+      datagram extension.  If not explicitly noted differently, the term
+      datagram in this document refers to a QUIC Datagram as defined in
+      [RFC9221].
+
+   Delay-based or Low-latency congestion control algorithm:  A
+      congestion control algorithm that aims at keeping queues, and thus
+      the latency, at intermediary network elements as short as
+      possible.  Delay-based congestion control algorithms use, for
+      example, an increasing one-way delay as a signal of congestion.
+
+   Endpoint:  A QUIC server or client that participates in an RoQ
+      session.
+
+   Frame:  A QUIC frame as defined in [RFC9000].
+
+   Loss-based congestion control algorithm:  A congestion control
+      algorithm that uses packet loss, or an Explicit Congestion
+      Notification (ECN) that is interpreted as loss (as in [RFC3168]),
+      as a signal for congestion.  Loss-based congestion control
+      algorithms allow senders to send data on a path until packets are
+      dropped by intermediary network elements, which the algorithm
+      treats as a signal of congestion.
+
+   Media Encoder:  An entity that is used by an application to produce a
+      stream of encoded media, which can be packetized in RTP packets to
+      be transmitted over QUIC.
+
+   QUIC congestion controller:  A software component of an application's
+      QUIC implementation that implements a congestion control
+      algorithm.
+
+   Rate Adaptation:  A congestion control mechanism that helps a sender
+      determine and adjust its sending rate, in order to maximize the
+      amount of information that is sent to a receiver, without causing
+      queues to build beyond a reasonable amount, causing "buffer bloat"
+      and "jitter".  Rate adapation is one way to accomplish congestion
+      control for real-time media, especially when a sender has multiple
+      media streams to the receiver, because the sum of all sending
+      rates for media streams must not be high enough to cause
+      congestion on the path these media streams share between sender
+      and receiver.
+
+   Receiver:  An endpoint that receives media in RTP packets and may
+      send or receive RTCP packets.
+
+   RTP congestion controller:  A software component of an application's
+      RTP implementation that implements a congestion control algorithm.
+
+   Sender:  An endpoint that sends media in RTP packets and may send or
+      receive RTCP packets.
+
+   Packet diagrams in this document use the format defined in
+   Section 1.3 of [RFC9000] to illustrate the order and size of fields.
+
+3.  Protocol Overview
+
+   This document introduces a mapping of the Real-time Transport
+   Protocol (RTP) to the QUIC transport protocol.  RoQ allows the use of
+   QUIC streams and QUIC datagrams to transport real-time data, and
+   thus, the QUIC implementation MUST support QUIC's datagram extension,
+   if RTP packets should be sent over QUIC datagrams.  Since datagram
+   frames cannot be fragmented, the QUIC implementation MUST also
+   provide a way to query the maximum datagram size so that an
+   application can create RTP packets that always fit into a QUIC
+   datagram frame.
+
+   [RFC3550] specifies that RTP sessions need to be transmitted on
+   different transport addresses to allow multiplexing between them.
+   RoQ uses a different approach to leverage the advantages of QUIC
+   connections without managing a separate QUIC connection per RTP
+   session.  QUIC does not provide demultiplexing between different
+   flows on datagrams but suggests that an application implement a
+   demultiplexing mechanism if required.  An example of such a mechanism
+   are flow identifiers prepended to each datagram frame as described in
+   Section 2.1 of [I-D.draft-ietf-masque-h3-datagram].  RoQ uses a flow
+   identifier to replace the network address and port number to
+   multiplex many RTP sessions over the same QUIC connection.
+
+   A rate adaptation algorithm can be plugged in to adapt the media
+   bitrate to the available bandwidth.  This document does not mandate
+   any specific rate adaptation algorithm, because the desired response
+   to congestion can be application and codec-specific.  For example,
+   adjusting quantization in response to congestion may work well in
+   many cases, but if what's being shared is video that includes text,
+   maintaining readability is important.
+
+   As of this writing, the IETF has produced two Experimental-track rate
+   adaptation specifications, Network-Assisted Dynamic Adaptation (NADA)
+   [RFC8698] and Self-Clocked Rate Adaptation for Multimedia (SCReAM)
+   [RFC8298].  These rate adaptation algorithms require some feedback
+   about the network's performance to calculate target bitrates.
+   Traditionally this feedback is generated at the receiver and sent
+   back to the sender via RTCP.
+
+   Since QUIC also collects some metrics about the network's
+   performance, these metrics can be used to generate the required
+   feedback at the sender-side and provide it to the rate adaptation
+   algorithm to avoid the additional overhead of the RTCP stream.  This
+   is discussed in more detail in Section 7.
+
+3.1.  Supported RTP Topologies
+
+   RoQ only supports some of the RTP topologies described in [RFC7667].
+   Most notably, due to QUIC [RFC9000] being a purely IP unicast
+   protocol at the time of writing, RoQ cannot be used as a transport
+   protocol for any of the paths that rely on IP multicast in several
+   multicast topologies (e.g., _Topo-ASM_, _Topo-SSM_, _Topo-SSM-RAMS_).
+
+   Some "multicast topologies" can include IP unicast paths (e.g.,
+   _Topo-SSM_, _Topo-SSM-RAMS_).  In these cases, the unicast paths can
+   use RoQ.
+
+   RTP supports different types of translators and mixers.  Whenever a
+   middlebox such as a translator or a mixer needs to access the content
+   of RTP/RTCP-packets, the QUIC connection has to be terminated at that
+   middlebox.
+
+   RoQ streams (see Section 5.2) can support much larger RTP packet
+   sizes than other transport protocols such as UDP can, which can lead
+   to problems with transport translators which translate from RoQ to
+   RTP over a different transport protocol.  A similar problem can occur
+   if a translator needs to translate from RTP over UDP to RoQ
+   datagrams, where the MTU of a QUIC datagram may be smaller than the
+   MTU of a UDP datagram.  In both cases, the translator may need to
+   rewrite the RTP packets to fit into the smaller MTU of the other
+   protocol.  Such a translator may need codec-specific knowledge to
+   packetize the payload of the incoming RTP packets in smaller RTP
+   packets.
+
+   Additional details are provided in the following table.
+
+   +=======================================+============+========+==========+
+   |RFC 7667 Section                       |Shortcut    |RTP over|Comments  |
+   |                                       |Name        |QUIC?   |          |
+   +=======================================+============+========+==========+
+   |3.1                                    |Topo-Point- |yes     |          |
+   |(https://datatracker.ietf.org/doc/html/|to-Point    |        |          |
+   |rfc7667#section-3.1)                   |            |        |          |
+   +---------------------------------------+------------+--------+----------+
+   |3.2.1.1                                |Topo-PtP-   |yes     |Note-NAT  |
+   |(https://datatracker.ietf.org/doc/html/|Relay       |        |          |
+   |rfc7667#section-3.2.1.1)               |            |        |          |
+   +---------------------------------------+------------+--------+----------+
+   |3.2.1.2                                |Topo-Trn-   |yes     |Note-MTU  |
+   |(https://datatracker.ietf.org/doc/html/|Translator  |        |Note-SEC  |
+   |rfc7667#section-3.2.1.2)               |            |        |          |
+   +---------------------------------------+------------+--------+----------+
+   |3.2.1.3                                |Topo-Media- |yes     |Note-MTU  |
+   |(https://datatracker.ietf.org/doc/html/|Translator  |        |          |
+   |rfc7667#section-3.2.1.3)               |            |        |          |
+   +---------------------------------------+------------+--------+----------+
+   |3.2.2                                  |Topo-Back-  |yes     |Note-SEC  |
+   |(https://datatracker.ietf.org/doc/html/|To-Back     |        |Note-MTU  |
+   |rfc7667#section-3.2.2)                 |            |        |Note-MCast|
+   +---------------------------------------+------------+--------+----------+
+   |3.3.1                                  |Topo-ASM    |no      |Note-MCast|
+   |(https://datatracker.ietf.org/doc/html/|            |        |          |
+   |rfc7667#section-3.3.1)                 |            |        |          |
+   +---------------------------------------+------------+--------+----------+
+   |3.3.2                                  |Topo-SSM    |partly  |Note-MCast|
+   |(https://datatracker.ietf.org/doc/html/|            |        |Note-     |
+   |rfc7667#section-3.3.2)                 |            |        |UCast-    |
+   |                                       |            |        |MCast     |
+   +---------------------------------------+------------+--------+----------+
+   |3.3.3                                  |Topo-SSM-   |partly  |Note-MCast|
+   |(https://datatracker.ietf.org/doc/html/|RAMS        |        |Note-     |
+   |rfc7667#section-3.3.3)                 |            |        |MCast-    |
+   |                                       |            |        |UCast     |
+   +---------------------------------------+------------+--------+----------+
+   |3.4                                    |Topo-Mesh   |yes     |Note-MCast|
+   |(https://datatracker.ietf.org/doc/html/|            |        |          |
+   |rfc7667#section-3.4)                   |            |        |          |
+   +---------------------------------------+------------+--------+----------+
+   |3.5.1                                  |Topo-PtM-   |possibly|Note-MCast|
+   |(https://datatracker.ietf.org/doc/html/|Trn-        |        |Note-MTU  |
+   |rfc7667#section-3.5.1)                 |Translator  |        |Note-Topo-|
+   |                                       |            |        |PtM-Trn-  |
+   |                                       |            |        |Translator|
+   +---------------------------------------+------------+--------+----------+
+   |3.6                                    |Topo-Mixer  |possibly|Note-MCast|
+   |(https://datatracker.ietf.org/doc/html/|            |        |Note-Topo-|
+   |rfc7667#section-3.6)                   |            |        |Mixer     |
+   +---------------------------------------+------------+--------+----------+
+   |3.6.1                                  |Media-      |partly  |Note-Topo-|
+   |(https://datatracker.ietf.org/doc/html/|Mixing-Mixer|        |Mixer     |
+   |rfc7667#section-3.6.1)                 |            |        |          |
+   +---------------------------------------+------------+--------+----------+
+   |3.6.2                                  |Media-      |partly  |Note-Topo-|
+   |(https://datatracker.ietf.org/doc/html/|Switching-  |        |Mixer     |
+   |rfc7667#section-3.6.2)                 |Mixer       |        |          |
+   +---------------------------------------+------------+--------+----------+
+   |3.7                                    |Selective   |yes     |Note-MCast|
+   |(https://datatracker.ietf.org/doc/html/|Forwarding  |        |Note-Topo-|
+   |rfc7667#section-3.7)                   |Middlebox   |        |Mixer     |
+   +---------------------------------------+------------+--------+----------+
+   |3.8                                    |Topo-Video- |yes     |Note-MTU  |
+   |(https://datatracker.ietf.org/doc/html/|switch-MCU  |        |Note-MCast|
+   |rfc7667#section-3.8)                   |            |        |Note-Topo-|
+   |                                       |            |        |Mixer     |
+   +---------------------------------------+------------+--------+----------+
+   |3.9                                    |Topo-RTCP-  |yes     |Note-MTU  |
+   |(https://datatracker.ietf.org/doc/html/|terminating-|        |Note-MCast|
+   |rfc7667#section-3.9)                   |MCU         |        |Note-Topo-|
+   |                                       |            |        |Mixer     |
+   +---------------------------------------+------------+--------+----------+
+   |3.10                                   |Topo-Split- |yes     |Note-MCast|
+   |(https://datatracker.ietf.org/doc/html/|Terminal    |        |          |
+   |rfc7667#section-3.10)                  |            |        |          |
+   +---------------------------------------+------------+--------+----------+
+   |3.11                                   |Topo-       |Possibly|Note-Warn,|
+   |(https://datatracker.ietf.org/doc/html/|Asymmetric  |        |Note-     |
+   |rfc7667#section-3.11)                  |            |        |MCast,    |
+   |                                       |            |        |Note-MTU  |
+   +---------------------------------------+------------+--------+----------+
+
+                                  Table 1
+
+   Note-NAT:  QUIC [RFC9000] doesn't support NAT traversal.
+
+   Note-MTU:  Supported, but may require MTU adaptation.
+
+   Note-Sec:  Note that RTP-over-QUIC provides mandatory security, and
+      other RTP transports do not.  Section 10 describes strategies to
+      prevent the inadvertent disclosure of RTP sessions to unintended
+      third parties.
+
+   Note-MCast:  QUIC [RFC9000] cannot be used for multicast paths.
+
+   Note-UCast-MCast:  The topology refers to a _Distribution Source_,
+      which receives and relays RTP from a number of different media
+      senders via unicast before relaying it to the receivers via
+      multicast.  QUIC can be used between the senders and the
+      _Distribution Source_.
+
+   Note-MCast-UCast:  The topology refers to a _Burst Source_ or
+      _Retransmission Source_, which retransmits RTP to receivers via
+      unicast.  QUIC can be used between the _Retransmission Source_ and
+      the receivers.
+
+   Note-Topo-PtM-Trn-Translator:  Supports unicast paths between RTP
+      sources and translators.
+
+   Note-Topo-Mixer:  Supports unicast paths between RTP senders and
+      mixers.
+
+   Note-Warn:  Quote from [RFC7667]: _This topology is so problematic
+      and it is so easy to get the RTCP processing wrong, that it is NOT
+      RECOMMENDED to implement this topology._
+
+4.  Connection Establishment and ALPN
+
+   QUIC requires the use of ALPN [RFC7301] tokens during connection
+   setup.  RoQ uses "rtp-mux-quic" as ALPN token in the TLS handshake
+   (see also Section 11.
+
+   Note that the use of a given RTP profile is not reflected in the ALPN
+   token even though it could be considered part of the application
+   usage.  This is simply because different RTP sessions, which may use
+   different RTP profiles, may be carried within the same QUIC
+   connection.
+
+      *Editor's note:* "rtp-mux-quic" indicates that RTP and other
+      protocols may be multiplexed on the same QUIC connection using a
+      flow identifier as described in Section 5.  Applications are
+      responsible for negotiation of protocols in use by appropriate use
+      of a signaling protocol such as SDP.
+
+      *Editor's note:* This implies that applications cannot use RoQ as
+      specified in this document over WebTransport.
+
+4.1.  Draft version identification
+
+      *RFC Editor's note:* Please remove this section prior to
+      publication of a final version of this document.
+
+   RoQ uses the token "rtp-mux-quic" to identify itself in ALPN.
+
+   Only implementations of the final, published RFC can identify
+   themselves as "rtp-mux-quic".  Until such an RFC exists,
+   implementations MUST NOT identify themselves using this string.
+
+   Implementations of draft versions of the protocol MUST add the string
+   "-" and the corresponding draft number to the identifier.  For
+   example, draft-ietf-avtcore-rtp-over-quic-04 is identified using the
+   string "rtp-mux-quic-04".
+
+   Non-compatible experiments that are based on these draft versions
+   MUST append the string "-" and an experiment name to the identifier.
+
+5.  Encapsulation
+
+   This section describes the encapsulation of RTP/RTCP packets in QUIC.
+
+   QUIC supports two transport methods: streams [RFC9000] and datagrams
+   [RFC9221].  This document specifies mappings of RTP to both of the
+   transport modes.  Senders MAY combine both modes by sending some RTP/
+   RTCP packets over the same or different QUIC streams and others in
+   QUIC datagrams.
+
+   Section 5.1 introduces a multiplexing mechanism that supports
+   multiplexing RTP, RTCP, and, with some constraints, other non-RTP
+   protocols.  Section 5.2 and Section 5.3 explain the specifics of
+   mapping RTP to QUIC streams and QUIC datagrams, respectively.
+
+5.1.  Multiplexing
+
+   RoQ uses flow identifiers to multiplex different RTP, RTCP, and non-
+   RTP data streams on a single QUIC connection.  A flow identifier is a
+   QUIC variable-length integer as described in Section 16 of [RFC9000].
+   Each flow identifier is associated with a stream of RTP packets, RTCP
+   packets, or a data stream of a non-RTP protocol.
+
+   In a QUIC connection using the ALPN token defined in Section 4, every
+   QUIC datagram and every QUIC stream MUST start with a flow
+   identifier.  A peer MUST NOT send any data in a datagram or stream
+   that is not associated with the flow identifier which started the
+   datagram or stream.
+
+   RTP and RTCP packets of different RTP sessions MUST use distinct flow
+   identifiers.  If peers wish to send multiple types of media in a
+   single RTP session, they MAY do so by following [RFC8860].
+
+   A single RTP session MAY be associated with one or two flow
+   identifiers.  Thus, it is possible to send RTP and RTCP packets
+   belonging to the same session using different flow identifiers.  RTP
+   and RTCP packets of a single RTP session MAY use the same flow
+   identifier (following the procedures defined in [RFC5761], or they
+   MAY use different flow identifiers.
+
+   The association between flow identifiers and data streams MUST be
+   negotiated using appropriate signaling.  Applications MAY send data
+   using flow identifiers not associated with any RTP or RTCP stream.
+   If a receiver cannot associate a flow identifier with any RTP/RTCP or
+   non-RTP stream, it MAY drop the data stream.
+
+   There are different use cases for sharing the same QUIC connection
+   between RTP and non-RTP data streams.  Peers might use the same
+   connection to exchange signaling messages or exchange data while
+   sending and receiving media streams.  The semantics of non-RTP
+   datagrams or streams are not in the scope of this document.  Peers
+   MAY use any protocol on top of the encapsulation described in this
+   document.
+
+   Flow identifiers introduce some overhead in addition to the header
+   overhead of RTP/RTCP and QUIC.  QUIC variable-length integers require
+   between one and eight bytes depending on the number expressed.  Thus,
+   it is advisable to use low numbers first and only use higher ones if
+   necessary due to an increased number of flows.
+
+5.2.  QUIC Streams
+
+   To send RTP/RTCP packets over QUIC streams, a sender MUST open a new
+   unidirectional QUIC stream.  Streams are unidirectional because there
+   is no synchronous relationship between sent and received RTP/RTCP
+   packets.  A sender MAY open new QUIC streams for different packets
+   using the same flow identifier, for example, to avoid head-of-line
+   blocking.
+
+   Figure 1 shows the encapsulation format for RoQ Streams.
+
+   Payload {
+     Flow Identifier (i),
+     RTP/RTCP Payload(..) ...,
+   }
+
+                    Figure 1: RoQ Streams Payload Format
+
+   Flow Identifier:  Flow identifier to demultiplex different data flows
+      on the same QUIC connection.
+
+   RTP/RTCP Payload:  Contains the RTP/RTCP payload; see Figure 2
+
+   The payload in a QUIC stream starts with the flow identifier followed
+   by one or more RTP/RTCP payloads.  All RTP/RTCP payloads sent on a
+   stream MUST belong to the RTP session with the same flow identifier.
+
+   Each payload begins with a length field indicating the length of the
+   RTP/RTCP packet, followed by the packet itself, see Figure 2.
+
+   RTP/RTCP Payload {
+     Length(i),
+     RTP/RTCP Packet(..),
+   }
+
+                Figure 2: RTP/RTCP payload for QUIC streams
+
+   Length:  A QUIC variable length integer (see Section 16 of [RFC9000])
+      describing the length of the following RTP/RTCP packets in bytes.
+
+   RTP/RTCP Packet:  The RTP/RTCP packet to transmit.
+
+   If a sender knows that a packet, which was not yet successfully and
+   completely transmitted, is no longer needed, the sender MAY close the
+   stream by sending a RESET_STREAM frame.
+
+   QUIC allows an application to abort reading the stream and specify an
+   error code Section 3.5 of [RFC9000].  An RTP receiver can signal this
+   to the RTP sender by sending a QUIC STOP_SENDING frame, which is
+   exported to the RTP sender through the ROQ API, as described in
+   Section 8.  The RTP-sender SHOULD not interpret the reception of
+   STOP_SENDING as an indication that the RTP receiver lost interest in
+   the media stream as a whole, but rather that a part of the media
+   stream was not received timely.  In this case, the late data could
+   also delay the following media frames due to head-of-line blocking,
+   which the sender can avoid by transmitting new media frames on new
+   QUIC streams.  A sender that receives STOP_SENDING MUST NOT
+   retransmit any media frames already sent on the QUIC stream, on which
+   it received the STOP_SENDING, on a new QUIC stream.  An RTP sender
+   SHOULD instead continue to send media frames on new QUIC streams
+   starting with the first frame that was not transmitted on the stream
+   that received STOP_SENDING.
+
+   Note that an RTP receiver cannot request a reset of only a particular
+   media frame because the sending QUIC implementation might already
+   have sent data for the following frame on the same stream.  In that
+   case, STOP_SENDING might lead to unintentionally skipping one or more
+   frames.
+
+      *Editor's note:* A receiver cannot cancel a certain frame but
+      still receive retransmissions for a frame the was following on the
+      same stream using STOP_SENDING, because STOP_SENDING does not
+      include an offset which would allow signaling where
+      retransmissions should continue.  If this is a required feature
+      for RoQ, it could be implemented using an extended STOP_SENDING
+      frame as, for example, proposed in
+      [I-D.draft-thomson-quic-enough-00].
+
+   A translator that translates between two endpoints, both connected
+   via QUIC, MUST forward RESET_STREAM frames received from one end to
+   the other unless it forwards the RTP packets on QUIC datagrams.
+
+   Large RTP packets sent on a stream will be fragmented into smaller
+   QUIC frames.  The QUIC frames are transmitted reliably and in order
+   such that a receiving application can read a complete RTP packet from
+   the stream as long as the stream is not closed with a RESET_STREAM
+   frame.  No retransmission has to be implemented by the application
+   since QUIC frames lost in transit are retransmitted by QUIC.
+
+   Opening new streams for new packets MAY implicitly limit the number
+   of packets concurrently in transit because the QUIC receiver provides
+   an upper bound of parallel streams, which it can update using QUIC
+   MAX_STREAMS frames.  The number of packets that have to be
+   transmitted concurrently depends on several factors, such as the
+   number of RTP streams within a QUIC connection, the bitrate of the
+   media streams, and the maximum acceptable transmission delay of a
+   given packet.  Receivers are responsible for providing senders enough
+   credit to open new streams for new packets anytime.  As an example,
+   consider a conference scenario with 20 participants.  Each
+   participant receives audio and video streams of every other
+   participant from a central server.  If the sender opens a new QUIC
+   stream for every frame at 30 frames per second video and 50 frames
+   per second audio, it will open 1520 new QUIC streams per second.  A
+   receiver must provide at least that many credits for opening new
+   unidirectional streams to the server every second.  In addition, the
+   receiver should also consider the requirements of protocols into
+   account that are multiplexed with RTP, including RTCP and data
+   streams.  These considerations may also be relevant when implementing
+   signaling since it may be necessary to inform the receiver about how
+   fast and how much stream credits it will have to provide to the
+   media-sending peer.
+
+5.3.  QUIC Datagrams
+
+   Senders can also transmit RTP packets in QUIC datagrams.  QUIC
+   datagrams are an extension to QUIC described in [RFC9221].  QUIC
+   datagrams preserve frame boundaries.  Thus, a single RTP packet can
+   be mapped to a single QUIC datagram without additional framing.
+   Senders SHOULD consider the header overhead associated with QUIC
+   datagrams and ensure that the RTP/RTCP packets, including their
+   payloads, flow identifier, QUIC, and IP headers, will fit into path
+   MTU.
+
+   Figure 3 shows the encapsulation format for RoQ Datagrams.
+
+   Payload {
+     Flow Identifier (i),
+     RTP/RTCP Packet (..),
+   }
+
+                   Figure 3: RoQ Datagram Payload Format
+
+   Flow Identifier:  Flow identifier to demultiplex different data flows
+      on the same QUIC connection.
+
+   RTP/RTCP Packet:  The RTP/RTCP packet to transmit.
+
+   Since QUIC datagrams are not retransmitted on loss (see also
+   Section 7.3 for loss signaling), if an application wishes to
+   retransmit lost RTP packets, the retransmission has to be implemented
+   by the application.  RTP retransmissions can be done in the same RTP
+   session or a separate RTP session [RFC4588] and the flow identifier
+   MUST be set to the flow identifier of the RTP session in which the
+   retransmission happens.
+
+6.  Congestion Control and Rate Adaptation
+
+   Like any other application on the internet, RoQ applications need a
+   mechanism to perform congestion control to avoid overloading the
+   network.  While any generic congestion controller can protect the
+   network, this document takes advantage of the opportunity to use rate
+   adaptation mechanisms that are designed to provide superior user
+   experiences for real-time media applications.
+
+   A wide variety of rate adaptation algorithms for real-time media have
+   been developed (for example, "Google Congestion Controller"
+   [I-D.draft-ietf-rmcat-gcc]).  The IETF has defined two algorithms in
+   two Experimental RFCs (e.g.  SCReAM [RFC8298] and NADA [RFC8698]).
+   These rate adaptation algorithms for RTP are specifically tailored
+   for real-time transmissions at low latencies, but this section would
+   apply to any rate adaptation algorithm that meets the requirements
+   described in "Congestion Control Requirements for Interactive Real-
+   Time Media" [RFC8836].
+
+   This document defines two architectures for congestion control and
+   bandwidth estimation for RoQ, depending on whether most rate
+   adaptation is performed within a QUIC implementation at the transport
+   layer, as described in Section 6.1, or within an RTP application
+   layer, as described in Section 6.2, but this document does not
+   mandate any specific congestion control or rate adaptation algorithm
+   for either QUIC or RTP.
+
+   This document also gives guidance about avoiding problems with
+   "nested" congestion controllers, in Section 6.3.
+
+   This document also discusses congestion control implications of using
+   shared or multiple separate QUIC connections to send and receive
+   multiple independent data streams, in Section 6.4.
+
+   It is assumed that the congestion controller in use provides a pacing
+   mechanism to determine when a packet can be sent to avoid bursts.
+   The currently proposed congestion control algorithms for real-time
+   communications (e.g.  SCReAM and NADA) provide such pacing
+   mechanisms.  The use of congestion controllers which don't provide a
+   pacing mechanism is out of scope of this document.
+
+6.1.  Congestion Control at the Transport Layer
+
+   QUIC is a congestion controlled transport protocol.  Senders are
+   required to employ some form of congestion control.  The default
+   congestion control specified for QUIC in [RFC9002] is similar to TCP
+   NewReno [RFC6582], but senders are free to choose any congestion
+   control algorithm as long as they follow the guidelines specified in
+   Section 3 of [RFC8085], and QUIC implementors make use of this
+   freedom.
+
+   If a QUIC implementation is to perform rate adaptation in a way that
+   accommodates real-time media, one way for the implementation to
+   recognize that it is carrying real-time media is to be explicitly
+   told that this is the case.  This document defines a new "TLS
+   Application-Layer Protocol Negotiation (ALPN) Protocol ID", as
+   described in Section 4, that a QUIC implementation can use as a
+   signal to choose a real-time media-centric rate controller, but this
+   is not required for ROQ deployments.
+
+   If congestion control is to be applied at the transport layer, it is
+   RECOMMENDED that the QUIC Implementation uses a congestion controller
+   that keeps queueing delays short to keep the transmission latency for
+   RTP and RTCP packets as low as possible, such as the IETF-defined
+   SCReAM [RFC8298] and NADA [RFC8698] algorithms.
+
+   Many low latency congestion control algorithms depend on detailed
+   arrival time feedback to estimate the current one-way delay between
+   sender and receiver.  QUIC does not provide arrival timestamps in its
+   acknowledgments.  The QUIC implementations of the sender and receiver
+   can use an extension to add this information to QUICs acknowledgment
+   frames, e.g.  [I-D.draft-smith-quic-receive-ts] or
+   [I-D.draft-huitema-quic-ts].
+
+   If congestion control is done by the QUIC implementation, the
+   application needs a mechanism to query the currently available
+   bandwidth to adapt media codec configurations.  The employed
+   congestion controller of the QUIC connection SHOULD expose such an
+   API to the application.  If a current bandwidth estimate is not
+   available from the QUIC congestion controller, the sender can either
+   implement an alternative bandwidth estimation at the application
+   layer as described in Section 6.2 or a receiver can feedback the
+   observed bandwidth through RTCP, e.g., using
+   [I-D.draft-alvestrand-rmcat-remb].
+
+6.2.  Congestion Control at the RTP Application Layer
+
+   RTP itself does not specify a congestion control algorithm, but
+   [RFC8888] defines an RTCP feedback message intended to enable rate
+   adaptation for interactive real-time traffic using RTP, and
+   successful rate adaptation will accomplish congestion control as
+   well.
+
+   The rate adaptation algorithms for RTP are specifically tailored for
+   real-time transmissions at low latencies, as described in Section 6.
+   The available rate adaptation algorithms expose a target_bitrate that
+   can be used to dynamically reconfigure media codecs to produce media
+   at a rate that can be sent in real-time under the observed network
+   conditions.
+
+   If an application cannot access a bandwidth estimation from the QUIC
+   layer, or the QUIC implementation does not support a delay-based,
+   low-latency congestion control algorithm, the application can
+   alternatively implement a bandwidth estimation algorithm at the
+   application layer.  Calculating a bandwidth estimation at the
+   application layer can be done using the same bandwidth estimation
+   algorithms as described in Section 6 (NADA, SCReAM).  The bandwidth
+   estimation algorithm typically needs some feedback on the
+   transmission performance.  This feedback can be collected following
+   the guidelines in Section 7.
+
+6.3.  Resolving Interactions Between QUIC and Application-layer
+      Congestion Control
+
+   Because QUIC is a congestion-controlled transport, as described in
+   Section 6.1, and RTP applications can also perform congestion control
+   and rate adaptation, as described in Section 6.2, implementers should
+   be aware of the possibility that these "nested" congestion control
+   loops, where both controllers are managing rate adaptation for the
+   same packet stream independently, may deliver problematic
+   performance.  Because this document is describing a specific case
+   (media transport), we can provide some guidance to avoid the worst
+   possible problems.
+
+   *  *Application-limited Media Flows* - if an application chooses RTP
+      as its transport mechanism, the goal will be maximizing the user
+      experience, not maximizing path bandwidth utilization.  If the
+      application is, in fact, transmitting media that does not saturate
+      path bandwidth, and paces its transmission, more heavy-handed
+      congestion control mechanisms (drastic reductions in the sending
+      rate when loss is detected, with much slower increases when losses
+      are no longer detected) should rarely come into play.  If the
+      application chooses ROQ as its transport, sends enough media to
+      saturate the path bandwidth, and does not adapt its own sending
+      rate, drastic measures will be required in order to avoid
+      sustained or oscillating congestion along the path.
+
+   *  *Awareness of Bufferbloat* - modern general-purpose congestion
+      controllers do not adjust their sending rates based only on packet
+      loss.  For example, BBR ("Bottleneck Bandwidth and Round-trip
+      propagation time") [I-D.cardwell-iccrg-bbr-congestion-control]
+      describes its strategy for adapting sending rates in this way:
+
+      (BBR) "uses recent measurements of a transport connection's
+      delivery rate, round-trip time, and packet loss rate to build an
+      explicit model of the network path.  BBR then uses this model to
+      control both how fast it sends data and the maximum volume of data
+      it allows in flight in the network at any time."
+
+6.4.  Sharing QUIC connections
+
+   Two endpoints may establish channels in order to exchange more than
+   one type of data simultaneously.  The channels can be intended to
+   carry real-time RTP data or other non-real-time data.  This can be
+   realized in different ways.
+
+   *  One straightforward solution is to establish multiple QUIC
+      connections, one for each channel, whether the channel is used for
+      real-time media or non-real-time data.  This is a straightforward
+      solution, but has the disadvantage that transport ports are more
+      quickly exhausted and these are limited by the 16-bit UDP source
+      and destination port number sizes [RFC768].
+
+   *  Alternatively, all real-time channels are mapped to one QUIC
+      connection, while a separate QUIC connection is created for the
+      non-real-time channels.
+
+   In both cases, the congestion controllers can be chosen to match the
+   demands of the respective channels and the different QUIC connections
+   will compete for the same resources in the network.  No local
+   prioritization of data across the different (types of) channels would
+   be necessary.
+
+   Although it is possible to multiplex (all or a subset of) real-time
+   and non-real-time channels onto a single, shared QUIC connection,
+   which can be done by using the flow identifier described in
+   Section 5.1, the underlying QUIC implementation will likely use the
+   same congestion controller for all channels in the shared QUIC
+   connection.  For this reason, applications multiplexing multiple
+   streams in one connection SHOULD implement some form of stream
+   prioritization or bandwidth allocation.
+
+7.  Replacing RTCP and RTP Header Extensions with QUIC Feedback
+
+   Because RTP has so often used UDP as its underlying transport
+   protocol, and receiving little or no feedback from UTP, RTP
+   implementations rely on feedback from the RTP Control Protocol (RTCP)
+   so that RTP senders and receivers can exchange control information to
+   monitor connection statistics and to identify and synchronize
+   streams.
+
+   Because QUIC provides its own transport-level feedback, at least some
+   RTP transport level feedback can be replaced with current QUIC
+   feedback [rfc9000].  In adition, RTP-level feedback that is not
+   available in QUIC by default can be replaced with generally useful
+   QUIC extensions.  Examples of these extentions include:
+
+   *  Arrival timestamps, which are not part of QUIC's default
+      acknowledgment frames, but can be added using
+      [I-D.draft-smith-quic-receive-ts] or [I-D.draft-huitema-quic-ts],
+      or
+
+   *  Adjusting the frequency of QUIC acknowledgments, using
+      [I-D.draft-ietf-quic-ack-frequency].
+
+   When statistics contained in RTCP packets are also available from
+   QUIC, or can be derived from statistics available from QUIC, it is
+   desireable to provide these statistics at only one protocol layer.
+   This avoids consumption of bandwidth to deliver duplicated control
+   information.  Because QUIC relies on certain frames being sent, it is
+   not possible to supress QUIC signaling in favor of RTCP signaling, so
+   if bandwidth is to be conserved, this must be accomplished by
+   surpressing RTCP signaling in favor of QUIC signalling.
+
+   This document specifies a baseline for replacing some of the RTCP
+   packet types by mapping the contents to QUIC connection statistics.
+   Future documents can extend this mapping for other RTCP format types,
+   and can make use of new QUIC extensions that become available over
+   time.
+
+   Most statements about "QUIC" in Section 7 are applicable to both RTP
+   encapsulated in QUIC streams and RTP encapsulated in QUIC datagrams.
+   The differences are described in Section 7.1 and Section 7.2.
+
+      *Editor's Note:* Additional discussion of bandwidth minimization
+      could go in this section, or in an earlier proposed section on
+      motivations for defining and deploying RoQ.
+
+   While RoQ places no restrictions on applications sending RTCP, this
+   document assumes that the reason an implementor chooses to support
+   RoQ is to obtain benefits beyond what's available when RTP uses UDP
+   as its underlying transport layer.  It is RECOMMENDED to expose
+   relevant information from the QUIC layer to the application instead
+   of exchanging additional RTCP packets, where applicable.
+
+   Section 7.3 and Section 7.4 discuss what information can be exposed
+   from the QUIC connection layer to reduce the RTCP overhead.
+
+   The list of RTCP packets in this section is not exhaustive and
+   similar considerations SHOULD be taken into account before exchanging
+   any other type of RTCP control packets using RoQ.
+
+   A more complete analysis of RTCP Control Packet Types (in
+   Section 7.5), Generic RTP Feedback (RTPFB) (in Section 7.6), Payload-
+   specific RTP Feedback (PSFB) (in Section 7.7), Extended Reports (in
+   Section 7.8), and RTP Header Extensions (in Section 7.9), including
+   the information that cannot be mapped from QUIC.
+
+7.1.  RoQ Datagrams
+
+   QUIC Datagrams are ack-eliciting packets, which means, that an
+   acknowledgment is triggered when a datagram frame is received.  Thus,
+   a sender can assume that an RTP packet arrived at the receiver or was
+   lost in transit, using the QUIC acknowledgments of QUIC Datagram
+   frames.  In the following, an RTP packet is regarded as acknowledged,
+   when the QUIC Datagram frame that carried the RTP packet, was
+   acknowledged.
+
+7.2.  RoQ Streams
+
+   For RTP packets that are sent over QUIC streams, an RTP packet can be
+   considered acknowledged, when all frames which carried fragments of
+   the RTP packet were acknowledged.
+
+   When QUIC Streams are used, the application should be aware that the
+   direct mapping proposed below may not reflect the real
+   characteristics of the network.  RTP packet loss can seem lower than
+   actual packet loss due to QUIC's automatic retransmissions.
+   Similarly, timing information might be incorrect due to
+   retransmissions.
+
+7.3.  Transport Layer Feedback
+
+   This section explains how some of the RTCP packet types which are
+   used to signal reception statistics can be replaced by equivalent
+   statistics that are already collected by QUIC.  The following list
+   explains how this mapping can be achieved for the individual fields
+   of different RTCP packet types.
+
+7.3.1.  Mapping QUIC Feedback to RTCP Receiver Reports ("RR")
+
+   Considerations for mapping QUIC feedback into _Receiver Reports_
+   (PT=201, Name=RR, [RFC3550]) are:
+
+   *  _Fraction lost_: When RTP packets are carried in QUIC datagrams,
+      the fraction of lost packets can be directly inferred from QUIC's
+      acknowledgments.  The calculation SHOULD include all packets up to
+      the acknowledged RTP packet with the highest RTP sequence number.
+      Later packets SHOULD be ignored, since they may still be in
+      flight, unless other QUIC packets that were sent after the RTP
+      packet, were already acknowledged.
+
+   *  _Cumulative lost_: Similar to the fraction of lost packets, the
+      cumulative loss can be inferred from QUIC's acknowledgments
+      including all packets up to the latest acknowledged packet.
+
+   *  _Highest Sequence Number received_: In RTCP, this field is a
+      32-bit field that contains the highest sequence number a receiver
+      received in an RTP packet and the count of sequence number cycles
+      the receiver has observed.  A sender sends RTP packets in QUIC
+      packets and receives acknowledgments for the QUIC packets.  By
+      keeping a mapping from a QUIC packet to the RTP packets
+      encapsulated in that QUIC packet, the sender can infer the highest
+      sequence number and number of cycles seen by the receiver from
+      QUIC acknowledgments.
+
+   *  _Interarrival jitter_: If QUIC acknowledgments carry timestamps as
+      described in one of the extensions referenced above, senders can
+      infer from QUIC acks the interarrival jitter from the arrival
+      timestamps.
+
+   *  _Last SR_: Similar to RTP arrival times, the arrival time of RTCP
+      Sender Reports can be inferred from QUIC acknowledgments, if they
+      include timestamps.
+
+   *  _Delay since last SR_: This field is not required when the
+      receiver reports are entirely replaced by QUIC feedback.
+
+7.3.2.  Mapping QUIC Feedback to RTCP Negative Acknowledgments* ("NACK")
+
+   Considerations for mapping QUIC feedback into _Negative
+   Acknowledgments_ (PT=205, FMT=1, Name=Generic NACK, [RFC4585]) are:
+
+   *  The generic negative acknowledgment packet contains information
+      about packets which the receiver considered lost.  Section 6.2.1.
+      of [RFC4585] recommends to use this feature only, if the
+      underlying protocol cannot provide similar feedback.  QUIC does
+      not provide negative acknowledgments, but can detect lost packets
+      based on the Gap numbers contained in QUIC ACK frames Section 6 of
+      [RFC9002].
+
+7.3.3.  Mapping QUIC Feedback to RTCP ECN Feedback ("ECN")
+
+   Considerations for mapping QUIC feedback into _ECN Feedback_ (PT=205,
+   FMT=8, Name=RTCP-ECN-FB, [RFC6679]) are:
+
+   *  ECN feedback packets report the count of observed ECN-CE marks.
+      [RFC6679] defines two RTCP reports, one packet type (with PT=205
+      and FMT=8) and a new report block for the extended reports which
+      are listed below.  QUIC supports ECN reporting through
+      acknowledgments.  If the QUIC connection supports ECN, the
+      reporting of ECN counts SHOULD be done using QUIC acknowledgments,
+      rather than RTCP ECN feedback reports.
+
+7.3.4.  Mapping QUIC Feedback to RTCP Congestion Control Feedback
+        ("CCFB")
+
+   Considerations for mapping QUIC feedback into _Congestion Control
+   Feedback_ (PT=205, FMT=11, Name=CCFB, [RFC8888]) are:
+
+   *  RTP Congestion Control Feedback contains acknowledgments, arrival
+      timestamps and ECN notifications for each received packet.
+      Acknowledgments and ECNs can be inferred from QUIC as described
+      above.  Arrival timestamps can be added through extended
+      acknowledgment frames as described in
+      [I-D.draft-smith-quic-receive-ts] or [I-D.draft-huitema-quic-ts].
+
+7.3.5.  Mapping QUIC Feedback to RTCP Extended Report ("XR")
+
+   Considerations for mapping QUIC feedback into _Extended Reports_
+   (PT=207, Name=XR, [RFC3611]) are:
+
+   *  Extended Reports offer an extensible framework for a variety of
+      different control messages.  Some of the standard report blocks
+      which can be implemented in extended reports such as loss RLE or
+      ECNs can be implemented in QUIC, too.
+
+   *  Other report blocks SHOULD be evaluated individually, to determine
+      whether if the contained information can be transmitted using QUIC
+      instead.
+
+7.4.  Application Layer Repair and other Control Messages
+
+   While Section 7.3.1 presented some RTCP packets that can be replaced
+   by QUIC features, QUIC cannot replace all of the defined RTCP packet
+   types.  This mostly affects RTCP packet types which carry control
+   information that is to be interpreted by the RTP application layer,
+   rather than the underlying transport protocol itself.
+
+   *  _Sender Reports_ (PT=200, Name=SR, [RFC3550]) are similar to
+      _Receiver Reports_, as described in Section 7.3.1.  They are sent
+      by media senders and additionally contain an NTP and a RTP
+      timestamp and the number of packets and octets transmitted by the
+      sender.  The timestamps can be used by a receiver to synchronize
+      streams.  QUIC cannot provide a similar control information, since
+      it does not know about RTP timestamps.  Nor can a QUIC receiver
+      calculate the packet or octet counts, since it does not know about
+      lost datagrams.  Thus, sender reports are required in RoQ to
+      synchronize streams at the receiver.  The sender reports SHOULD
+      not contain any receiver report blocks, as the information can be
+      inferred from the QUIC transport as explained in Section 7.3.1.
+
+   In addition to carrying transmission statistics, RTCP packets can
+   contain application layer control information, that cannot directly
+   be mapped to QUIC.  Examples of this information may include:
+
+   *  _Source Description_ (PT=202, Name=SDES), _Bye_ (PT=203, Name=BYE)
+      and _Application_ (PT=204, Name=APP) packet types from [RFC3550],
+      or
+
+   *  many of the payload specific feedback messages (PT=206) defined in
+      [RFC4585], used to control the codec behavior of the sender.
+
+   Since QUIC does not provide any kind of application layer control
+   messaging, QUIC feedback cannot be mapped into these RTCP packet
+   types.  If the RTP application needs this information, the RTCP
+   packet types are used in the same way as they would be used over any
+   other transport protocol.
+
+7.5.  RTCP Control Packet Types
+
+   Several but not all of these control packets and their attributes can
+   be mapped from QUIC, as described in Section 7.3.1.  "Mappable from
+   QUIC" has one of three values: "yes", "QUIC extension required", and
+   "no".
+
+   +============+========+===+=========+=========+====================+
+   |Name        |Shortcut|PT |Defining |Mappable | Comments           |
+   |            |        |   |Document |from QUIC|                    |
+   +============+========+===+=========+=========+====================+
+   |SMPTE time- |SMPTETC |194|[RFC5484]|no       |                    |
+   |code mapping|        |   |         |         |                    |
+   +------------+--------+---+---------+---------+--------------------+
+   |Extended    |IJ      |195|[RFC5450]|QUIC     | _IJ_ was           |
+   |inter-      |        |   |         |extension| introduced to      |
+   |arrival     |        |   |         |required | improve jitter     |
+   |jitter      |        |   |         |         | reports when RTP   |
+   |report      |        |   |         |         | packets are not    |
+   |            |        |   |         |         | sent at the time   |
+   |            |        |   |         |         | indicated by their |
+   |            |        |   |         |         | RTP timestamp.     |
+   |            |        |   |         |         | Jitter can be      |
+   |            |        |   |         |         | calculated using   |
+   |            |        |   |         |         | QUIC timestamps,   |
+   |            |        |   |         |         | because QUIC       |
+   |            |        |   |         |         | timestamps are     |
+   |            |        |   |         |         | added when the     |
+   |            |        |   |         |         | QUIC packet is     |
+   |            |        |   |         |         | actually sent.     |
+   +------------+--------+---+---------+---------+--------------------+
+   |Sender      |SR      |200|[RFC3550]|partly   | - NTP timestamps   |
+   |Reports     |        |   |         |         | cannot be replaced |
+   |            |        |   |         |         | by QUIC and are    |
+   |            |        |   |         |         | required for       |
+   |            |        |   |         |         | synchronization    |
+   |            |        |   |         |         | (but see note      |
+   |            |        |   |         |         | below)             |
+   |            |        |   |         |         | - packet and octet |
+   |            |        |   |         |         | counts cannot be   |
+   |            |        |   |         |         | provided by QUIC   |
+   |            |        |   |         |         | - see below for    |
+   |            |        |   |         |         | _RR_s contained in |
+   |            |        |   |         |         | _SR_s              |
+   +------------+--------+---+---------+---------+--------------------+
+   |Receiver    |RR      |201|[RFC3550]|possibly | - _Fraction        |
+   |Reports     |        |   |         |         | Lost_/_Cumulative  |
+   |            |        |   |         |         | Lost_/_Highest     |
+   |            |        |   |         |         | Sequence Number    |
+   |            |        |   |         |         | received_ can      |
+   |            |        |   |         |         | directly be        |
+   |            |        |   |         |         | inferred from QUIC |
+   |            |        |   |         |         | ACKs               |
+   |            |        |   |         |         | - _Interarrival    |
+   |            |        |   |         |         | Jitter_/_Last SR_  |
+   |            |        |   |         |         | need a QUIC        |
+   |            |        |   |         |         | timestamp          |
+   |            |        |   |         |         | extension.  Using  |
+   |            |        |   |         |         | QUIC ts is         |
+   |            |        |   |         |         | slightly different |
+   |            |        |   |         |         | because it ignores |
+   |            |        |   |         |         | transmission       |
+   |            |        |   |         |         | offsets from RTP   |
+   |            |        |   |         |         | timestamps, but    |
+   |            |        |   |         |         | that seems like a  |
+   |            |        |   |         |         | good thing (see    |
+   |            |        |   |         |         | _IJ_ above)        |
+   +------------+--------+---+---------+---------+--------------------+
+   |Source      |SDES    |202|[RFC3550]|no       |                    |
+   |description |        |   |         |         |                    |
+   +------------+--------+---+---------+---------+--------------------+
+   |Goodbye     |BYE     |203|[RFC3550]|possibly | using QUIC         |
+   |            |        |   |         |         | CONNECTION_CLOSE   |
+   |            |        |   |         |         | frame?             |
+   +------------+--------+---+---------+---------+--------------------+
+   |Application-|APP     |204|[RFC3550]|no       |                    |
+   |defined     |        |   |         |         |                    |
+   +------------+--------+---+---------+---------+--------------------+
+   |Generic RTP |RTPFB   |205|[RFC4585]|partly   | see table below    |
+   |Feedback    |        |   |         |         |                    |
+   +------------+--------+---+---------+---------+--------------------+
+   |Payload-    |PSFB    |205|[RFC4585]|         | see table below    |
+   |specific    |        |   |         |         |                    |
+   +------------+--------+---+---------+---------+--------------------+
+   |extended    |XR      |207|[RFC3611]|partly   | see table below    |
+   |report      |        |   |         |         |                    |
+   +------------+--------+---+---------+---------+--------------------+
+   |AVB RTCP    |AVB     |   |         |         |                    |
+   |packet      |        |   |         |         |                    |
+   +------------+--------+---+---------+---------+--------------------+
+   |Receiver    |RSI     |209|[RFC5760]|         |                    |
+   |Summary     |        |   |         |         |                    |
+   |Information |        |   |         |         |                    |
+   +------------+--------+---+---------+---------+--------------------+
+   |Port Mapping|TOKEN   |210|[RFC6284]|no?      |                    |
+   +------------+--------+---+---------+---------+--------------------+
+   |IDMS        |IDMS    |211|[RFC7272]|no       |                    |
+   |Settings    |        |   |         |         |                    |
+   +------------+--------+---+---------+---------+--------------------+
+   |Reporting   |RGRS    |212|[RFC8861]|         |                    |
+   |Group       |        |   |         |         |                    |
+   |Reporting   |        |   |         |         |                    |
+   |Sources     |        |   |         |         |                    |
+   +------------+--------+---+---------+---------+--------------------+
+   |Splicing    |SNM     |213|[RFC8286]|no       |                    |
+   |Notification|        |   |         |         |                    |
+   |Message     |        |   |         |         |                    |
+   +------------+--------+---+---------+---------+--------------------+
+
+                                 Table 2
+
+7.5.1.  Notes
+
+   *  _SR_ NTP timestamps: We cannot send NTP timestamps in the same
+      format the SRs use, but couldn't a QUIC timestamp extension
+      provide the same information?
+
+7.6.  Generic RTP Feedback (RTPFB)
+
+   +=======+=================+=================+========+================+
+   |Name   |Long Name        |Document         |Mappable|Comments        |
+   |       |                 |                 |from    |                |
+   |       |                 |                 |QUIC    |                |
+   +=======+=================+=================+========+================+
+   |Generic|Generic negative |[RFC4585]        |possibly|Using QUIC ACKs |
+   |NACK   |acknowledgement  |                 |        |                |
+   +-------+-----------------+-----------------+--------+----------------+
+   |TMMBR  |Temporary Maximum|[RFC5104]        |no      |                |
+   |       |Media Stream Bit |                 |        |                |
+   |       |Rate Request     |                 |        |                |
+   +-------+-----------------+-----------------+--------+----------------+
+   |TMMBN  |Temporary Maximum|[RFC5104]        |no      |                |
+   |       |Media Stream Bit |                 |        |                |
+   |       |Rate Notification|                 |        |                |
+   +-------+-----------------+-----------------+--------+----------------+
+   |RTCP-  |RTCP Rapid       |[RFC6051]        |no      |                |
+   |SR-REQ |Resynchronisation|                 |        |                |
+   |       |Request          |                 |        |                |
+   +-------+-----------------+-----------------+--------+----------------+
+   |RAMS   |Rapid Acquisition|[RFC6285]        |no      |                |
+   |       |of Multicast     |                 |        |                |
+   |       |Sessions         |                 |        |                |
+   +-------+-----------------+-----------------+--------+----------------+
+   |TLLEI  |Transport-Layer  |[RFC6642]        |no?     |no way of       |
+   |       |Third-Party Loss |                 |        |telling QUIC    |
+   |       |Early Indication |                 |        |peer "don't ask |
+   |       |                 |                 |        |for             |
+   |       |                 |                 |        |retransmission",|
+   |       |                 |                 |        |but QUIC would  |
+   |       |                 |                 |        |not ask that    |
+   |       |                 |                 |        |anyway, only    |
+   |       |                 |                 |        |RTCP NACK?      |
+   +-------+-----------------+-----------------+--------+----------------+
+   |RTCP-  |RTCP ECN Feedback|[RFC6679]        |partly  |QUIC does not   |
+   |ECN-FB |                 |                 |        |provide info    |
+   |       |                 |                 |        |about duplicates|
+   +-------+-----------------+-----------------+--------+----------------+
+   |PAUSE- |Media Pause/     |[RFC7728]        |no      |                |
+   |RESUME |Resume           |                 |        |                |
+   +-------+-----------------+-----------------+--------+----------------+
+   |DBI    |Delay Budget     |[_3GPP-TS-26.114]|        |                |
+   |       |Information (DBI)|                 |        |                |
+   +-------+-----------------+-----------------+--------+----------------+
+   |CCFB   |RTP Congestion   |[RFC8888]        |possibly|- _ECN_/_ACK_   |
+   |       |Control Feedback |                 |        |natively in QUIC|
+   |       |                 |                 |        |- timestamps    |
+   |       |                 |                 |        |require QUIC    |
+   |       |                 |                 |        |timestamp       |
+   |       |                 |                 |        |extension       |
+   +-------+-----------------+-----------------+--------+----------------+
+
+                                  Table 3
+
+7.7.  Payload-specific RTP Feedback (PSFB)
+
+   Because QUIC is a generic transport protocol, QUIC feedback cannot
+   replace the following Payload-specific RTP Feedback (PSFB) feedback.
+
+    +=======+========================+================================+
+    | Name  | Long Name              | Document                       |
+    +=======+========================+================================+
+    | PLI   | Picture Loss           | [RFC4585]                      |
+    |       | Indication             |                                |
+    +-------+------------------------+--------------------------------+
+    | SLI   | Slice Loss Indication  | [RFC4585]                      |
+    +-------+------------------------+--------------------------------+
+    | RPSI  | Reference Picture      | [RFC4585]                      |
+    |       | Selection Indication   |                                |
+    +-------+------------------------+--------------------------------+
+    | FIR   | Full Intra Request     | [RFC5104]                      |
+    |       | Command                |                                |
+    +-------+------------------------+--------------------------------+
+    | TSTR  | Temporal-Spatial       | [RFC5104]                      |
+    |       | Trade-off Request      |                                |
+    +-------+------------------------+--------------------------------+
+    | TSTN  | Temporal-Spatial       | [RFC5104]                      |
+    |       | Trade-off Notification |                                |
+    +-------+------------------------+--------------------------------+
+    | VBCM  | Video Back Channel     | [RFC5104]                      |
+    |       | Message                |                                |
+    +-------+------------------------+--------------------------------+
+    | PSLEI | Payload-Specific       | [RFC6642]                      |
+    |       | Third-Party Loss Early |                                |
+    |       | Indication             |                                |
+    +-------+------------------------+--------------------------------+
+    | ROI   | Video region-of-       | [_3GPP-TS-26.114]              |
+    |       | interest (ROI)         |                                |
+    +-------+------------------------+--------------------------------+
+    | LRR   | Layer Refresh Request  | [I-D.draft-ietf-avtext-lrr-07] |
+    |       | Command                |                                |
+    +-------+------------------------+--------------------------------+
+    | AFB   | Application Layer      | [RFC4585]                      |
+    |       | Feedback               |                                |
+    +-------+------------------------+--------------------------------+
+
+                                  Table 4
+
+7.8.  Extended Reports (XR)
+
+   +===============+==========+========+===============================+
+   |Name           |Document  |Mappable| Comments                      |
+   |               |          |from    |                               |
+   |               |          |QUIC    |                               |
+   +===============+==========+========+===============================+
+   |Loss RLE Report|[RFC3611] |yes     | QUIC ACKs                     |
+   |Block          |          |        |                               |
+   +---------------+----------+--------+-------------------------------+
+   |Duplicate RLE  |[RFC3611] |no      |                               |
+   |Report Block   |          |        |                               |
+   +---------------+----------+--------+-------------------------------+
+   |Packet Receipt |[RFC3611] |possibly| - Could be replaced by QUIC   |
+   |Times Report   |          |        | timestamps.                   |
+   |Block          |          |        | - Would not use RTP           |
+   |               |          |        | timestamps.                   |
+   |               |          |        | - Only if QUIC timestamps for |
+   |               |          |        | *every* packet is included    |
+   |               |          |        | (e.g. _draft-smith-quic-      |
+   |               |          |        | receive-ts_ but not _draft-   |
+   |               |          |        | huitema-quic-ts_)             |
+   +---------------+----------+--------+-------------------------------+
+   |Receiver       |[RFC3611] |possibly| QUIC timestamps               |
+   |Reference Time |          |        |                               |
+   |Report Block   |          |        |                               |
+   +---------------+----------+--------+-------------------------------+
+   |DLRR Report    |[RFC3611] |possibly| QUIC ACKs and QUIC            |
+   |Block          |          |        | timestamps.  In general,      |
+   |               |          |        | however, it seems to be       |
+   |               |          |        | useful only to calculate RTT, |
+   |               |          |        | which is natively available   |
+   |               |          |        | in QUIC.                      |
+   +---------------+----------+--------+-------------------------------+
+   |Statistics     |[RFC3611] |partly  | - loss and jitter as          |
+   |Summary Report |          |        | described in other reports    |
+   |Block          |          |        | above.                        |
+   |               |          |        | - _TTL_/_HL_/_Duplicates_ not |
+   |               |          |        | available in QUIC             |
+   +---------------+----------+--------+-------------------------------+
+   |VoIP Metrics   |[RFC3611] |no      | as in other reports above,    |
+   |Report Block   |          |        | only loss and RTT available   |
+   +---------------+----------+--------+-------------------------------+
+   |RTCP XR        |[RFC5093] |no      |                               |
+   +---------------+----------+--------+-------------------------------+
+   |Texas          |          |        |                               |
+   |Instruments    |          |        |                               |
+   |Extended VoIP  |          |        |                               |
+   |Quality Block  |          |        |                               |
+   +---------------+----------+--------+-------------------------------+
+   |Post-repair    |[RFC5725] |no      |                               |
+   |Loss RLE Report|          |        |                               |
+   |Block          |          |        |                               |
+   +---------------+----------+--------+-------------------------------+
+   |Multicast      |[RFC6332] |no      |                               |
+   |Acquisition    |          |        |                               |
+   |Report Block   |          |        |                               |
+   +---------------+----------+--------+-------------------------------+
+   |IDMS Report    |[RFC7272] |no      |                               |
+   |Block          |          |        |                               |
+   +---------------+----------+--------+-------------------------------+
+   |ECN Summary    |[RFC6679] |partly  | QUIC does not provide info    |
+   |Report         |          |        | about duplicates              |
+   +---------------+----------+--------+-------------------------------+
+   |Measurement    |[RFC6776] |no      |                               |
+   |Information    |          |        |                               |
+   |Block          |          |        |                               |
+   +---------------+----------+--------+-------------------------------+
+   |Packet Delay   |[RFC6798] |no      | QUIC timestamps may be used   |
+   |Variation      |          |        | to achieve the same goal?     |
+   |Metrics Block  |          |        |                               |
+   +---------------+----------+--------+-------------------------------+
+   |Delay Metrics  |[RFC6843] |no      | QUIC has RTT and can provide  |
+   |Block          |          |        | timestamps for one-way delay, |
+   |               |          |        | but no way of informing peers |
+   |               |          |        | about end-to-end statistics   |
+   |               |          |        | when QUIC is only used on one |
+   |               |          |        | segment of the path.          |
+   +---------------+----------+--------+-------------------------------+
+   |Burst/Gap Loss |[RFC7004] |        | QUIC ACKs?                    |
+   |Summary        |          |        |                               |
+   |Statistics     |          |        |                               |
+   |Block          |          |        |                               |
+   +---------------+----------+--------+-------------------------------+
+   |Burst/Gap      |[RFC7004] |no      |                               |
+   |Discard Summary|          |        |                               |
+   |Statistics     |          |        |                               |
+   |Block          |          |        |                               |
+   +---------------+----------+--------+-------------------------------+
+   |Frame          |[RFC7004] |no      |                               |
+   |Impairment     |          |        |                               |
+   |Statistics     |          |        |                               |
+   |Summary        |          |        |                               |
+   +---------------+----------+--------+-------------------------------+
+   |Burst/Gap Loss |[RFC6958] |        | QUIC ACKs?                    |
+   |Metrics Block  |          |        |                               |
+   +---------------+----------+--------+-------------------------------+
+   |Burst/Gap      |[RFC7003] |no      |                               |
+   |Discard Metrics|          |        |                               |
+   |Block          |          |        |                               |
+   +---------------+----------+--------+-------------------------------+
+   |MPEG2 Transport|[RFC6990] |no      |                               |
+   |Stream PSI-    |          |        |                               |
+   |Independent    |          |        |                               |
+   |Decodability   |          |        |                               |
+   |Statistics     |          |        |                               |
+   |Metrics Block  |          |        |                               |
+   +---------------+----------+--------+-------------------------------+
+   |De-Jitter      |[RFC7005] |no      |                               |
+   |Buffer Metrics |          |        |                               |
+   |Block          |          |        |                               |
+   +---------------+----------+--------+-------------------------------+
+   |Discard Count  |[RFC7002] |no      |                               |
+   |Metrics Block  |          |        |                               |
+   +---------------+----------+--------+-------------------------------+
+   |DRLE (Discard  |[RFC7097] |no      |                               |
+   |RLE Report)    |          |        |                               |
+   +---------------+----------+--------+-------------------------------+
+   |BDR (Bytes     |[RFC7243] |no      |                               |
+   |Discarded      |          |        |                               |
+   |Report)        |          |        |                               |
+   +---------------+----------+--------+-------------------------------+
+   |RFISD (RTP     |[RFC7244] |no      |                               |
+   |Flows Initial  |          |        |                               |
+   |Synchronization|          |        |                               |
+   |Delay)         |          |        |                               |
+   +---------------+----------+--------+-------------------------------+
+   |RFSO (RTP Flows|[RFC7244] |no      |                               |
+   |Synchronization|          |        |                               |
+   |Offset Metrics |          |        |                               |
+   |Block)         |          |        |                               |
+   +---------------+----------+--------+-------------------------------+
+   |MOS Metrics    |[RFC7266] |no      |                               |
+   |Block          |          |        |                               |
+   +---------------+----------+--------+-------------------------------+
+   |LCB (Loss      |[RFC7294],|no      |                               |
+   |Concealment    |Section   |        |                               |
+   |Metrics Block) |4.1       |        |                               |
+   +---------------+----------+--------+-------------------------------+
+   |CSB (Concealed |[RFC7294],|no      |                               |
+   |Seconds Metrics|Section   |        |                               |
+   |Block)         |4.1       |        |                               |
+   +---------------+----------+--------+-------------------------------+
+   |MPEG2 Transport|[RFC7380] |no      |                               |
+   |Stream PSI     |          |        |                               |
+   |Decodability   |          |        |                               |
+   |Statistics     |          |        |                               |
+   |Metrics Block  |          |        |                               |
+   +---------------+----------+--------+-------------------------------+
+   |Post-Repair    |[RFC7509] |no      |                               |
+   |Loss Count     |          |        |                               |
+   |Metrics Report |          |        |                               |
+   |Block          |          |        |                               |
+   +---------------+----------+--------+-------------------------------+
+   |Video Loss     |[RFC7867] |no      |                               |
+   |Concealment    |          |        |                               |
+   |Metric Report  |          |        |                               |
+   |Block          |          |        |                               |
+   +---------------+----------+--------+-------------------------------+
+   |Independent    |[RFC8015] |no      |                               |
+   |Burst/Gap      |          |        |                               |
+   |Discard Metrics|          |        |                               |
+   |Block          |          |        |                               |
+   +---------------+----------+--------+-------------------------------+
+
+                                  Table 5
+
+7.9.  RTP Header extensions
+
+   *  _Transmission offset_ [RFC5450] is used for better jitter
+      calculation.  If we have QUIC timestamps, we don't need to work
+      around RTP timestamps offsets because we can use the QUIC
+      timestamps to calculate network jitter.
+
+8.  API Considerations
+
+   The mapping described in the previous sections poses some interface
+   requirements on the QUIC implementation.  Although a basic mapping
+   should work without any of these requirements most of the
+   optimizations regarding rate adaptation and RTCP mapping require
+   certain functionalities to be exposed to the application.  The
+   following to sections contain a list of information that is required
+   by an application to implement different optimizations (Section 8.1)
+   and functions that a QUIC implementation SHOULD expose to an
+   application (Section 8.2).
+
+   Each item in the following list can be considered individually.  Any
+   exposed information or function can be used by RoQ regardless of
+   whether the other items are available.  Thus, RoQ does not depend on
+   the availability of all of the listed features but can apply
+   different optimizations depending on the functionality exposed by the
+   QUIC implementation.
+
+8.1.  Information to be exported from QUIC
+
+   This section provides a list of items that an application might want
+   to export from an underlying QUIC implementation.  It is thus
+   RECOMMENDED that a QUIC implementation exports the listed items to
+   the application.
+
+   *  _Maximum Datagram Size_: The maximum datagram size that the QUIC
+      connection can transmit.
+
+   *  _Datagram Acknowledgment and Loss_: Section 5.2 of [RFC9221]
+      allows QUIC implementations to notify the application that a QUIC
+      Datagram was acknowledged or that it believes a datagram was lost.
+      The exposed information SHOULD include enough information to allow
+      the application to maintain a mapping between the datagram that
+      was acknowledged/lost and the RTP packet that was sent in that
+      datagram.
+
+   *  _Stream States_: The QUIC implementation SHOULD expose to a
+      sender, how much of the data that was sent on a stream was
+      successfully delivered and how much data is still outstanding to
+      be sent or retransmitted.
+
+   *  _Arrival timestamps_: If the QUIC connection uses a timestamp
+      extension like [I-D.draft-smith-quic-receive-ts] or
+      [I-D.draft-huitema-quic-ts], the arrival timestamps or one-way
+      delays SHOULD be exposed to the application.
+
+   *  _Bandwidth Estimation_: If congestion control is done at the
+      transport layer in the QUIC implementation, the QUIC
+      implementation SHOULD expose an estimation of the currently
+      available bandwidth to the application.  Exposing the bandwidth
+      estimation avoids the implementation of an additional bandwidth
+      estimation algorithm in the application.
+
+   *  _ECN_: If ECN marks are available, they SHOULD be exposed to the
+      application.
+
+8.2.  Functions to be exposed by QUIC
+
+   This sections lists functions that a QUIC implementation SHOULD
+   expose to an application to implement different features of the
+   mapping described in the previous sections of this document.
+
+   *  _Cancel Streams_: To allow an application to cancel
+      (re)transmission of packets that are no longer needed, the QUIC
+      implementation MUST expose a way to cancel the corresponding QUIC
+      streams.
+
+   *  _Configure Congestion Controller_: If congestion control is to be
+      implemented at the QUIC connection layer as described in
+      Section 6.1, the QUIC implementation SHOULD expose an API to allow
+      the application to configure the specifics of the congestion
+      controller.
+
+9.  Discussion
+
+9.1.  Impact of Connection Migration
+
+   RTP sessions are characterized by a continuous flow of packets into
+   either or both directions.  A connection migration may lead to
+   pausing media transmission until reachability of the peer under the
+   new address is validated.  This may lead to short breaks in media
+   delivery in the order of RTT and, if RTCP is used for RTT
+   measurements, may cause spikes in observed delays.  Application layer
+   congestion control mechanisms (and also packet repair schemes such as
+   retransmissions) need to be prepared to cope with such spikes.
+
+   If a QUIC connection is established via a signaling channel, this
+   signaling may have involved Interactive Connectivity Establishment
+   (ICE) exchanges to determine and choose suitable (IP address, port
+   number) pairs for the QUIC connection.  Subsequent address change
+   events may be noticed by QUIC via its connection migration handling
+   and/or at the ICE or other application layer, e.g., by noticing
+   changing IP addresses at the network interface.  This may imply that
+   the two signaling and data "layers" get (temporarily) out of sync.
+
+      *Editor's Note:* It may be desirable that the API provides an
+      indication of connection migration event for either case.
+
+9.2.  0-RTT considerations
+
+   For repeated connections between peers, the initiator of a QUIC
+   connection can use 0-RTT data for both QUIC streams and datagrams.
+   As such packets are subject to replay attacks, applications shall
+   carefully specify which data types and operations are allowed.  0-RTT
+   data may be beneficial for use with RoQ to reduce the risk of media
+   clipping, e.g., at the beginning of a conversation.
+
+   This specification defines carrying RTP on top of QUIC and thus does
+   not finally define what the actual application data are going to be.
+   RTP typically carries ephemeral media contents that is rendered and
+   possibly recorded but otherwise causes no side effects.  Moreover,
+   the amount of data that can be carried as 0-RTT data is rather
+   limited.  But it is the responsibility of the respective application
+   to determine if 0-RTT data is permissible.
+
+      *Editor's Note:* Since the QUIC connection will often be created
+      in the context of an existing signaling relationship (e.g., using
+      WebRTC or SIP), specific 0-RTT keying material could be exchanged
+      to prevent replays across sessions.  Within the same connection,
+      replayed media packets would be discarded as duplicates by the
+      receiver.
+
+10.  Security Considerations
+
+   RoQ is subject to the security considerations of RTP described in
+   Section 9 of [RFC3550] and the security considerations of any RTP
+   profile in use.
+
+   The security considerations for the QUIC protocol and datagram
+   extension described in Section 21 of [RFC9000], Section 9 of
+   [RFC9001], Section 8 of [RFC9002] and Section 6 of [RFC9221] also
+   apply to RoQ.
+
+   Note that RTP-over-QUIC provides mandatory security, and other RTP
+   transports do not.  In order to prevent the inadvertent disclosure of
+   RTP sessions to unintended third parties, RTP topologies described in
+   Section 3.1 that include middleboxes supporting both RTP-over-QUIC
+   and non-RTP-over-QUIC paths MUST forward RTP packets on non-RTP-over-
+   QUIC paths using a secure AVP profile ([RFC3711], [RFC4585], or
+   another AVP profile providing equivalent RTP-level security), whether
+   or not RTP-over-QUIC senders are using a secure AVP profile for those
+   RTP packets.
+
+11.  IANA Considerations
+
+11.1.  Registration of a RoQ Identification String
+
+   This document creates a new registration for the identification of
+   RoQ in the "TLS Application-Layer Protocol Negotiation (ALPN)
+   Protocol IDs" registry [RFC7301].
+
+   The "rtp-mux-quic" string identifies RoQ:
+
+   Protocol:  RTP over QUIC (RoQ)
+
+   Identification Sequence:  0x72 0x74 0x70 0x2D 0x6F 0x76 0x65 0x72
+      0x2D 0x71 0x75 0x69 0x63 ("rtp-mux-quic")
+
+   Specification:  This document
+
+12.  References
+
+12.1.  Normative References
+
+   [I-D.draft-huitema-quic-ts]
+              Huitema, C., "Quic Timestamps For Measuring One-Way
+              Delays", Work in Progress, Internet-Draft, draft-huitema-
+              quic-ts-08, 28 August 2022,
+              <https://datatracker.ietf.org/doc/html/draft-huitema-quic-
+              ts-08>.
+
+   [I-D.draft-ietf-quic-ack-frequency]
+              Iyengar, J., Swett, I., and M. Kühlewind, "QUIC
+              Acknowledgement Frequency", Work in Progress, Internet-
+              Draft, draft-ietf-quic-ack-frequency-04, 26 March 2023,
+              <https://datatracker.ietf.org/doc/html/draft-ietf-quic-
+              ack-frequency-04>.
+
+   [I-D.draft-smith-quic-receive-ts]
+              Smith, C. and I. Swett, "QUIC Extension for Reporting
+              Packet Receive Timestamps", Work in Progress, Internet-
+              Draft, draft-smith-quic-receive-ts-00, 25 October 2021,
+              <https://datatracker.ietf.org/doc/html/draft-smith-quic-
+              receive-ts-00>.
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119,
+              DOI 10.17487/RFC2119, March 1997,
+              <https://www.rfc-editor.org/rfc/rfc2119>.
+
+   [RFC3550]  Schulzrinne, H., Casner, S., Frederick, R., and V.
+              Jacobson, "RTP: A Transport Protocol for Real-Time
+              Applications", STD 64, RFC 3550, DOI 10.17487/RFC3550,
+              July 2003, <https://www.rfc-editor.org/rfc/rfc3550>.
+
+   [RFC3551]  Schulzrinne, H. and S. Casner, "RTP Profile for Audio and
+              Video Conferences with Minimal Control", STD 65, RFC 3551,
+              DOI 10.17487/RFC3551, July 2003,
+              <https://www.rfc-editor.org/rfc/rfc3551>.
+
+   [RFC3611]  Friedman, T., Ed., Caceres, R., Ed., and A. Clark, Ed.,
+              "RTP Control Protocol Extended Reports (RTCP XR)",
+              RFC 3611, DOI 10.17487/RFC3611, November 2003,
+              <https://www.rfc-editor.org/rfc/rfc3611>.
+
+   [RFC4585]  Ott, J., Wenger, S., Sato, N., Burmeister, C., and J. Rey,
+              "Extended RTP Profile for Real-time Transport Control
+              Protocol (RTCP)-Based Feedback (RTP/AVPF)", RFC 4585,
+              DOI 10.17487/RFC4585, July 2006,
+              <https://www.rfc-editor.org/rfc/rfc4585>.
+
+   [RFC4588]  Rey, J., Leon, D., Miyazaki, A., Varsa, V., and R.
+              Hakenberg, "RTP Retransmission Payload Format", RFC 4588,
+              DOI 10.17487/RFC4588, July 2006,
+              <https://www.rfc-editor.org/rfc/rfc4588>.
+
+   [RFC6679]  Westerlund, M., Johansson, I., Perkins, C., O'Hanlon, P.,
+              and K. Carlberg, "Explicit Congestion Notification (ECN)
+              for RTP over UDP", RFC 6679, DOI 10.17487/RFC6679, August
+              2012, <https://www.rfc-editor.org/rfc/rfc6679>.
+
+   [RFC7301]  Friedl, S., Popov, A., Langley, A., and E. Stephan,
+              "Transport Layer Security (TLS) Application-Layer Protocol
+              Negotiation Extension", RFC 7301, DOI 10.17487/RFC7301,
+              July 2014, <https://www.rfc-editor.org/rfc/rfc7301>.
+
+   [RFC7667]  Westerlund, M. and S. Wenger, "RTP Topologies", RFC 7667,
+              DOI 10.17487/RFC7667, November 2015,
+              <https://www.rfc-editor.org/rfc/rfc7667>.
+
+   [RFC768]   Postel, J., "User Datagram Protocol", STD 6, RFC 768,
+              DOI 10.17487/RFC0768, August 1980,
+              <https://www.rfc-editor.org/rfc/rfc768>.
+
+   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+              May 2017, <https://www.rfc-editor.org/rfc/rfc8174>.
+
+   [RFC8298]  Johansson, I. and Z. Sarker, "Self-Clocked Rate Adaptation
+              for Multimedia", RFC 8298, DOI 10.17487/RFC8298, December
+              2017, <https://www.rfc-editor.org/rfc/rfc8298>.
+
+   [RFC8698]  Zhu, X., Pan, R., Ramalho, M., and S. Mena, "Network-
+              Assisted Dynamic Adaptation (NADA): A Unified Congestion
+              Control Scheme for Real-Time Media", RFC 8698,
+              DOI 10.17487/RFC8698, February 2020,
+              <https://www.rfc-editor.org/rfc/rfc8698>.
+
+   [RFC8836]  Jesup, R. and Z. Sarker, Ed., "Congestion Control
+              Requirements for Interactive Real-Time Media", RFC 8836,
+              DOI 10.17487/RFC8836, January 2021,
+              <https://www.rfc-editor.org/rfc/rfc8836>.
+
+   [RFC8888]  Sarker, Z., Perkins, C., Singh, V., and M. Ramalho, "RTP
+              Control Protocol (RTCP) Feedback for Congestion Control",
+              RFC 8888, DOI 10.17487/RFC8888, January 2021,
+              <https://www.rfc-editor.org/rfc/rfc8888>.
+
+   [RFC8999]  Thomson, M., "Version-Independent Properties of QUIC",
+              RFC 8999, DOI 10.17487/RFC8999, May 2021,
+              <https://www.rfc-editor.org/rfc/rfc8999>.
+
+   [RFC9000]  Iyengar, J., Ed. and M. Thomson, Ed., "QUIC: A UDP-Based
+              Multiplexed and Secure Transport", RFC 9000,
+              DOI 10.17487/RFC9000, May 2021,
+              <https://www.rfc-editor.org/rfc/rfc9000>.
+
+   [rfc9000]  Iyengar, J., Ed. and M. Thomson, Ed., "QUIC: A UDP-Based
+              Multiplexed and Secure Transport", RFC 9000,
+              DOI 10.17487/RFC9000, May 2021,
+              <https://www.rfc-editor.org/rfc/rfc9000>.
+
+   [RFC9001]  Thomson, M., Ed. and S. Turner, Ed., "Using TLS to Secure
+              QUIC", RFC 9001, DOI 10.17487/RFC9001, May 2021,
+              <https://www.rfc-editor.org/rfc/rfc9001>.
+
+   [RFC9002]  Iyengar, J., Ed. and I. Swett, Ed., "QUIC Loss Detection
+              and Congestion Control", RFC 9002, DOI 10.17487/RFC9002,
+              May 2021, <https://www.rfc-editor.org/rfc/rfc9002>.
+
+   [RFC9221]  Pauly, T., Kinnear, E., and D. Schinazi, "An Unreliable
+              Datagram Extension to QUIC", RFC 9221,
+              DOI 10.17487/RFC9221, March 2022,
+              <https://www.rfc-editor.org/rfc/rfc9221>.
+
+12.2.  Informative References
+
+   [I-D.cardwell-iccrg-bbr-congestion-control]
+              Cardwell, N., Cheng, Y., Yeganeh, S. H., Swett, I., and V.
+              Jacobson, "BBR Congestion Control", Work in Progress,
+              Internet-Draft, draft-cardwell-iccrg-bbr-congestion-
+              control-02, 7 March 2022,
+              <https://datatracker.ietf.org/doc/html/draft-cardwell-
+              iccrg-bbr-congestion-control-02>.
+
+   [I-D.draft-alvestrand-rmcat-remb]
+              Alvestrand, H. T., "RTCP message for Receiver Estimated
+              Maximum Bitrate", Work in Progress, Internet-Draft, draft-
+              alvestrand-rmcat-remb-03, 21 October 2013,
+              <https://datatracker.ietf.org/doc/html/draft-alvestrand-
+              rmcat-remb-03>.
+
+   [I-D.draft-dawkins-avtcore-sdp-rtp-quic]
+              Dawkins, S., "SDP Offer/Answer for RTP using QUIC as
+              Transport", Work in Progress, Internet-Draft, draft-
+              dawkins-avtcore-sdp-rtp-quic-00, 28 January 2022,
+              <https://datatracker.ietf.org/doc/html/draft-dawkins-
+              avtcore-sdp-rtp-quic-00>.
+
+   [I-D.draft-hurst-quic-rtp-tunnelling]
+              Hurst, S., "QRT: QUIC RTP Tunnelling", Work in Progress,
+              Internet-Draft, draft-hurst-quic-rtp-tunnelling-01, 28
+              January 2021, <https://datatracker.ietf.org/doc/html/
+              draft-hurst-quic-rtp-tunnelling-01>.
+
+   [I-D.draft-ietf-avtext-lrr-07]
+              Lennox, J., Hong, D., Uberti, J., Holmer, S., and M.
+              Flodman, "The Layer Refresh Request (LRR) RTCP Feedback
+              Message", Work in Progress, Internet-Draft, draft-ietf-
+              avtext-lrr-07, 2 July 2017,
+              <https://datatracker.ietf.org/doc/html/draft-ietf-avtext-
+              lrr-07>.
+
+   [I-D.draft-ietf-masque-h3-datagram]
+              Schinazi, D. and L. Pardue, "HTTP Datagrams and the
+              Capsule Protocol", Work in Progress, Internet-Draft,
+              draft-ietf-masque-h3-datagram-11, 17 June 2022,
+              <https://datatracker.ietf.org/doc/html/draft-ietf-masque-
+              h3-datagram-11>.
+
+   [I-D.draft-ietf-rmcat-gcc]
+              Holmer, S., Lundin, H., Carlucci, G., De Cicco, L., and S.
+              Mascolo, "A Google Congestion Control Algorithm for Real-
+              Time Communication", Work in Progress, Internet-Draft,
+              draft-ietf-rmcat-gcc-02, 8 July 2016,
+              <https://datatracker.ietf.org/doc/html/draft-ietf-rmcat-
+              gcc-02>.
+
+   [I-D.draft-ietf-wish-whip]
+              Murillo, S. G. and A. Gouaillard, "WebRTC-HTTP ingestion
+              protocol (WHIP)", Work in Progress, Internet-Draft, draft-
+              ietf-wish-whip-08, 30 March 2023,
+              <https://datatracker.ietf.org/doc/html/draft-ietf-wish-
+              whip-08>.
+
+   [I-D.draft-thomson-quic-enough-00]
+              Thomson, M., "Signaling That a QUIC Receiver Has Enough
+              Stream Data", Work in Progress, Internet-Draft, draft-
+              thomson-quic-enough-00, 30 March 2023,
+              <https://datatracker.ietf.org/doc/html/draft-thomson-quic-
+              enough-00>.
+
+   [RFC3168]  Ramakrishnan, K., Floyd, S., and D. Black, "The Addition
+              of Explicit Congestion Notification (ECN) to IP",
+              RFC 3168, DOI 10.17487/RFC3168, September 2001,
+              <https://www.rfc-editor.org/rfc/rfc3168>.
+
+   [RFC3261]  Rosenberg, J., Schulzrinne, H., Camarillo, G., Johnston,
+              A., Peterson, J., Sparks, R., Handley, M., and E.
+              Schooler, "SIP: Session Initiation Protocol", RFC 3261,
+              DOI 10.17487/RFC3261, June 2002,
+              <https://www.rfc-editor.org/rfc/rfc3261>.
+
+   [RFC3711]  Baugher, M., McGrew, D., Naslund, M., Carrara, E., and K.
+              Norrman, "The Secure Real-time Transport Protocol (SRTP)",
+              RFC 3711, DOI 10.17487/RFC3711, March 2004,
+              <https://www.rfc-editor.org/rfc/rfc3711>.
+
+   [RFC5093]  Hunt, G., "BT's eXtended Network Quality RTP Control
+              Protocol Extended Reports (RTCP XR XNQ)", RFC 5093,
+              DOI 10.17487/RFC5093, December 2007,
+              <https://www.rfc-editor.org/rfc/rfc5093>.
+
+   [RFC5104]  Wenger, S., Chandra, U., Westerlund, M., and B. Burman,
+              "Codec Control Messages in the RTP Audio-Visual Profile
+              with Feedback (AVPF)", RFC 5104, DOI 10.17487/RFC5104,
+              February 2008, <https://www.rfc-editor.org/rfc/rfc5104>.
+
+   [RFC5450]  Singer, D. and H. Desineni, "Transmission Time Offsets in
+              RTP Streams", RFC 5450, DOI 10.17487/RFC5450, March 2009,
+              <https://www.rfc-editor.org/rfc/rfc5450>.
+
+   [RFC5484]  Singer, D., "Associating Time-Codes with RTP Streams",
+              RFC 5484, DOI 10.17487/RFC5484, March 2009,
+              <https://www.rfc-editor.org/rfc/rfc5484>.
+
+   [RFC5725]  Begen, A., Hsu, D., and M. Lague, "Post-Repair Loss RLE
+              Report Block Type for RTP Control Protocol (RTCP) Extended
+              Reports (XRs)", RFC 5725, DOI 10.17487/RFC5725, February
+              2010, <https://www.rfc-editor.org/rfc/rfc5725>.
+
+   [RFC5760]  Ott, J., Chesterfield, J., and E. Schooler, "RTP Control
+              Protocol (RTCP) Extensions for Single-Source Multicast
+              Sessions with Unicast Feedback", RFC 5760,
+              DOI 10.17487/RFC5760, February 2010,
+              <https://www.rfc-editor.org/rfc/rfc5760>.
+
+   [RFC5761]  Perkins, C. and M. Westerlund, "Multiplexing RTP Data and
+              Control Packets on a Single Port", RFC 5761,
+              DOI 10.17487/RFC5761, April 2010,
+              <https://www.rfc-editor.org/rfc/rfc5761>.
+
+   [RFC6051]  Perkins, C. and T. Schierl, "Rapid Synchronisation of RTP
+              Flows", RFC 6051, DOI 10.17487/RFC6051, November 2010,
+              <https://www.rfc-editor.org/rfc/rfc6051>.
+
+   [RFC6284]  Begen, A., Wing, D., and T. Van Caenegem, "Port Mapping
+              between Unicast and Multicast RTP Sessions", RFC 6284,
+              DOI 10.17487/RFC6284, June 2011,
+              <https://www.rfc-editor.org/rfc/rfc6284>.
+
+   [RFC6285]  Ver Steeg, B., Begen, A., Van Caenegem, T., and Z. Vax,
+              "Unicast-Based Rapid Acquisition of Multicast RTP
+              Sessions", RFC 6285, DOI 10.17487/RFC6285, June 2011,
+              <https://www.rfc-editor.org/rfc/rfc6285>.
+
+   [RFC6332]  Begen, A. and E. Friedrich, "Multicast Acquisition Report
+              Block Type for RTP Control Protocol (RTCP) Extended
+              Reports (XRs)", RFC 6332, DOI 10.17487/RFC6332, July 2011,
+              <https://www.rfc-editor.org/rfc/rfc6332>.
+
+   [RFC6582]  Henderson, T., Floyd, S., Gurtov, A., and Y. Nishida, "The
+              NewReno Modification to TCP's Fast Recovery Algorithm",
+              RFC 6582, DOI 10.17487/RFC6582, April 2012,
+              <https://www.rfc-editor.org/rfc/rfc6582>.
+
+   [RFC6642]  Wu, Q., Ed., Xia, F., and R. Even, "RTP Control Protocol
+              (RTCP) Extension for a Third-Party Loss Report", RFC 6642,
+              DOI 10.17487/RFC6642, June 2012,
+              <https://www.rfc-editor.org/rfc/rfc6642>.
+
+   [RFC6776]  Clark, A. and Q. Wu, "Measurement Identity and Information
+              Reporting Using a Source Description (SDES) Item and an
+              RTCP Extended Report (XR) Block", RFC 6776,
+              DOI 10.17487/RFC6776, October 2012,
+              <https://www.rfc-editor.org/rfc/rfc6776>.
+
+   [RFC6798]  Clark, A. and Q. Wu, "RTP Control Protocol (RTCP) Extended
+              Report (XR) Block for Packet Delay Variation Metric
+              Reporting", RFC 6798, DOI 10.17487/RFC6798, November 2012,
+              <https://www.rfc-editor.org/rfc/rfc6798>.
+
+   [RFC6843]  Clark, A., Gross, K., and Q. Wu, "RTP Control Protocol
+              (RTCP) Extended Report (XR) Block for Delay Metric
+              Reporting", RFC 6843, DOI 10.17487/RFC6843, January 2013,
+              <https://www.rfc-editor.org/rfc/rfc6843>.
+
+   [RFC6958]  Clark, A., Zhang, S., Zhao, J., and Q. Wu, Ed., "RTP
+              Control Protocol (RTCP) Extended Report (XR) Block for
+              Burst/Gap Loss Metric Reporting", RFC 6958,
+              DOI 10.17487/RFC6958, May 2013,
+              <https://www.rfc-editor.org/rfc/rfc6958>.
+
+   [RFC6990]  Huang, R., Wu, Q., Asaeda, H., and G. Zorn, "RTP Control
+              Protocol (RTCP) Extended Report (XR) Block for MPEG-2
+              Transport Stream (TS) Program Specific Information (PSI)
+              Independent Decodability Statistics Metrics Reporting",
+              RFC 6990, DOI 10.17487/RFC6990, August 2013,
+              <https://www.rfc-editor.org/rfc/rfc6990>.
+
+   [RFC7002]  Clark, A., Zorn, G., and Q. Wu, "RTP Control Protocol
+              (RTCP) Extended Report (XR) Block for Discard Count Metric
+              Reporting", RFC 7002, DOI 10.17487/RFC7002, September
+              2013, <https://www.rfc-editor.org/rfc/rfc7002>.
+
+   [RFC7003]  Clark, A., Huang, R., and Q. Wu, Ed., "RTP Control
+              Protocol (RTCP) Extended Report (XR) Block for Burst/Gap
+              Discard Metric Reporting", RFC 7003, DOI 10.17487/RFC7003,
+              September 2013, <https://www.rfc-editor.org/rfc/rfc7003>.
+
+   [RFC7004]  Zorn, G., Schott, R., Wu, Q., Ed., and R. Huang, "RTP
+              Control Protocol (RTCP) Extended Report (XR) Blocks for
+              Summary Statistics Metrics Reporting", RFC 7004,
+              DOI 10.17487/RFC7004, September 2013,
+              <https://www.rfc-editor.org/rfc/rfc7004>.
+
+   [RFC7005]  Clark, A., Singh, V., and Q. Wu, "RTP Control Protocol
+              (RTCP) Extended Report (XR) Block for De-Jitter Buffer
+              Metric Reporting", RFC 7005, DOI 10.17487/RFC7005,
+              September 2013, <https://www.rfc-editor.org/rfc/rfc7005>.
+
+   [RFC7097]  Ott, J., Singh, V., Ed., and I. Curcio, "RTP Control
+              Protocol (RTCP) Extended Report (XR) for RLE of Discarded
+              Packets", RFC 7097, DOI 10.17487/RFC7097, January 2014,
+              <https://www.rfc-editor.org/rfc/rfc7097>.
+
+   [RFC7243]  Singh, V., Ed., Ott, J., and I. Curcio, "RTP Control
+              Protocol (RTCP) Extended Report (XR) Block for the Bytes
+              Discarded Metric", RFC 7243, DOI 10.17487/RFC7243, May
+              2014, <https://www.rfc-editor.org/rfc/rfc7243>.
+
+   [RFC7244]  Asaeda, H., Wu, Q., and R. Huang, "RTP Control Protocol
+              (RTCP) Extended Report (XR) Blocks for Synchronization
+              Delay and Offset Metrics Reporting", RFC 7244,
+              DOI 10.17487/RFC7244, May 2014,
+              <https://www.rfc-editor.org/rfc/rfc7244>.
+
+   [RFC7266]  Clark, A., Wu, Q., Schott, R., and G. Zorn, "RTP Control
+              Protocol (RTCP) Extended Report (XR) Blocks for Mean
+              Opinion Score (MOS) Metric Reporting", RFC 7266,
+              DOI 10.17487/RFC7266, June 2014,
+              <https://www.rfc-editor.org/rfc/rfc7266>.
+
+   [RFC7272]  van Brandenburg, R., Stokking, H., van Deventer, O.,
+              Boronat, F., Montagud, M., and K. Gross, "Inter-
+              Destination Media Synchronization (IDMS) Using the RTP
+              Control Protocol (RTCP)", RFC 7272, DOI 10.17487/RFC7272,
+              June 2014, <https://www.rfc-editor.org/rfc/rfc7272>.
+
+   [RFC7294]  Clark, A., Zorn, G., Bi, C., and Q. Wu, "RTP Control
+              Protocol (RTCP) Extended Report (XR) Blocks for
+              Concealment Metrics Reporting on Audio Applications",
+              RFC 7294, DOI 10.17487/RFC7294, July 2014,
+              <https://www.rfc-editor.org/rfc/rfc7294>.
+
+   [RFC7380]  Tong, J., Bi, C., Ed., Even, R., Wu, Q., Ed., and R.
+              Huang, "RTP Control Protocol (RTCP) Extended Report (XR)
+              Block for MPEG2 Transport Stream (TS) Program Specific
+              Information (PSI) Decodability Statistics Metrics
+              Reporting", RFC 7380, DOI 10.17487/RFC7380, November 2014,
+              <https://www.rfc-editor.org/rfc/rfc7380>.
+
+   [RFC7509]  Huang, R. and V. Singh, "RTP Control Protocol (RTCP)
+              Extended Report (XR) for Post-Repair Loss Count Metrics",
+              RFC 7509, DOI 10.17487/RFC7509, May 2015,
+              <https://www.rfc-editor.org/rfc/rfc7509>.
+
+   [RFC7728]  Burman, B., Akram, A., Even, R., and M. Westerlund, "RTP
+              Stream Pause and Resume", RFC 7728, DOI 10.17487/RFC7728,
+              February 2016, <https://www.rfc-editor.org/rfc/rfc7728>.
+
+   [RFC7826]  Schulzrinne, H., Rao, A., Lanphier, R., Westerlund, M.,
+              and M. Stiemerling, Ed., "Real-Time Streaming Protocol
+              Version 2.0", RFC 7826, DOI 10.17487/RFC7826, December
+              2016, <https://www.rfc-editor.org/rfc/rfc7826>.
+
+   [RFC7867]  Huang, R., "RTP Control Protocol (RTCP) Extended Report
+              (XR) Block for Loss Concealment Metrics for Video
+              Applications", RFC 7867, DOI 10.17487/RFC7867, July 2016,
+              <https://www.rfc-editor.org/rfc/rfc7867>.
+
+   [RFC8015]  Singh, V., Perkins, C., Clark, A., and R. Huang, "RTP
+              Control Protocol (RTCP) Extended Report (XR) Block for
+              Independent Reporting of Burst/Gap Discard Metrics",
+              RFC 8015, DOI 10.17487/RFC8015, November 2016,
+              <https://www.rfc-editor.org/rfc/rfc8015>.
+
+   [RFC8085]  Eggert, L., Fairhurst, G., and G. Shepherd, "UDP Usage
+              Guidelines", BCP 145, RFC 8085, DOI 10.17487/RFC8085,
+              March 2017, <https://www.rfc-editor.org/rfc/rfc8085>.
+
+   [RFC8286]  Xia, J., Even, R., Huang, R., and L. Deng, "RTP/RTCP
+              Extension for RTP Splicing Notification", RFC 8286,
+              DOI 10.17487/RFC8286, October 2017,
+              <https://www.rfc-editor.org/rfc/rfc8286>.
+
+   [RFC8825]  Alvestrand, H., "Overview: Real-Time Protocols for
+              Browser-Based Applications", RFC 8825,
+              DOI 10.17487/RFC8825, January 2021,
+              <https://www.rfc-editor.org/rfc/rfc8825>.
+
+   [RFC8860]  Westerlund, M., Perkins, C., and J. Lennox, "Sending
+              Multiple Types of Media in a Single RTP Session",
+              RFC 8860, DOI 10.17487/RFC8860, January 2021,
+              <https://www.rfc-editor.org/rfc/rfc8860>.
+
+   [RFC8861]  Lennox, J., Westerlund, M., Wu, Q., and C. Perkins,
+              "Sending Multiple RTP Streams in a Single RTP Session:
+              Grouping RTP Control Protocol (RTCP) Reception Statistics
+              and Other Feedback", RFC 8861, DOI 10.17487/RFC8861,
+              January 2021, <https://www.rfc-editor.org/rfc/rfc8861>.
+
+   [RFC9308]  Kühlewind, M. and B. Trammell, "Applicability of the QUIC
+              Transport Protocol", RFC 9308, DOI 10.17487/RFC9308,
+              September 2022, <https://www.rfc-editor.org/rfc/rfc9308>.
+
+   [_3GPP-TS-26.114]
+              "IP Multimedia Subsystem (IMS); Multimedia telephony;
+              Media handling and interaction", 5 January 2023,
+              <(https://portal.3gpp.org/desktopmodules/Specifications/
+              specificationId=1404)>.
+
+Appendix A.  Experimental Results
+
+   An experimental implementation of the mapping described in this
+   document can be found on Github (https://github.com/mengelbart/rtp-
+   over-quic).  The application implements the RoQ Datagrams mapping and
+   implements SCReAM congestion control at the application layer.  It
+   can optionally disable the builtin QUIC congestion control (NewReno).
+   The endpoints only use RTCP for congestion control feedback, which
+   can optionally be disabled and replaced by the QUIC connection
+   statistics as described in Section 7.3.
+
+   Experimental results of the implementation can be found on Github
+   (https://github.com/mengelbart/rtp-over-quic-mininet), too.
+
+Acknowledgments
+
+   Early versions of this document were similar in spirit to
+   [I-D.draft-hurst-quic-rtp-tunnelling], although many details differ.
+   The authors would like to thank Sam Hurst for providing his thoughts
+   about how QUIC could be used to carry RTP.
+
+   The authors would like to thank Bernard Aboba, David Schinazi, Lucas
+   Pardue, Sergio Garcia Murillo, Spencer Dawkins, and Vidhi Goel for
+   their valuable comments and suggestions contributing to this
+   document.
+
+Authors' Addresses
+
+   Jörg Ott
+   Technical University Munich
+   Email: ott@in.tum.de
+
+
+   Mathis Engelbart
+   Technical University Munich
+   Email: mathis.engelbart@gmail.com
