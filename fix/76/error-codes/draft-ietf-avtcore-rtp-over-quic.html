@@ -15,22 +15,22 @@ endpoints, in order to reduce the need to exchange RTCP packets and how to
 implement congestion control and rate adaptation without relying on RTCP
 feedback. 
     " name="description">
-<meta content="xml2rfc 3.17.1" name="generator">
+<meta content="xml2rfc 3.17.4" name="generator">
 <meta content="Internet-Draft" name="keyword">
 <meta content="draft-ietf-avtcore-rtp-over-quic-latest" name="ietf.draft">
 <!-- Generator version information:
-  xml2rfc 3.17.1
-    Python 3.10.11
-    appdirs 1.4.4
+  xml2rfc 3.17.4
+    Python 3.11.4
     ConfigArgParse 1.5.3
-    google-i18n-address 2.5.2
+    google-i18n-address 3.1.0
     intervaltree 3.1.0
     Jinja2 3.1.2
     lxml 4.9.2
+    platformdirs 3.8.0
     pycountry 22.3.5
     PyYAML 6.0
-    requests 2.28.1
-    setuptools 65.6.0
+    requests 2.31.0
+    setuptools 67.7.2
     six 1.16.0
     wcwidth 0.2.6
 -->
@@ -1039,11 +1039,11 @@ svg :is([stroke="fill"], [fill^="#fff"]) {
 <thead><tr>
 <td class="left">Internet-Draft</td>
 <td class="center">RTP over QUIC</td>
-<td class="right">May 2023</td>
+<td class="right">July 2023</td>
 </tr></thead>
 <tfoot><tr>
 <td class="left">Ott &amp; Engelbart</td>
-<td class="center">Expires 17 November 2023</td>
+<td class="center">Expires 4 January 2024</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1056,12 +1056,12 @@ svg :is([stroke="fill"], [fill^="#fff"]) {
 <dd class="internet-draft">draft-ietf-avtcore-rtp-over-quic-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2023-05-16" class="published">16 May 2023</time>
+<time datetime="2023-07-03" class="published">3 July 2023</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2023-11-17">17 November 2023</time></dd>
+<dd class="expires"><time datetime="2024-01-04">4 January 2024</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1115,7 +1115,7 @@ feedback.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 17 November 2023.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 4 January 2024.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1185,6 +1185,17 @@ feedback.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.2">
                 <p id="section-toc.1-1.5.2.2.1"><a href="#section-5.2" class="auto internal xref">5.2</a>.  <a href="#name-quic-streams" class="internal xref">QUIC Streams</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.2.2.1">
+                    <p id="section-toc.1-1.5.2.2.2.1.1"><a href="#section-5.2.1" class="auto internal xref">5.2.1</a>.  <a href="#name-stream-encapsulation" class="internal xref">Stream Encapsulation</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.2.2.2">
+                    <p id="section-toc.1-1.5.2.2.2.2.1"><a href="#section-5.2.2" class="auto internal xref">5.2.2</a>.  <a href="#name-media-frame-cancellation" class="internal xref">Media Frame Cancellation</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.2.2.3">
+                    <p id="section-toc.1-1.5.2.2.2.3.1"><a href="#section-5.2.3" class="auto internal xref">5.2.3</a>.  <a href="#name-flow-control-and-max_stream" class="internal xref">Flow control and MAX_STREAMS</a></p>
+</li>
+                </ul>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.3">
                 <p id="section-toc.1-1.5.2.3.1"><a href="#section-5.3" class="auto internal xref">5.3</a>.  <a href="#name-quic-datagrams" class="internal xref">QUIC Datagrams</a></p>
@@ -1192,136 +1203,134 @@ feedback.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6">
-            <p id="section-toc.1-1.6.1"><a href="#section-6" class="auto internal xref">6</a>.  <a href="#name-replacing-rtcp-and-rtp-head" class="internal xref">Replacing RTCP and RTP Header Extensions with QUIC Feedback</a></p>
-<ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.1">
-                <p id="section-toc.1-1.6.2.1.1"><a href="#section-6.1" class="auto internal xref">6.1</a>.  <a href="#name-roq-datagrams" class="internal xref">RoQ Datagrams</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.2">
-                <p id="section-toc.1-1.6.2.2.1"><a href="#section-6.2" class="auto internal xref">6.2</a>.  <a href="#name-roq-streams" class="internal xref">RoQ Streams</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.3">
-                <p id="section-toc.1-1.6.2.3.1"><a href="#section-6.3" class="auto internal xref">6.3</a>.  <a href="#name-transport-layer-feedback" class="internal xref">Transport Layer Feedback</a></p>
-<ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.3.2.1">
-                    <p id="section-toc.1-1.6.2.3.2.1.1"><a href="#section-6.3.1" class="auto internal xref">6.3.1</a>.  <a href="#name-mapping-quic-feedback-to-rt" class="internal xref">Mapping QUIC Feedback to RTCP Receiver Reports ("RR")</a></p>
-</li>
-                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.3.2.2">
-                    <p id="section-toc.1-1.6.2.3.2.2.1"><a href="#section-6.3.2" class="auto internal xref">6.3.2</a>.  <a href="#name-mapping-quic-feedback-to-rtc" class="internal xref">Mapping QUIC Feedback to RTCP Negative Acknowledgments* ("NACK")</a></p>
-</li>
-                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.3.2.3">
-                    <p id="section-toc.1-1.6.2.3.2.3.1"><a href="#section-6.3.3" class="auto internal xref">6.3.3</a>.  <a href="#name-mapping-quic-feedback-to-rtcp" class="internal xref">Mapping QUIC Feedback to RTCP ECN Feedback ("ECN")</a></p>
-</li>
-                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.3.2.4">
-                    <p id="section-toc.1-1.6.2.3.2.4.1"><a href="#section-6.3.4" class="auto internal xref">6.3.4</a>.  <a href="#name-mapping-quic-feedback-to-rtcp-" class="internal xref">Mapping QUIC Feedback to RTCP Congestion Control Feedback ("CCFB")</a></p>
-</li>
-                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.3.2.5">
-                    <p id="section-toc.1-1.6.2.3.2.5.1"><a href="#section-6.3.5" class="auto internal xref">6.3.5</a>.  <a href="#name-mapping-quic-feedback-to-rtcp-e" class="internal xref">Mapping QUIC Feedback to RTCP Extended Report ("XR")</a></p>
-</li>
-                </ul>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.4">
-                <p id="section-toc.1-1.6.2.4.1"><a href="#section-6.4" class="auto internal xref">6.4</a>.  <a href="#name-application-layer-repair-an" class="internal xref">Application Layer Repair and other Control Messages</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.5">
-                <p id="section-toc.1-1.6.2.5.1"><a href="#section-6.5" class="auto internal xref">6.5</a>.  <a href="#name-rtcp-control-packet-types" class="internal xref">RTCP Control Packet Types</a></p>
-<ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.5.2.1">
-                    <p id="section-toc.1-1.6.2.5.2.1.1"><a href="#section-6.5.1" class="auto internal xref">6.5.1</a>.  <a href="#name-notes" class="internal xref">Notes</a></p>
-</li>
-                </ul>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.6">
-                <p id="section-toc.1-1.6.2.6.1"><a href="#section-6.6" class="auto internal xref">6.6</a>.  <a href="#name-generic-rtp-feedback-rtpfb" class="internal xref">Generic RTP Feedback (RTPFB)</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.7">
-                <p id="section-toc.1-1.6.2.7.1"><a href="#section-6.7" class="auto internal xref">6.7</a>.  <a href="#name-payload-specific-rtp-feedba" class="internal xref">Payload-specific RTP Feedback (PSFB)</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.8">
-                <p id="section-toc.1-1.6.2.8.1"><a href="#section-6.8" class="auto internal xref">6.8</a>.  <a href="#name-extended-reports-xr" class="internal xref">Extended Reports (XR)</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.9">
-                <p id="section-toc.1-1.6.2.9.1"><a href="#section-6.9" class="auto internal xref">6.9</a>.  <a href="#name-rtp-header-extensions" class="internal xref">RTP Header extensions</a></p>
-</li>
-            </ul>
+            <p id="section-toc.1-1.6.1"><a href="#section-6" class="auto internal xref">6</a>.  <a href="#name-connection-shutdown" class="internal xref">Connection Shutdown</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7">
             <p id="section-toc.1-1.7.1"><a href="#section-7" class="auto internal xref">7</a>.  <a href="#name-congestion-control-and-rate" class="internal xref">Congestion Control and Rate Adaptation</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.1">
-                <p id="section-toc.1-1.7.2.1.1"><a href="#section-7.1" class="auto internal xref">7.1</a>.  <a href="#name-congestion-control-at-the-q" class="internal xref">Congestion Control at the QUIC layer</a></p>
+                <p id="section-toc.1-1.7.2.1.1"><a href="#section-7.1" class="auto internal xref">7.1</a>.  <a href="#name-congestion-control-at-the-t" class="internal xref">Congestion Control at the Transport Layer</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.2">
-                <p id="section-toc.1-1.7.2.2.1"><a href="#section-7.2" class="auto internal xref">7.2</a>.  <a href="#name-congestion-control-at-the-a" class="internal xref">Congestion Control at the Application Layer</a></p>
+                <p id="section-toc.1-1.7.2.2.1"><a href="#section-7.2" class="auto internal xref">7.2</a>.  <a href="#name-congestion-control-at-the-r" class="internal xref">Congestion Control at the RTP Application Layer</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.3">
-                <p id="section-toc.1-1.7.2.3.1"><a href="#section-7.3" class="auto internal xref">7.3</a>.  <a href="#name-shared-quic-connections" class="internal xref">Shared QUIC connections</a></p>
+                <p id="section-toc.1-1.7.2.3.1"><a href="#section-7.3" class="auto internal xref">7.3</a>.  <a href="#name-resolving-interactions-betw" class="internal xref">Resolving Interactions Between QUIC and Application-layer Congestion Control</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.4">
+                <p id="section-toc.1-1.7.2.4.1"><a href="#section-7.4" class="auto internal xref">7.4</a>.  <a href="#name-sharing-quic-connections" class="internal xref">Sharing QUIC connections</a></p>
 </li>
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8">
-            <p id="section-toc.1-1.8.1"><a href="#section-8" class="auto internal xref">8</a>.  <a href="#name-error-handling" class="internal xref">Error Handling</a></p>
+            <p id="section-toc.1-1.8.1"><a href="#section-8" class="auto internal xref">8</a>.  <a href="#name-replacing-rtcp-and-rtp-head" class="internal xref">Replacing RTCP and RTP Header Extensions with QUIC Feedback</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.1">
-                <p id="section-toc.1-1.8.2.1.1"><a href="#section-8.1" class="auto internal xref">8.1</a>.  <a href="#name-roq-error-codes" class="internal xref">RoQ Error Codes</a></p>
+                <p id="section-toc.1-1.8.2.1.1"><a href="#section-8.1" class="auto internal xref">8.1</a>.  <a href="#name-roq-datagrams" class="internal xref">RoQ Datagrams</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.2">
+                <p id="section-toc.1-1.8.2.2.1"><a href="#section-8.2" class="auto internal xref">8.2</a>.  <a href="#name-roq-streams" class="internal xref">RoQ Streams</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.3">
+                <p id="section-toc.1-1.8.2.3.1"><a href="#section-8.3" class="auto internal xref">8.3</a>.  <a href="#name-transport-layer-feedback" class="internal xref">Transport Layer Feedback</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.3.2.1">
+                    <p id="section-toc.1-1.8.2.3.2.1.1"><a href="#section-8.3.1" class="auto internal xref">8.3.1</a>.  <a href="#name-mapping-quic-feedback-to-rt" class="internal xref">Mapping QUIC Feedback to RTCP Receiver Reports ("RR")</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.3.2.2">
+                    <p id="section-toc.1-1.8.2.3.2.2.1"><a href="#section-8.3.2" class="auto internal xref">8.3.2</a>.  <a href="#name-mapping-quic-feedback-to-rtc" class="internal xref">Mapping QUIC Feedback to RTCP Negative Acknowledgments* ("NACK")</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.3.2.3">
+                    <p id="section-toc.1-1.8.2.3.2.3.1"><a href="#section-8.3.3" class="auto internal xref">8.3.3</a>.  <a href="#name-mapping-quic-feedback-to-rtcp" class="internal xref">Mapping QUIC Feedback to RTCP ECN Feedback ("ECN")</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.3.2.4">
+                    <p id="section-toc.1-1.8.2.3.2.4.1"><a href="#section-8.3.4" class="auto internal xref">8.3.4</a>.  <a href="#name-mapping-quic-feedback-to-rtcp-" class="internal xref">Mapping QUIC Feedback to RTCP Congestion Control Feedback ("CCFB")</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.3.2.5">
+                    <p id="section-toc.1-1.8.2.3.2.5.1"><a href="#section-8.3.5" class="auto internal xref">8.3.5</a>.  <a href="#name-mapping-quic-feedback-to-rtcp-e" class="internal xref">Mapping QUIC Feedback to RTCP Extended Report ("XR")</a></p>
+</li>
+                </ul>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.4">
+                <p id="section-toc.1-1.8.2.4.1"><a href="#section-8.4" class="auto internal xref">8.4</a>.  <a href="#name-application-layer-repair-an" class="internal xref">Application Layer Repair and other Control Messages</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.5">
+                <p id="section-toc.1-1.8.2.5.1"><a href="#section-8.5" class="auto internal xref">8.5</a>.  <a href="#name-rtcp-control-packet-types" class="internal xref">RTCP Control Packet Types</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.5.2.1">
+                    <p id="section-toc.1-1.8.2.5.2.1.1"><a href="#section-8.5.1" class="auto internal xref">8.5.1</a>.  <a href="#name-notes" class="internal xref">Notes</a></p>
+</li>
+                </ul>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.6">
+                <p id="section-toc.1-1.8.2.6.1"><a href="#section-8.6" class="auto internal xref">8.6</a>.  <a href="#name-generic-rtp-feedback-rtpfb" class="internal xref">Generic RTP Feedback (RTPFB)</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.7">
+                <p id="section-toc.1-1.8.2.7.1"><a href="#section-8.7" class="auto internal xref">8.7</a>.  <a href="#name-payload-specific-rtp-feedba" class="internal xref">Payload-specific RTP Feedback (PSFB)</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.8">
+                <p id="section-toc.1-1.8.2.8.1"><a href="#section-8.8" class="auto internal xref">8.8</a>.  <a href="#name-extended-reports-xr" class="internal xref">Extended Reports (XR)</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.9">
+                <p id="section-toc.1-1.8.2.9.1"><a href="#section-8.9" class="auto internal xref">8.9</a>.  <a href="#name-rtp-header-extensions" class="internal xref">RTP Header extensions</a></p>
 </li>
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9">
-            <p id="section-toc.1-1.9.1"><a href="#section-9" class="auto internal xref">9</a>.  <a href="#name-api-considerations" class="internal xref">API Considerations</a></p>
-<ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.1">
-                <p id="section-toc.1-1.9.2.1.1"><a href="#section-9.1" class="auto internal xref">9.1</a>.  <a href="#name-information-to-be-exported-" class="internal xref">Information to be exported from QUIC</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.2">
-                <p id="section-toc.1-1.9.2.2.1"><a href="#section-9.2" class="auto internal xref">9.2</a>.  <a href="#name-functions-to-be-exposed-by-" class="internal xref">Functions to be exposed by QUIC</a></p>
-</li>
-            </ul>
+            <p id="section-toc.1-1.9.1"><a href="#section-9" class="auto internal xref">9</a>.  <a href="#name-error-handling" class="internal xref">Error Handling</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10">
-            <p id="section-toc.1-1.10.1"><a href="#section-10" class="auto internal xref">10</a>. <a href="#name-discussion" class="internal xref">Discussion</a></p>
+            <p id="section-toc.1-1.10.1"><a href="#section-10" class="auto internal xref">10</a>. <a href="#name-api-considerations" class="internal xref">API Considerations</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10.2.1">
-                <p id="section-toc.1-1.10.2.1.1"><a href="#section-10.1" class="auto internal xref">10.1</a>.  <a href="#name-flow-identifier" class="internal xref">Flow Identifier</a></p>
+                <p id="section-toc.1-1.10.2.1.1"><a href="#section-10.1" class="auto internal xref">10.1</a>.  <a href="#name-information-to-be-exported-" class="internal xref">Information to be exported from QUIC</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10.2.2">
-                <p id="section-toc.1-1.10.2.2.1"><a href="#section-10.2" class="auto internal xref">10.2</a>.  <a href="#name-impact-of-connection-migrat" class="internal xref">Impact of Connection Migration</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10.2.3">
-                <p id="section-toc.1-1.10.2.3.1"><a href="#section-10.3" class="auto internal xref">10.3</a>.  <a href="#name-0-rtt-considerations" class="internal xref">0-RTT considerations</a></p>
+                <p id="section-toc.1-1.10.2.2.1"><a href="#section-10.2" class="auto internal xref">10.2</a>.  <a href="#name-functions-to-be-exposed-by-" class="internal xref">Functions to be exposed by QUIC</a></p>
 </li>
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11">
-            <p id="section-toc.1-1.11.1"><a href="#section-11" class="auto internal xref">11</a>. <a href="#name-security-considerations" class="internal xref">Security Considerations</a></p>
-</li>
-          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12">
-            <p id="section-toc.1-1.12.1"><a href="#section-12" class="auto internal xref">12</a>. <a href="#name-iana-considerations" class="internal xref">IANA Considerations</a></p>
+            <p id="section-toc.1-1.11.1"><a href="#section-11" class="auto internal xref">11</a>. <a href="#name-discussion" class="internal xref">Discussion</a></p>
 <ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12.2.1">
-                <p id="section-toc.1-1.12.2.1.1"><a href="#section-12.1" class="auto internal xref">12.1</a>.  <a href="#name-registration-of-a-roq-ident" class="internal xref">Registration of a RoQ Identification String</a></p>
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11.2.1">
+                <p id="section-toc.1-1.11.2.1.1"><a href="#section-11.1" class="auto internal xref">11.1</a>.  <a href="#name-impact-of-connection-migrat" class="internal xref">Impact of Connection Migration</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11.2.2">
+                <p id="section-toc.1-1.11.2.2.1"><a href="#section-11.2" class="auto internal xref">11.2</a>.  <a href="#name-0-rtt-considerations" class="internal xref">0-RTT considerations</a></p>
 </li>
             </ul>
 </li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12">
+            <p id="section-toc.1-1.12.1"><a href="#section-12" class="auto internal xref">12</a>. <a href="#name-security-considerations" class="internal xref">Security Considerations</a></p>
+</li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13">
-            <p id="section-toc.1-1.13.1"><a href="#section-13" class="auto internal xref">13</a>. <a href="#name-references" class="internal xref">References</a></p>
+            <p id="section-toc.1-1.13.1"><a href="#section-13" class="auto internal xref">13</a>. <a href="#name-iana-considerations" class="internal xref">IANA Considerations</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13.2.1">
-                <p id="section-toc.1-1.13.2.1.1"><a href="#section-13.1" class="auto internal xref">13.1</a>.  <a href="#name-normative-references" class="internal xref">Normative References</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13.2.2">
-                <p id="section-toc.1-1.13.2.2.1"><a href="#section-13.2" class="auto internal xref">13.2</a>.  <a href="#name-informative-references" class="internal xref">Informative References</a></p>
+                <p id="section-toc.1-1.13.2.1.1"><a href="#section-13.1" class="auto internal xref">13.1</a>.  <a href="#name-registration-of-a-roq-ident" class="internal xref">Registration of a RoQ Identification String</a></p>
 </li>
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.14">
-            <p id="section-toc.1-1.14.1"><a href="#appendix-A" class="auto internal xref">Appendix A</a>.  <a href="#name-experimental-results" class="internal xref">Experimental Results</a></p>
+            <p id="section-toc.1-1.14.1"><a href="#section-14" class="auto internal xref">14</a>. <a href="#name-references" class="internal xref">References</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.14.2.1">
+                <p id="section-toc.1-1.14.2.1.1"><a href="#section-14.1" class="auto internal xref">14.1</a>.  <a href="#name-normative-references" class="internal xref">Normative References</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.14.2.2">
+                <p id="section-toc.1-1.14.2.2.1"><a href="#section-14.2" class="auto internal xref">14.2</a>.  <a href="#name-informative-references" class="internal xref">Informative References</a></p>
+</li>
+            </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.15">
-            <p id="section-toc.1-1.15.1"><a href="#appendix-B" class="auto internal xref"></a><a href="#name-acknowledgments" class="internal xref">Acknowledgments</a></p>
+            <p id="section-toc.1-1.15.1"><a href="#appendix-A" class="auto internal xref">Appendix A</a>.  <a href="#name-experimental-results" class="internal xref">Experimental Results</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.16">
-            <p id="section-toc.1-1.16.1"><a href="#appendix-C" class="auto internal xref"></a><a href="#name-authors-addresses" class="internal xref">Authors' Addresses</a></p>
+            <p id="section-toc.1-1.16.1"><a href="#appendix-B" class="auto internal xref"></a><a href="#name-acknowledgments" class="internal xref">Acknowledgments</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.17">
+            <p id="section-toc.1-1.17.1"><a href="#appendix-C" class="auto internal xref"></a><a href="#name-authors-addresses" class="internal xref">Authors' Addresses</a></p>
 </li>
         </ul>
 </nav>
@@ -1513,7 +1522,7 @@ packetized in RTP packets to be transmitted over QUIC.<a href="#section-2-4.14.1
 to maximize the amount of information that is sent to a receiver, without
 causing queues to build beyond a reasonable amount, causing "buffer bloat" and
 "jitter". Rate adapation is one way to accomplish congestion control for
-realtime media, especially when a sender has multiple media streams to the
+real-time media, especially when a sender has multiple media streams to the
 receiver, because the sum of all sending rates for media streams must not be
 high enough to cause congestion on the path these media streams share between
 sender and receiver.<a href="#section-2-4.18.1" class="pilcrow">¶</a></p>
@@ -1573,7 +1582,7 @@ feedback is generated at the receiver and sent back to the sender via RTCP.<a hr
 <p id="section-3-5">Since QUIC also collects some metrics about the network's performance, these
 metrics can be used to generate the required feedback at the sender-side and
 provide it to the rate adaptation algorithm to avoid the additional overhead of the
-RTCP stream. This is discussed in more detail in <a href="#rtcp-mapping" class="auto internal xref">Section 6</a>.<a href="#section-3-5" class="pilcrow">¶</a></p>
+RTCP stream. This is discussed in more detail in <a href="#rtcp-mapping" class="auto internal xref">Section 8</a>.<a href="#section-3-5" class="pilcrow">¶</a></p>
 <div id="topologies">
 <section id="section-3.1">
         <h3 id="name-supported-rtp-topologies">
@@ -1770,7 +1779,7 @@ packetize the payload of the incoming RTP packets in smaller RTP packets.<a href
 <dt id="section-3.1-7.5">Note-Sec:</dt>
           <dd style="margin-left: 1.5em" id="section-3.1-7.6">
             <p id="section-3.1-7.6.1">Note that RTP-over-QUIC provides mandatory security, and other RTP transports
-do not. <a href="#sec-considerations" class="auto internal xref">Section 11</a> describes strategies to prevent the inadvertent
+do not. <a href="#sec-considerations" class="auto internal xref">Section 12</a> describes strategies to prevent the inadvertent
 disclosure of RTP sessions to unintended third parties.<a href="#section-3.1-7.6.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
@@ -1823,7 +1832,7 @@ topology.</em><a href="#section-3.1-7.18.1" class="pilcrow">¶</a></p>
       </h2>
 <p id="section-4-1">QUIC requires the use of ALPN <span>[<a href="#RFC7301" class="cite xref">RFC7301</a>]</span> tokens during connection setup. RoQ
 uses "rtp-mux-quic" as ALPN token in the TLS handshake (see also
-<a href="#iana-considerations" class="auto internal xref">Section 12</a>.<a href="#section-4-1" class="pilcrow">¶</a></p>
+<a href="#iana-considerations" class="auto internal xref">Section 13</a>.<a href="#section-4-1" class="pilcrow">¶</a></p>
 <p id="section-4-2">Note that the use of a given RTP profile is not reflected in the ALPN token even
 though it could be considered part of the application usage.  This is simply
 because different RTP sessions, which may use different RTP profiles, may be
@@ -1907,8 +1916,10 @@ they MAY use different flow identifiers.<a href="#section-5.1-4" class="pilcrow"
 <p id="section-5.1-5">The association between flow identifiers and data streams MUST be negotiated
 using appropriate signaling. Applications MAY send data using flow identifiers
 not associated with any RTP or RTCP stream. If a receiver cannot associate a
-flow identifier with any RTP/RTCP or non-RTP stream, it MAY drop the data
-stream.<a href="#section-5.1-5" class="pilcrow">¶</a></p>
+flow identifier with any RTP/RTCP or non-RTP flow, it MAY drop the data flow. If
+the data flow was sent on a QUIC stream, the receiver SHOULD send a
+STOP_SENDING frame with the application error code set to
+ROQ_UNKNOWN_FLOW_ID.<a href="#section-5.1-5" class="pilcrow">¶</a></p>
 <p id="section-5.1-6">There are different use cases for sharing the same QUIC connection between RTP
 and non-RTP data streams. Peers might use the same connection to exchange
 signaling messages or exchange data while sending and receiving media streams.
@@ -1927,15 +1938,25 @@ of flows.<a href="#section-5.1-7" class="pilcrow">¶</a></p>
         <h3 id="name-quic-streams">
 <a href="#section-5.2" class="section-number selfRef">5.2. </a><a href="#name-quic-streams" class="section-name selfRef">QUIC Streams</a>
         </h3>
-<p id="section-5.2-1">To send RTP/RTCP packets over QUIC streams, a sender MUST open a new
-unidirectional QUIC stream. Streams are unidirectional because there is no
-synchronous relationship between sent and received RTP/RTCP packets. A sender
-MAY open new QUIC streams for different packets using the same flow identifier,
-for example, to avoid head-of-line blocking.<a href="#section-5.2-1" class="pilcrow">¶</a></p>
-<p id="section-5.2-2"><a href="#fig-stream-payload" class="auto internal xref">Figure 1</a> shows the encapsulation format for RoQ Streams.<a href="#section-5.2-2" class="pilcrow">¶</a></p>
+<p id="section-5.2-1">To send RTP/RTCP packets over QUIC streams, a sender opens a new QUIC stream.
+The new QUIC stream MUST be a unidirectional QUIC stream. Streams are
+unidirectional because there is no synchronous relationship between sent and
+received RTP/RTCP packets. A peer that receives a bidirectional stream with a
+flow identifier that is associated with an RTP or RTCP stream, SHOULD stop
+reading from the stream and send a STOP_SENDING frame with the application
+protocol error code set to ROQ_STREAM_CREATION_ERROR.<a href="#section-5.2-1" class="pilcrow">¶</a></p>
+<p id="section-5.2-2">A RoQ sender MAY open new QUIC streams for different packets using the same flow
+identifier, for example, to avoid head-of-line blocking. A RoQ receiver MUST be
+able to receive packets of a single RTP/RTCP stream on multiple QUIC streams.<a href="#section-5.2-2" class="pilcrow">¶</a></p>
+<div id="stream-encapsulation">
+<section id="section-5.2.1">
+          <h4 id="name-stream-encapsulation">
+<a href="#section-5.2.1" class="section-number selfRef">5.2.1. </a><a href="#name-stream-encapsulation" class="section-name selfRef">Stream Encapsulation</a>
+          </h4>
+<p id="section-5.2.1-1"><a href="#fig-stream-payload" class="auto internal xref">Figure 1</a> shows the encapsulation format for RoQ Streams.<a href="#section-5.2.1-1" class="pilcrow">¶</a></p>
 <span id="name-roq-streams-payload-format"></span><div id="fig-stream-payload">
 <figure id="figure-1">
-          <div class="alignLeft art-text artwork" id="section-5.2-3.1">
+            <div class="alignLeft art-text artwork" id="section-5.2.1-2.1">
 <pre>
 Payload {
   Flow Identifier (i),
@@ -1945,29 +1966,29 @@ Payload {
 </div>
 <figcaption><a href="#figure-1" class="selfRef">Figure 1</a>:
 <a href="#name-roq-streams-payload-format" class="selfRef">RoQ Streams Payload Format</a>
-          </figcaption></figure>
+            </figcaption></figure>
 </div>
-<span class="break"></span><dl class="dlParallel" id="section-5.2-4">
-          <dt id="section-5.2-4.1">Flow Identifier:</dt>
-          <dd style="margin-left: 1.5em" id="section-5.2-4.2">
-            <p id="section-5.2-4.2.1">Flow identifier to demultiplex different data flows on the same QUIC
-connection.<a href="#section-5.2-4.2.1" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="section-5.2.1-3">
+            <dt id="section-5.2.1-3.1">Flow Identifier:</dt>
+            <dd style="margin-left: 1.5em" id="section-5.2.1-3.2">
+              <p id="section-5.2.1-3.2.1">Flow identifier to demultiplex different data flows on the same QUIC
+connection.<a href="#section-5.2.1-3.2.1" class="pilcrow">¶</a></p>
+</dd>
+            <dd class="break"></dd>
+<dt id="section-5.2.1-3.3">RTP/RTCP Payload:</dt>
+            <dd style="margin-left: 1.5em" id="section-5.2.1-3.4">
+              <p id="section-5.2.1-3.4.1">Contains the RTP/RTCP payload; see <a href="#fig-rtp-stream-payload" class="auto internal xref">Figure 2</a><a href="#section-5.2.1-3.4.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
-<dt id="section-5.2-4.3">RTP/RTCP Payload:</dt>
-          <dd style="margin-left: 1.5em" id="section-5.2-4.4">
-            <p id="section-5.2-4.4.1">Contains the RTP/RTCP payload; see <a href="#fig-rtp-stream-payload" class="auto internal xref">Figure 2</a><a href="#section-5.2-4.4.1" class="pilcrow">¶</a></p>
-</dd>
-        <dd class="break"></dd>
 </dl>
-<p id="section-5.2-5">The payload in a QUIC stream starts with the flow identifier followed by one or
+<p id="section-5.2.1-4">The payload in a QUIC stream starts with the flow identifier followed by one or
 more RTP/RTCP payloads. All RTP/RTCP payloads sent on a stream MUST belong to
-the RTP session with the same flow identifier.<a href="#section-5.2-5" class="pilcrow">¶</a></p>
-<p id="section-5.2-6">Each payload begins with a length field indicating the length of the RTP/RTCP
-packet, followed by the packet itself, see <a href="#fig-rtp-stream-payload" class="auto internal xref">Figure 2</a>.<a href="#section-5.2-6" class="pilcrow">¶</a></p>
+the RTP session with the same flow identifier.<a href="#section-5.2.1-4" class="pilcrow">¶</a></p>
+<p id="section-5.2.1-5">Each payload begins with a length field indicating the length of the RTP/RTCP
+packet, followed by the packet itself, see <a href="#fig-rtp-stream-payload" class="auto internal xref">Figure 2</a>.<a href="#section-5.2.1-5" class="pilcrow">¶</a></p>
 <span id="name-rtp-rtcp-payload-for-quic-s"></span><div id="fig-rtp-stream-payload">
 <figure id="figure-2">
-          <div class="alignLeft art-text artwork" id="section-5.2-7.1">
+            <div class="alignLeft art-text artwork" id="section-5.2.1-6.1">
 <pre>
 RTP/RTCP Payload {
   Length(i),
@@ -1977,51 +1998,93 @@ RTP/RTCP Payload {
 </div>
 <figcaption><a href="#figure-2" class="selfRef">Figure 2</a>:
 <a href="#name-rtp-rtcp-payload-for-quic-s" class="selfRef">RTP/RTCP payload for QUIC streams</a>
-          </figcaption></figure>
+            </figcaption></figure>
 </div>
-<span class="break"></span><dl class="dlParallel" id="section-5.2-8">
-          <dt id="section-5.2-8.1">Length:</dt>
-          <dd style="margin-left: 1.5em" id="section-5.2-8.2">
-            <p id="section-5.2-8.2.1">A QUIC variable length integer <span><a href="https://rfc-editor.org/rfc/rfc9000#section-16" class="relref">Section 16</a> of [<a href="#RFC9000" class="cite xref">RFC9000</a>]</span> describing the
-length of the following RTP/RTCP packets in bytes.<a href="#section-5.2-8.2.1" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="section-5.2.1-7">
+            <dt id="section-5.2.1-7.1">Length:</dt>
+            <dd style="margin-left: 1.5em" id="section-5.2.1-7.2">
+              <p id="section-5.2.1-7.2.1">A QUIC variable length integer <span><a href="https://rfc-editor.org/rfc/rfc9000#section-16" class="relref">Section 16</a> of [<a href="#RFC9000" class="cite xref">RFC9000</a>]</span> describing the
+length of the following RTP/RTCP packets in bytes.<a href="#section-5.2.1-7.2.1" class="pilcrow">¶</a></p>
+</dd>
+            <dd class="break"></dd>
+<dt id="section-5.2.1-7.3">RTP/RTCP Packet:</dt>
+            <dd style="margin-left: 1.5em" id="section-5.2.1-7.4">
+              <p id="section-5.2.1-7.4.1">The RTP/RTCP packet to transmit.<a href="#section-5.2.1-7.4.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
-<dt id="section-5.2-8.3">RTP/RTCP Packet:</dt>
-          <dd style="margin-left: 1.5em" id="section-5.2-8.4">
-            <p id="section-5.2-8.4.1">The RTP/RTCP packet to transmit.<a href="#section-5.2-8.4.1" class="pilcrow">¶</a></p>
-</dd>
-        <dd class="break"></dd>
 </dl>
-<p id="section-5.2-9">If a sender knows that a packet, which was not yet successfully and completely
-transmitted, is no longer needed, the sender MAY close the stream by sending a
-RESET_STREAM frame.<a href="#section-5.2-9" class="pilcrow">¶</a></p>
-<p id="section-5.2-10">A translator that translates between two endpoints, both connected via QUIC,
-MUST forward RESET_STREAM frames received from one end to the other unless it
-forwards the RTP packets on QUIC datagrams.<a href="#section-5.2-10" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="media-frame-cancellation">
+<section id="section-5.2.2">
+          <h4 id="name-media-frame-cancellation">
+<a href="#section-5.2.2" class="section-number selfRef">5.2.2. </a><a href="#name-media-frame-cancellation" class="section-name selfRef">Media Frame Cancellation</a>
+          </h4>
+<p id="section-5.2.2-1">QUIC uses RESET_STREAM and STOP_SENDING frames to terminate the sending part
+of a stream and to request termination of an incoming stream by the sending
+peer respectively.<a href="#section-5.2.2-1" class="pilcrow">¶</a></p>
+<p id="section-5.2.2-2">A RoQ sender MAY use RESET_STREAM if it knows that a packet, which was not yet
+successfully and completely transmitted, is no longer needed.<a href="#section-5.2.2-2" class="pilcrow">¶</a></p>
+<p id="section-5.2.2-3">A RoQ receiver that is no longer be interested in reading a certain partition of
+the media stream MAY signal this to the sending peer using a STOP_SENDING
+frame.<a href="#section-5.2.2-3" class="pilcrow">¶</a></p>
+<p id="section-5.2.2-4">In both cases, the error code of the RESET_STREAM frame or the STOP_SENDING
+frame MUST be set to ROQ_FRAME_CANCELLED.<a href="#section-5.2.2-4" class="pilcrow">¶</a></p>
+<p id="section-5.2.2-5">When a RoQ sender receives a STOP_SENDING frame, the RoQ sender MUST open one
+or more new QUIC streams to send new media frames. Any media frame that has
+already been sent on the QUIC stream that received the STOP_SENDING frame, MUST
+NOT be sent again on the new QUIC stream(s).<a href="#section-5.2.2-5" class="pilcrow">¶</a></p>
+<p id="section-5.2.2-6">Note that an RTP receiver cannot request a reset of only a particular media
+frame because the sending QUIC implementation might already have sent data for
+the following frame on the same stream. In that case, STOP_SENDING and the
+following RESET_STREAM would also drop the following media frame and thus lead
+to unintentionally skipping one or more frames.<a href="#section-5.2.2-6" class="pilcrow">¶</a></p>
 <ul class="normal ulEmpty">
-<li class="normal ulEmpty" id="section-5.2-11.1">
-            <p id="section-5.2-11.1.1"><strong>Editor's Note:</strong> It might be desired to also allow the receiver to request
-cancellation of a stream by sending STOP_SENDING frame. However, this might
-lead to unintended packet loss because the receiver does not know which and
-how many packets follow on the same stream. If this feature is required, a
-solution could be to require senders to open new streams for each application
-data unit, as described in a previous version of this document.<a href="#section-5.2-11.1.1" class="pilcrow">¶</a></p>
+<li class="normal ulEmpty" id="section-5.2.2-7.1">
+              <p id="section-5.2.2-7.1.1"><strong>Editor's note:</strong> A receiver cannot cancel a certain frame but still receive
+retransmissions for a frame the was following on the same stream using
+STOP_SENDING, because STOP_SENDING does not include an offset which would
+allow signaling where retransmissions should continue. If this is a required
+feature for RoQ, it could be implemented using an extended STOP_SENDING frame
+as, for example, proposed in <span>[<a href="#I-D.draft-thomson-quic-enough-00" class="cite xref">I-D.draft-thomson-quic-enough-00</a>]</span>.<a href="#section-5.2.2-7.1.1" class="pilcrow">¶</a></p>
 </li>
-        </ul>
-<p id="section-5.2-12">Large RTP packets sent on a stream will be fragmented into smaller QUIC frames.
+          </ul>
+<p id="section-5.2.2-8">A translator that translates between two endpoints, both connected via QUIC,
+MUST forward RESET_STREAM frames received from one end to the other unless it
+forwards the RTP packets on QUIC datagrams.<a href="#section-5.2.2-8" class="pilcrow">¶</a></p>
+<p id="section-5.2.2-9">Large RTP packets sent on a stream will be fragmented into smaller QUIC frames.
 The QUIC frames are transmitted reliably and in order such that a receiving
 application can read a complete RTP packet from the stream as long as the stream
 is not closed with a RESET_STREAM frame. No retransmission has to be
 implemented by the application since QUIC frames lost in transit are
-retransmitted by QUIC.<a href="#section-5.2-12" class="pilcrow">¶</a></p>
-<p id="section-5.2-13">Opening new streams for new packets MAY implicitly limit the number of packets
+retransmitted by QUIC.<a href="#section-5.2.2-9" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="flow-control-and-maxstreams">
+<section id="section-5.2.3">
+          <h4 id="name-flow-control-and-max_stream">
+<a href="#section-5.2.3" class="section-number selfRef">5.2.3. </a><a href="#name-flow-control-and-max_stream" class="section-name selfRef">Flow control and MAX_STREAMS</a>
+          </h4>
+<p id="section-5.2.3-1">Opening new streams for new packets MAY implicitly limit the number of packets
 concurrently in transit because the QUIC receiver provides an upper bound of
 parallel streams, which it can update using QUIC MAX_STREAMS frames. The number
 of packets that have to be transmitted concurrently depends on several factors,
 such as the number of RTP streams within a QUIC connection, the bitrate of the
 media streams, and the maximum acceptable transmission delay of a given packet.
-Receivers are responsible for providing senders with enough credit to open new
-streams for new packets at any time.<a href="#section-5.2-13" class="pilcrow">¶</a></p>
+Receivers are responsible for providing senders enough credit to open new
+streams for new packets anytime. As an example, consider a conference scenario
+with 20 participants. Each participant receives audio and video streams of every
+other participant from a central server. If the sender opens a new QUIC stream
+for every frame at 30 frames per second video and 50 frames per second audio, it
+will open 1520 new QUIC streams per second. A receiver must provide at least
+that many credits for opening new unidirectional streams to the server every
+second. In addition, the receiver should also consider the requirements of
+protocols into account that are multiplexed with RTP, including RTCP and data
+streams. These considerations may also be relevant when implementing signaling
+since it may be necessary to inform the receiver about how fast and how much
+stream credits it will have to provide to the media-sending peer.<a href="#section-5.2.3-1" class="pilcrow">¶</a></p>
+</section>
+</div>
 </section>
 </div>
 <div id="quic-datagrams">
@@ -2030,16 +2093,21 @@ streams for new packets at any time.<a href="#section-5.2-13" class="pilcrow">¶
 <a href="#section-5.3" class="section-number selfRef">5.3. </a><a href="#name-quic-datagrams" class="section-name selfRef">QUIC Datagrams</a>
         </h3>
 <p id="section-5.3-1">Senders can also transmit RTP packets in QUIC datagrams. QUIC datagrams are an
-extension to QUIC described in <span>[<a href="#RFC9221" class="cite xref">RFC9221</a>]</span>. QUIC datagrams preserve frame
-boundaries. Thus, a single RTP packet can be mapped to a single QUIC datagram
-without additional framing. Senders SHOULD consider the header overhead
-associated with QUIC datagrams and ensure that the RTP/RTCP packets, including
-their payloads, flow identifier, QUIC, and IP headers, will fit into path MTU.<a href="#section-5.3-1" class="pilcrow">¶</a></p>
-<p id="section-5.3-2"><a href="#fig-dgram-payload" class="auto internal xref">Figure 3</a> shows the encapsulation format for RoQ
-Datagrams.<a href="#section-5.3-2" class="pilcrow">¶</a></p>
+extension to QUIC described in <span>[<a href="#RFC9221" class="cite xref">RFC9221</a>]</span>. QUIC datagrams can only be used if
+the use of the extension was successfully negotiated during the QUIC handshake.
+If the use of datagrams was signalled using a signalling protocol, but the
+datagram extension was not negotiated during the handshake, a peer MAY close the
+connection with the ROQ_SIGNALING_ERROR error code.<a href="#section-5.3-1" class="pilcrow">¶</a></p>
+<p id="section-5.3-2">QUIC datagrams preserve frame boundaries. Thus, a single RTP packet can be
+mapped to a single QUIC datagram without additional framing. Senders SHOULD
+consider the header overhead associated with QUIC datagrams and ensure that the
+RTP/RTCP packets, including their payloads, flow identifier, QUIC, and IP
+headers, will fit into path MTU.<a href="#section-5.3-2" class="pilcrow">¶</a></p>
+<p id="section-5.3-3"><a href="#fig-dgram-payload" class="auto internal xref">Figure 3</a> shows the encapsulation format for RoQ
+Datagrams.<a href="#section-5.3-3" class="pilcrow">¶</a></p>
 <span id="name-roq-datagram-payload-format"></span><div id="fig-dgram-payload">
 <figure id="figure-3">
-          <div class="alignLeft art-text artwork" id="section-5.3-3.1">
+          <div class="alignLeft art-text artwork" id="section-5.3-4.1">
 <pre>
 Payload {
   Flow Identifier (i),
@@ -2051,240 +2119,428 @@ Payload {
 <a href="#name-roq-datagram-payload-format" class="selfRef">RoQ Datagram Payload Format</a>
           </figcaption></figure>
 </div>
-<span class="break"></span><dl class="dlParallel" id="section-5.3-4">
-          <dt id="section-5.3-4.1">Flow Identifier:</dt>
-          <dd style="margin-left: 1.5em" id="section-5.3-4.2">
-            <p id="section-5.3-4.2.1">Flow identifier to demultiplex different data flows on the same QUIC
-connection.<a href="#section-5.3-4.2.1" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="section-5.3-5">
+          <dt id="section-5.3-5.1">Flow Identifier:</dt>
+          <dd style="margin-left: 1.5em" id="section-5.3-5.2">
+            <p id="section-5.3-5.2.1">Flow identifier to demultiplex different data flows on the same QUIC
+connection.<a href="#section-5.3-5.2.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
-<dt id="section-5.3-4.3">RTP/RTCP Packet:</dt>
-          <dd style="margin-left: 1.5em" id="section-5.3-4.4">
-            <p id="section-5.3-4.4.1">The RTP/RTCP packet to transmit.<a href="#section-5.3-4.4.1" class="pilcrow">¶</a></p>
+<dt id="section-5.3-5.3">RTP/RTCP Packet:</dt>
+          <dd style="margin-left: 1.5em" id="section-5.3-5.4">
+            <p id="section-5.3-5.4.1">The RTP/RTCP packet to transmit.<a href="#section-5.3-5.4.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
 </dl>
-<p id="section-5.3-5">Since QUIC datagrams are not retransmitted on loss (see also
-<a href="#transport-layer-feedback" class="auto internal xref">Section 6.3</a> for loss signaling), if an application wishes to
+<p id="section-5.3-6">Since QUIC datagrams are not retransmitted on loss (see also
+<a href="#transport-layer-feedback" class="auto internal xref">Section 8.3</a> for loss signaling), if an application wishes to
 retransmit lost RTP packets, the retransmission has to be implemented by the
 application. RTP retransmissions can be done in the same RTP session or a
 separate RTP session <span>[<a href="#RFC4588" class="cite xref">RFC4588</a>]</span> and the flow identifier MUST be set to the
-flow identifier of the RTP session in which the retransmission happens.<a href="#section-5.3-5" class="pilcrow">¶</a></p>
+flow identifier of the RTP session in which the retransmission happens.<a href="#section-5.3-6" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="connection-shutdown">
+<section id="section-6">
+      <h2 id="name-connection-shutdown">
+<a href="#section-6" class="section-number selfRef">6. </a><a href="#name-connection-shutdown" class="section-name selfRef">Connection Shutdown</a>
+      </h2>
+<p id="section-6-1">Both peers MAY close the connection for variety of reasons. If one of the peers
+wants to close the RoQ connection, the peer can use a QUIC CONNECTION_CLOSE
+frame with one of the error codes defined in <a href="#error-handling" class="auto internal xref">Section 9</a>.<a href="#section-6-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="congestion-control">
+<section id="section-7">
+      <h2 id="name-congestion-control-and-rate">
+<a href="#section-7" class="section-number selfRef">7. </a><a href="#name-congestion-control-and-rate" class="section-name selfRef">Congestion Control and Rate Adaptation</a>
+      </h2>
+<p id="section-7-1">Like any other application on the internet, RoQ applications need a mechanism to
+perform congestion control to avoid overloading the network. While any generic
+congestion controller can protect the network, this document takes advantage of
+the opportunity to use rate adaptation mechanisms that are designed to provide
+superior user experiences for real-time media applications.<a href="#section-7-1" class="pilcrow">¶</a></p>
+<p id="section-7-2">A wide variety of rate adaptation algorithms for real-time media have been
+developed (for example, "Google Congestion Controller"
+<span>[<a href="#I-D.draft-ietf-rmcat-gcc" class="cite xref">I-D.draft-ietf-rmcat-gcc</a>]</span>). The IETF has defined two algorithms in two
+Experimental RFCs (e.g. SCReAM <span>[<a href="#RFC8298" class="cite xref">RFC8298</a>]</span> and NADA <span>[<a href="#RFC8698" class="cite xref">RFC8698</a>]</span>). These rate
+adaptation algorithms for RTP are specifically tailored for real-time
+transmissions at low latencies, but this section would apply to any rate
+adaptation algorithm that meets the requirements described in "Congestion
+Control Requirements for Interactive Real-Time Media" <span>[<a href="#RFC8836" class="cite xref">RFC8836</a>]</span>.<a href="#section-7-2" class="pilcrow">¶</a></p>
+<p id="section-7-3">This document defines two architectures for congestion control and bandwidth
+estimation for RoQ, depending on whether most rate adaptation is performed
+within a QUIC implementation at the transport layer, as described in
+<a href="#cc-quic-layer" class="auto internal xref">Section 7.1</a>, or within an RTP application layer, as described in
+<a href="#cc-application-layer" class="auto internal xref">Section 7.2</a>, but this document does not mandate any specific
+congestion control or rate adaptation algorithm for either QUIC or RTP.<a href="#section-7-3" class="pilcrow">¶</a></p>
+<p id="section-7-4">This document also gives guidance about avoiding problems with "nested"
+congestion controllers, in <a href="#nested-CC" class="auto internal xref">Section 7.3</a>.<a href="#section-7-4" class="pilcrow">¶</a></p>
+<p id="section-7-5">This document also discusses congestion control
+implications of using shared or multiple separate QUIC connections to send and
+receive multiple independent data streams, in <a href="#shared-connections" class="auto internal xref">Section 7.4</a>.<a href="#section-7-5" class="pilcrow">¶</a></p>
+<p id="section-7-6">It is assumed that the congestion controller in use provides a pacing mechanism
+to determine when a packet can be sent to avoid bursts. The currently proposed
+congestion control algorithms for real-time communications (e.g. SCReAM and
+NADA) provide such pacing mechanisms. The use of congestion controllers which
+don't provide a pacing mechanism is out of scope of this document.<a href="#section-7-6" class="pilcrow">¶</a></p>
+<div id="cc-quic-layer">
+<section id="section-7.1">
+        <h3 id="name-congestion-control-at-the-t">
+<a href="#section-7.1" class="section-number selfRef">7.1. </a><a href="#name-congestion-control-at-the-t" class="section-name selfRef">Congestion Control at the Transport Layer</a>
+        </h3>
+<p id="section-7.1-1">QUIC is a congestion controlled transport protocol. Senders are required to
+employ some form of congestion control. The default congestion control specified
+for QUIC in <span>[<a href="#RFC9002" class="cite xref">RFC9002</a>]</span> is similar to TCP NewReno <span>[<a href="#RFC6582" class="cite xref">RFC6582</a>]</span>, but senders are
+free to choose any congestion control algorithm as long as they follow the
+guidelines specified in <span><a href="https://rfc-editor.org/rfc/rfc8085#section-3" class="relref">Section 3</a> of [<a href="#RFC8085" class="cite xref">RFC8085</a>]</span>, and QUIC implementors make
+use of this freedom.<a href="#section-7.1-1" class="pilcrow">¶</a></p>
+<p id="section-7.1-2">If a QUIC implementation is to perform rate adaptation in a way that
+accommodates real-time media, one way for the implementation to recognize that
+it is carrying real-time media is to be explicitly told that this is the case.
+This document defines a new "TLS Application-Layer Protocol Negotiation (ALPN)
+Protocol ID", as described in <a href="#alpn" class="auto internal xref">Section 4</a>, that a QUIC implementation can use as a
+signal to choose a real-time media-centric rate controller, but this is not
+required for ROQ deployments.<a href="#section-7.1-2" class="pilcrow">¶</a></p>
+<p id="section-7.1-3">If congestion control is to be applied at the transport layer, it is RECOMMENDED
+that the QUIC Implementation uses a congestion controller that keeps queueing
+delays short to keep the transmission latency for RTP and RTCP packets as low as
+possible, such as the IETF-defined SCReAM <span>[<a href="#RFC8298" class="cite xref">RFC8298</a>]</span> and NADA <span>[<a href="#RFC8698" class="cite xref">RFC8698</a>]</span>
+algorithms.<a href="#section-7.1-3" class="pilcrow">¶</a></p>
+<p id="section-7.1-4">Many low latency congestion control algorithms depend on detailed arrival time
+feedback to estimate the current one-way delay between sender and receiver. QUIC
+does not provide arrival timestamps in its acknowledgments. The QUIC
+implementations of the sender and receiver can use an extension to add this
+information to QUICs acknowledgment frames, e.g.
+<span>[<a href="#I-D.draft-smith-quic-receive-ts" class="cite xref">I-D.draft-smith-quic-receive-ts</a>]</span> or <span>[<a href="#I-D.draft-huitema-quic-ts" class="cite xref">I-D.draft-huitema-quic-ts</a>]</span>.<a href="#section-7.1-4" class="pilcrow">¶</a></p>
+<p id="section-7.1-5">If congestion control is done by the QUIC implementation, the application needs
+a mechanism to query the currently available bandwidth to adapt media codec
+configurations. The employed congestion controller of the QUIC connection SHOULD
+expose such an API to the application. If a current bandwidth estimate is not
+available from the QUIC congestion controller, the sender can either implement
+an alternative bandwidth estimation at the application layer as described in
+<a href="#cc-application-layer" class="auto internal xref">Section 7.2</a> or a receiver can feedback the observed bandwidth
+through RTCP, e.g., using <span>[<a href="#I-D.draft-alvestrand-rmcat-remb" class="cite xref">I-D.draft-alvestrand-rmcat-remb</a>]</span>.<a href="#section-7.1-5" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="cc-application-layer">
+<section id="section-7.2">
+        <h3 id="name-congestion-control-at-the-r">
+<a href="#section-7.2" class="section-number selfRef">7.2. </a><a href="#name-congestion-control-at-the-r" class="section-name selfRef">Congestion Control at the RTP Application Layer</a>
+        </h3>
+<p id="section-7.2-1">RTP itself does not specify a congestion control algorithm, but <span>[<a href="#RFC8888" class="cite xref">RFC8888</a>]</span>
+defines an RTCP feedback message intended to enable rate adaptation for
+interactive real-time traffic using RTP, and successful rate adaptation will
+accomplish congestion control as well.<a href="#section-7.2-1" class="pilcrow">¶</a></p>
+<p id="section-7.2-2">The rate adaptation algorithms for RTP are specifically tailored for real-time
+transmissions at low latencies, as described in <a href="#congestion-control" class="auto internal xref">Section 7</a>. The
+available rate adaptation algorithms expose a <code>target_bitrate</code> that can be used
+to dynamically reconfigure media codecs to produce media at a rate that can be
+sent in real-time under the observed network conditions.<a href="#section-7.2-2" class="pilcrow">¶</a></p>
+<p id="section-7.2-3">If an application cannot access a bandwidth estimation from the QUIC layer, or
+the QUIC implementation does not support a delay-based, low-latency congestion
+control algorithm, the application can alternatively implement a bandwidth estimation
+algorithm at the application layer. Calculating a bandwidth estimation at the
+application layer can be done using the same bandwidth estimation algorithms as
+described in <a href="#congestion-control" class="auto internal xref">Section 7</a> (NADA, SCReAM). The bandwidth estimation
+algorithm typically needs some feedback on the transmission performance. This
+feedback can be collected following the guidelines in <a href="#rtcp-mapping" class="auto internal xref">Section 8</a>.<a href="#section-7.2-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="nested-CC">
+<section id="section-7.3">
+        <h3 id="name-resolving-interactions-betw">
+<a href="#section-7.3" class="section-number selfRef">7.3. </a><a href="#name-resolving-interactions-betw" class="section-name selfRef">Resolving Interactions Between QUIC and Application-layer Congestion Control</a>
+        </h3>
+<p id="section-7.3-1">Because QUIC is a congestion-controlled transport, as described in
+<a href="#cc-quic-layer" class="auto internal xref">Section 7.1</a>, and RTP applications can also perform congestion control and
+rate adaptation, as described in <a href="#cc-application-layer" class="auto internal xref">Section 7.2</a>, implementers should
+be aware of the possibility that these "nested" congestion control loops, where
+both controllers are managing rate adaptation for the same packet stream
+independently, may deliver problematic performance. Because this document is
+describing a specific case (media transport), we can provide some guidance to
+avoid the worst possible problems.<a href="#section-7.3-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-7.3-2.1">
+            <strong>Application-limited Media Flows</strong> - if an application chooses RTP as its
+transport mechanism, the goal will be maximizing the user experience, not
+maximizing path bandwidth utilization. If the application is, in fact,
+transmitting media that does not saturate path bandwidth, and paces its
+transmission, more heavy-handed congestion control mechanisms (drastic
+reductions in the sending rate when loss is detected, with much slower
+increases when losses are no longer detected) should rarely come into play. If
+the application chooses ROQ as its transport, sends enough media to saturate
+the path bandwidth, and does not adapt its own sending rate, drastic measures
+will be required in order to avoid sustained or oscillating congestion along
+the path.<a href="#section-7.3-2.1" class="pilcrow">¶</a>
+</li>
+          <li class="normal" id="section-7.3-2.2">
+            <strong>Awareness of Bufferbloat</strong> - modern general-purpose congestion controllers
+do not adjust  their sending rates based only on packet loss. For example, BBR
+("Bottleneck Bandwidth and Round-trip propagation time")
+<span>[<a href="#I-D.cardwell-iccrg-bbr-congestion-control" class="cite xref">I-D.cardwell-iccrg-bbr-congestion-control</a>]</span> describes its strategy for
+adapting sending rates in this way:<a href="#section-7.3-2.2" class="pilcrow">¶</a>
+</li>
+        </ul>
+<ul class="normal ulEmpty">
+<li class="normal ulEmpty" id="section-7.3-3.1">
+            <p id="section-7.3-3.1.1">(BBR) "uses recent measurements of a transport connection's delivery rate,
+round-trip time, and packet loss rate to build an explicit model of the
+network path. BBR then uses this model to control both how fast it sends data
+and the maximum volume of data it allows in flight in the network at any
+time."<a href="#section-7.3-3.1.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+</section>
+</div>
+<div id="shared-connections">
+<section id="section-7.4">
+        <h3 id="name-sharing-quic-connections">
+<a href="#section-7.4" class="section-number selfRef">7.4. </a><a href="#name-sharing-quic-connections" class="section-name selfRef">Sharing QUIC connections</a>
+        </h3>
+<p id="section-7.4-1">Two endpoints may establish channels in order to exchange more than one type of
+data simultaneously. The channels can be intended to carry real-time RTP data or
+other non-real-time data. This can be realized in different ways.<a href="#section-7.4-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-7.4-2.1">One straightforward solution is to establish multiple QUIC connections, one
+for each channel, whether the channel is used for real-time media or
+non-real-time data. This is a straightforward solution, but has the
+disadvantage that transport ports are more quickly exhausted and these are
+limited by the 16-bit UDP source and destination port number sizes
+<span>[<a href="#RFC768" class="cite xref">RFC768</a>]</span>.<a href="#section-7.4-2.1" class="pilcrow">¶</a>
+</li>
+          <li class="normal" id="section-7.4-2.2">Alternatively, all real-time channels are mapped to one QUIC connection, while
+a separate QUIC connection is created for the non-real-time channels.<a href="#section-7.4-2.2" class="pilcrow">¶</a>
+</li>
+        </ul>
+<p id="section-7.4-3">In both cases, the congestion controllers can be chosen to match the demands of
+the respective channels and the different QUIC connections will compete for the
+same resources in the network. No local prioritization of data across the
+different (types of) channels would be necessary.<a href="#section-7.4-3" class="pilcrow">¶</a></p>
+<p id="section-7.4-4">Although it is possible to multiplex (all or a subset of) real-time and
+non-real-time channels onto a single, shared QUIC connection, which can be done
+by using the flow identifier described in <a href="#multiplexing" class="auto internal xref">Section 5.1</a>, the underlying QUIC
+implementation will likely use the same congestion controller for all channels
+in the shared QUIC connection. For this reason, applications multiplexing
+multiple streams in one connection SHOULD implement some form of stream
+prioritization or bandwidth allocation.<a href="#section-7.4-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
 </div>
 <div id="rtcp-mapping">
-<section id="section-6">
+<section id="section-8">
       <h2 id="name-replacing-rtcp-and-rtp-head">
-<a href="#section-6" class="section-number selfRef">6. </a><a href="#name-replacing-rtcp-and-rtp-head" class="section-name selfRef">Replacing RTCP and RTP Header Extensions with QUIC Feedback</a>
+<a href="#section-8" class="section-number selfRef">8. </a><a href="#name-replacing-rtcp-and-rtp-head" class="section-name selfRef">Replacing RTCP and RTP Header Extensions with QUIC Feedback</a>
       </h2>
-<p id="section-6-1">Because RTP has so often used UDP as its underlying transport protocol, and
+<p id="section-8-1">Because RTP has so often used UDP as its underlying transport protocol, and
 receiving little or no feedback from UTP, RTP implementations rely on feedback from
 the RTP Control Protocol (RTCP) so that RTP senders and receivers can exchange
 control information to monitor connection statistics and to identify and
-synchronize streams.<a href="#section-6-1" class="pilcrow">¶</a></p>
-<p id="section-6-2">Because QUIC provides its own transport-level feedback, at least some RTP
+synchronize streams.<a href="#section-8-1" class="pilcrow">¶</a></p>
+<p id="section-8-2">Because QUIC provides its own transport-level feedback, at least some RTP
 transport level feedback can be replaced with current QUIC feedback
 <span>[<a href="#rfc9000" class="cite xref">rfc9000</a>]</span>. In adition, RTP-level feedback that is not available in QUIC by
 default can be replaced with generally useful QUIC extensions. Examples of these
-extentions include:<a href="#section-6-2" class="pilcrow">¶</a></p>
+extentions include:<a href="#section-8-2" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-6-3.1">Arrival timestamps, which are not part of QUIC's default acknowledgment
+<li class="normal" id="section-8-3.1">Arrival timestamps, which are not part of QUIC's default acknowledgment
 frames, but can be added using <span>[<a href="#I-D.draft-smith-quic-receive-ts" class="cite xref">I-D.draft-smith-quic-receive-ts</a>]</span> or
-<span>[<a href="#I-D.draft-huitema-quic-ts" class="cite xref">I-D.draft-huitema-quic-ts</a>]</span>, or<a href="#section-6-3.1" class="pilcrow">¶</a>
+<span>[<a href="#I-D.draft-huitema-quic-ts" class="cite xref">I-D.draft-huitema-quic-ts</a>]</span>, or<a href="#section-8-3.1" class="pilcrow">¶</a>
 </li>
-        <li class="normal" id="section-6-3.2">Adjusting the frequency of QUIC acknowledgments, using
-<span>[<a href="#I-D.draft-ietf-quic-ack-frequency" class="cite xref">I-D.draft-ietf-quic-ack-frequency</a>]</span>.<a href="#section-6-3.2" class="pilcrow">¶</a>
+        <li class="normal" id="section-8-3.2">Adjusting the frequency of QUIC acknowledgments, using
+<span>[<a href="#I-D.draft-ietf-quic-ack-frequency" class="cite xref">I-D.draft-ietf-quic-ack-frequency</a>]</span>.<a href="#section-8-3.2" class="pilcrow">¶</a>
 </li>
       </ul>
-<p id="section-6-4">When statistics contained in RTCP packets are also available from QUIC, or can
+<p id="section-8-4">When statistics contained in RTCP packets are also available from QUIC, or can
 be derived from statistics available from QUIC, it is desireable to provide
 these statistics at only one protocol layer. This avoids consumption of
 bandwidth to deliver duplicated control information. Because QUIC relies on
 certain frames being sent, it is not possible to supress QUIC signaling in favor
 of RTCP signaling, so if bandwidth is to be conserved, this must be accomplished
-by surpressing RTCP signaling in favor of QUIC signalling.<a href="#section-6-4" class="pilcrow">¶</a></p>
-<p id="section-6-5">This document specifies a baseline for replacing some of the RTCP packet types
+by surpressing RTCP signaling in favor of QUIC signalling.<a href="#section-8-4" class="pilcrow">¶</a></p>
+<p id="section-8-5">This document specifies a baseline for replacing some of the RTCP packet types
 by mapping the contents to QUIC connection statistics. Future documents can
 extend this mapping for other RTCP format types, and can make use of new QUIC
-extensions that become available over time.<a href="#section-6-5" class="pilcrow">¶</a></p>
-<p id="section-6-6">Most statements about "QUIC" in <a href="#rtcp-mapping" class="auto internal xref">Section 6</a> are applicable to both RTP
+extensions that become available over time.<a href="#section-8-5" class="pilcrow">¶</a></p>
+<p id="section-8-6">Most statements about "QUIC" in <a href="#rtcp-mapping" class="auto internal xref">Section 8</a> are applicable to both RTP
 encapsulated in QUIC streams and RTP encapsulated in QUIC datagrams. The
-differences are described in <a href="#roc-d" class="auto internal xref">Section 6.1</a> and <a href="#roc-s" class="auto internal xref">Section 6.2</a>.<a href="#section-6-6" class="pilcrow">¶</a></p>
+differences are described in <a href="#roc-d" class="auto internal xref">Section 8.1</a> and <a href="#roc-s" class="auto internal xref">Section 8.2</a>.<a href="#section-8-6" class="pilcrow">¶</a></p>
 <ul class="normal ulEmpty">
-<li class="normal ulEmpty" id="section-6-7.1">
-          <p id="section-6-7.1.1"><strong>Editor's Note:</strong> Additional discussion of bandwidth minimization could go in
+<li class="normal ulEmpty" id="section-8-7.1">
+          <p id="section-8-7.1.1"><strong>Editor's Note:</strong> Additional discussion of bandwidth minimization could go in
 this section, or in an earlier proposed section on motivations for defining
-and deploying RoQ.<a href="#section-6-7.1.1" class="pilcrow">¶</a></p>
+and deploying RoQ.<a href="#section-8-7.1.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
-<p id="section-6-8">While RoQ places no restrictions on applications sending RTCP, this
+<p id="section-8-8">While RoQ places no restrictions on applications sending RTCP, this
 document assumes that the reason an implementor chooses to support RoQ
 is to obtain benefits beyond what's available when RTP uses UDP as its
 underlying transport layer. It is RECOMMENDED to expose relevant information
 from the QUIC layer to the application instead of exchanging additional RTCP
-packets, where applicable.<a href="#section-6-8" class="pilcrow">¶</a></p>
-<p id="section-6-9"><a href="#transport-layer-feedback" class="auto internal xref">Section 6.3</a> and <a href="#al-repair" class="auto internal xref">Section 6.4</a> discuss what information can be
-exposed from the QUIC connection layer to reduce the RTCP overhead.<a href="#section-6-9" class="pilcrow">¶</a></p>
-<p id="section-6-10">The list of RTCP packets in this section is not exhaustive and similar
+packets, where applicable.<a href="#section-8-8" class="pilcrow">¶</a></p>
+<p id="section-8-9"><a href="#transport-layer-feedback" class="auto internal xref">Section 8.3</a> and <a href="#al-repair" class="auto internal xref">Section 8.4</a> discuss what information can be
+exposed from the QUIC connection layer to reduce the RTCP overhead.<a href="#section-8-9" class="pilcrow">¶</a></p>
+<p id="section-8-10">The list of RTCP packets in this section is not exhaustive and similar
 considerations SHOULD be taken into account before exchanging any other type of
-RTCP control packets using RoQ.<a href="#section-6-10" class="pilcrow">¶</a></p>
-<p id="section-6-11">A more complete analysis of RTCP Control Packet Types (in <a href="#control-packets" class="auto internal xref">Section 6.5</a>),
-Generic RTP Feedback (RTPFB) (in <a href="#generic-feedback" class="auto internal xref">Section 6.6</a>), Payload-specific RTP
-Feedback (PSFB) (in <a href="#payload-specific-feedback" class="auto internal xref">Section 6.7</a>), Extended Reports (in
-<a href="#extended-reports" class="auto internal xref">Section 6.8</a>), and RTP Header Extensions (in <a href="#rtp-header-extensions" class="auto internal xref">Section 6.9</a>),
-including the information that cannot be mapped from QUIC.<a href="#section-6-11" class="pilcrow">¶</a></p>
+RTCP control packets using RoQ.<a href="#section-8-10" class="pilcrow">¶</a></p>
+<p id="section-8-11">A more complete analysis of RTCP Control Packet Types (in <a href="#control-packets" class="auto internal xref">Section 8.5</a>),
+Generic RTP Feedback (RTPFB) (in <a href="#generic-feedback" class="auto internal xref">Section 8.6</a>), Payload-specific RTP
+Feedback (PSFB) (in <a href="#payload-specific-feedback" class="auto internal xref">Section 8.7</a>), Extended Reports (in
+<a href="#extended-reports" class="auto internal xref">Section 8.8</a>), and RTP Header Extensions (in <a href="#rtp-header-extensions" class="auto internal xref">Section 8.9</a>),
+including the information that cannot be mapped from QUIC.<a href="#section-8-11" class="pilcrow">¶</a></p>
 <div id="roc-d">
-<section id="section-6.1">
+<section id="section-8.1">
         <h3 id="name-roq-datagrams">
-<a href="#section-6.1" class="section-number selfRef">6.1. </a><a href="#name-roq-datagrams" class="section-name selfRef">RoQ Datagrams</a>
+<a href="#section-8.1" class="section-number selfRef">8.1. </a><a href="#name-roq-datagrams" class="section-name selfRef">RoQ Datagrams</a>
         </h3>
-<p id="section-6.1-1">QUIC Datagrams are ack-eliciting packets, which means, that an acknowledgment is
+<p id="section-8.1-1">QUIC Datagrams are ack-eliciting packets, which means, that an acknowledgment is
 triggered when a datagram frame is received. Thus, a sender can assume that an
 RTP packet arrived at the receiver or was lost in transit, using the QUIC
 acknowledgments of QUIC Datagram frames. In the following, an RTP packet is
 regarded as acknowledged, when the QUIC Datagram frame that carried the RTP
-packet, was acknowledged.<a href="#section-6.1-1" class="pilcrow">¶</a></p>
+packet, was acknowledged.<a href="#section-8.1-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="roc-s">
-<section id="section-6.2">
+<section id="section-8.2">
         <h3 id="name-roq-streams">
-<a href="#section-6.2" class="section-number selfRef">6.2. </a><a href="#name-roq-streams" class="section-name selfRef">RoQ Streams</a>
+<a href="#section-8.2" class="section-number selfRef">8.2. </a><a href="#name-roq-streams" class="section-name selfRef">RoQ Streams</a>
         </h3>
-<p id="section-6.2-1">For RTP packets that are sent over QUIC streams, an
+<p id="section-8.2-1">For RTP packets that are sent over QUIC streams, an
 RTP packet can be considered acknowledged, when all frames which carried
-fragments of the RTP packet were acknowledged.<a href="#section-6.2-1" class="pilcrow">¶</a></p>
-<p id="section-6.2-2">When QUIC Streams are used, the application should be aware that the direct
+fragments of the RTP packet were acknowledged.<a href="#section-8.2-1" class="pilcrow">¶</a></p>
+<p id="section-8.2-2">When QUIC Streams are used, the application should be aware that the direct
 mapping proposed below may not reflect the real characteristics of the network.
 RTP packet loss can seem lower than actual packet loss due to QUIC's automatic
 retransmissions. Similarly, timing information might be incorrect due to
-retransmissions.<a href="#section-6.2-2" class="pilcrow">¶</a></p>
+retransmissions.<a href="#section-8.2-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="transport-layer-feedback">
-<section id="section-6.3">
+<section id="section-8.3">
         <h3 id="name-transport-layer-feedback">
-<a href="#section-6.3" class="section-number selfRef">6.3. </a><a href="#name-transport-layer-feedback" class="section-name selfRef">Transport Layer Feedback</a>
+<a href="#section-8.3" class="section-number selfRef">8.3. </a><a href="#name-transport-layer-feedback" class="section-name selfRef">Transport Layer Feedback</a>
         </h3>
-<p id="section-6.3-1">This section explains how some of the RTCP packet types which are used to signal
+<p id="section-8.3-1">This section explains how some of the RTCP packet types which are used to signal
 reception statistics can be replaced by equivalent statistics that are already
 collected by QUIC. The following list explains how this mapping can be achieved
-for the individual fields of different RTCP packet types.<a href="#section-6.3-1" class="pilcrow">¶</a></p>
+for the individual fields of different RTCP packet types.<a href="#section-8.3-1" class="pilcrow">¶</a></p>
 <div id="RR-mappings">
-<section id="section-6.3.1">
+<section id="section-8.3.1">
           <h4 id="name-mapping-quic-feedback-to-rt">
-<a href="#section-6.3.1" class="section-number selfRef">6.3.1. </a><a href="#name-mapping-quic-feedback-to-rt" class="section-name selfRef">Mapping QUIC Feedback to RTCP Receiver Reports ("RR")</a>
+<a href="#section-8.3.1" class="section-number selfRef">8.3.1. </a><a href="#name-mapping-quic-feedback-to-rt" class="section-name selfRef">Mapping QUIC Feedback to RTCP Receiver Reports ("RR")</a>
           </h4>
-<p id="section-6.3.1-1">Considerations for mapping QUIC feedback into <em>Receiver Reports</em> (<code>PT=201</code>,
-<code>Name=RR</code>, <span>[<a href="#RFC3550" class="cite xref">RFC3550</a>]</span>) are:<a href="#section-6.3.1-1" class="pilcrow">¶</a></p>
+<p id="section-8.3.1-1">Considerations for mapping QUIC feedback into <em>Receiver Reports</em> (<code>PT=201</code>,
+<code>Name=RR</code>, <span>[<a href="#RFC3550" class="cite xref">RFC3550</a>]</span>) are:<a href="#section-8.3.1-1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-6.3.1-2.1">
+<li class="normal" id="section-8.3.1-2.1">
               <em>Fraction lost</em>: When RTP packets are carried in QUIC datagrams, the fraction of lost packets can be directly inferred from
 QUIC's acknowledgments. The calculation SHOULD include all packets up to the
 acknowledged RTP packet with the highest RTP sequence number. Later packets
 SHOULD be ignored, since they may still be in flight, unless other QUIC
-packets that were sent after the RTP packet, were already acknowledged.<a href="#section-6.3.1-2.1" class="pilcrow">¶</a>
+packets that were sent after the RTP packet, were already acknowledged.<a href="#section-8.3.1-2.1" class="pilcrow">¶</a>
 </li>
-            <li class="normal" id="section-6.3.1-2.2">
+            <li class="normal" id="section-8.3.1-2.2">
               <em>Cumulative lost</em>: Similar to the fraction of lost packets, the cumulative
 loss can be inferred from QUIC's acknowledgments including all packets up to
-the latest acknowledged packet.<a href="#section-6.3.1-2.2" class="pilcrow">¶</a>
+the latest acknowledged packet.<a href="#section-8.3.1-2.2" class="pilcrow">¶</a>
 </li>
-            <li class="normal" id="section-6.3.1-2.3">
+            <li class="normal" id="section-8.3.1-2.3">
               <em>Highest Sequence Number received</em>: In RTCP, this field is a 32-bit field
 that contains the highest sequence number a receiver received in an RTP
 packet and the count of sequence number cycles the receiver has observed. A
 sender sends RTP packets in QUIC packets and receives acknowledgments for
 the QUIC packets. By keeping a mapping from a QUIC packet to the RTP packets
 encapsulated in that QUIC packet, the sender can infer the highest sequence
-number and number of cycles seen by the receiver from QUIC acknowledgments.<a href="#section-6.3.1-2.3" class="pilcrow">¶</a>
+number and number of cycles seen by the receiver from QUIC acknowledgments.<a href="#section-8.3.1-2.3" class="pilcrow">¶</a>
 </li>
-            <li class="normal" id="section-6.3.1-2.4">
+            <li class="normal" id="section-8.3.1-2.4">
               <em>Interarrival jitter</em>: If QUIC acknowledgments carry timestamps as described
 in one of the extensions referenced above, senders can infer from QUIC acks
-the interarrival jitter from the arrival timestamps.<a href="#section-6.3.1-2.4" class="pilcrow">¶</a>
+the interarrival jitter from the arrival timestamps.<a href="#section-8.3.1-2.4" class="pilcrow">¶</a>
 </li>
-            <li class="normal" id="section-6.3.1-2.5">
+            <li class="normal" id="section-8.3.1-2.5">
               <em>Last SR</em>: Similar to RTP arrival times, the arrival time of RTCP Sender
 Reports can be inferred from QUIC acknowledgments, if they include
-timestamps.<a href="#section-6.3.1-2.5" class="pilcrow">¶</a>
+timestamps.<a href="#section-8.3.1-2.5" class="pilcrow">¶</a>
 </li>
-            <li class="normal" id="section-6.3.1-2.6">
+            <li class="normal" id="section-8.3.1-2.6">
               <em>Delay since last SR</em>: This field is not required when the receiver reports
-are entirely replaced by QUIC feedback.<a href="#section-6.3.1-2.6" class="pilcrow">¶</a>
+are entirely replaced by QUIC feedback.<a href="#section-8.3.1-2.6" class="pilcrow">¶</a>
 </li>
           </ul>
 </section>
 </div>
 <div id="NACK-mappings">
-<section id="section-6.3.2">
+<section id="section-8.3.2">
           <h4 id="name-mapping-quic-feedback-to-rtc">
-<a href="#section-6.3.2" class="section-number selfRef">6.3.2. </a><a href="#name-mapping-quic-feedback-to-rtc" class="section-name selfRef">Mapping QUIC Feedback to RTCP Negative Acknowledgments* ("NACK")</a>
+<a href="#section-8.3.2" class="section-number selfRef">8.3.2. </a><a href="#name-mapping-quic-feedback-to-rtc" class="section-name selfRef">Mapping QUIC Feedback to RTCP Negative Acknowledgments* ("NACK")</a>
           </h4>
-<p id="section-6.3.2-1">Considerations for mapping QUIC feedback into <em>Negative Acknowledgments</em>
-(<code>PT=205</code>, <code>FMT=1</code>, <code>Name=Generic NACK</code>, <span>[<a href="#RFC4585" class="cite xref">RFC4585</a>]</span>) are:<a href="#section-6.3.2-1" class="pilcrow">¶</a></p>
+<p id="section-8.3.2-1">Considerations for mapping QUIC feedback into <em>Negative Acknowledgments</em>
+(<code>PT=205</code>, <code>FMT=1</code>, <code>Name=Generic NACK</code>, <span>[<a href="#RFC4585" class="cite xref">RFC4585</a>]</span>) are:<a href="#section-8.3.2-1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-6.3.2-2.1">The generic negative acknowledgment packet contains information about
+<li class="normal" id="section-8.3.2-2.1">The generic negative acknowledgment packet contains information about
 packets which the receiver considered lost. <span><a href="https://rfc-editor.org/rfc/rfc4585#section-6.2.1." class="relref">Section 6.2.1.</a> of [<a href="#RFC4585" class="cite xref">RFC4585</a>]</span>
 recommends to use this feature only, if the underlying protocol cannot
 provide similar feedback. QUIC does not provide negative acknowledgments,
-but can detect lost packets based on the Gap numbers contained in QUIC ACK frames <span><a href="https://rfc-editor.org/rfc/rfc9002#section-6" class="relref">Section 6</a> of [<a href="#RFC9002" class="cite xref">RFC9002</a>]</span>.<a href="#section-6.3.2-2.1" class="pilcrow">¶</a>
+but can detect lost packets based on the Gap numbers contained in QUIC ACK frames <span><a href="https://rfc-editor.org/rfc/rfc9002#section-6" class="relref">Section 6</a> of [<a href="#RFC9002" class="cite xref">RFC9002</a>]</span>.<a href="#section-8.3.2-2.1" class="pilcrow">¶</a>
 </li>
           </ul>
 </section>
 </div>
 <div id="ECN-mappings">
-<section id="section-6.3.3">
+<section id="section-8.3.3">
           <h4 id="name-mapping-quic-feedback-to-rtcp">
-<a href="#section-6.3.3" class="section-number selfRef">6.3.3. </a><a href="#name-mapping-quic-feedback-to-rtcp" class="section-name selfRef">Mapping QUIC Feedback to RTCP ECN Feedback ("ECN")</a>
+<a href="#section-8.3.3" class="section-number selfRef">8.3.3. </a><a href="#name-mapping-quic-feedback-to-rtcp" class="section-name selfRef">Mapping QUIC Feedback to RTCP ECN Feedback ("ECN")</a>
           </h4>
-<p id="section-6.3.3-1">Considerations for mapping QUIC feedback into <em>ECN Feedback</em> (<code>PT=205</code>, <code>FMT=8</code>,
-<code>Name=RTCP-ECN-FB</code>, <span>[<a href="#RFC6679" class="cite xref">RFC6679</a>]</span>) are:<a href="#section-6.3.3-1" class="pilcrow">¶</a></p>
+<p id="section-8.3.3-1">Considerations for mapping QUIC feedback into <em>ECN Feedback</em> (<code>PT=205</code>, <code>FMT=8</code>,
+<code>Name=RTCP-ECN-FB</code>, <span>[<a href="#RFC6679" class="cite xref">RFC6679</a>]</span>) are:<a href="#section-8.3.3-1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-6.3.3-2.1">ECN feedback packets report the count of observed ECN-CE marks. <span>[<a href="#RFC6679" class="cite xref">RFC6679</a>]</span>
+<li class="normal" id="section-8.3.3-2.1">ECN feedback packets report the count of observed ECN-CE marks. <span>[<a href="#RFC6679" class="cite xref">RFC6679</a>]</span>
 defines two RTCP reports, one packet type (with <code>PT=205</code> and <code>FMT=8</code>) and a
 new report block for the extended reports which are listed below. QUIC
 supports ECN reporting through acknowledgments. If the QUIC connection supports
 ECN, the reporting of ECN counts SHOULD be done using QUIC acknowledgments,
-rather than RTCP ECN feedback reports.<a href="#section-6.3.3-2.1" class="pilcrow">¶</a>
+rather than RTCP ECN feedback reports.<a href="#section-8.3.3-2.1" class="pilcrow">¶</a>
 </li>
           </ul>
 </section>
 </div>
 <div id="CCFB-mappings">
-<section id="section-6.3.4">
+<section id="section-8.3.4">
           <h4 id="name-mapping-quic-feedback-to-rtcp-">
-<a href="#section-6.3.4" class="section-number selfRef">6.3.4. </a><a href="#name-mapping-quic-feedback-to-rtcp-" class="section-name selfRef">Mapping QUIC Feedback to RTCP Congestion Control Feedback ("CCFB")</a>
+<a href="#section-8.3.4" class="section-number selfRef">8.3.4. </a><a href="#name-mapping-quic-feedback-to-rtcp-" class="section-name selfRef">Mapping QUIC Feedback to RTCP Congestion Control Feedback ("CCFB")</a>
           </h4>
-<p id="section-6.3.4-1">Considerations for mapping QUIC feedback into <em>Congestion Control Feedback</em>
-(<code>PT=205</code>, <code>FMT=11</code>, <code>Name=CCFB</code>, <span>[<a href="#RFC8888" class="cite xref">RFC8888</a>]</span>) are:<a href="#section-6.3.4-1" class="pilcrow">¶</a></p>
+<p id="section-8.3.4-1">Considerations for mapping QUIC feedback into <em>Congestion Control Feedback</em>
+(<code>PT=205</code>, <code>FMT=11</code>, <code>Name=CCFB</code>, <span>[<a href="#RFC8888" class="cite xref">RFC8888</a>]</span>) are:<a href="#section-8.3.4-1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-6.3.4-2.1">RTP Congestion Control Feedback contains acknowledgments, arrival timestamps
+<li class="normal" id="section-8.3.4-2.1">RTP Congestion Control Feedback contains acknowledgments, arrival timestamps
 and ECN notifications for each received packet. Acknowledgments and ECNs can
 be inferred from QUIC as described above. Arrival timestamps can be added
 through extended acknowledgment frames as described in
-<span>[<a href="#I-D.draft-smith-quic-receive-ts" class="cite xref">I-D.draft-smith-quic-receive-ts</a>]</span> or <span>[<a href="#I-D.draft-huitema-quic-ts" class="cite xref">I-D.draft-huitema-quic-ts</a>]</span>.<a href="#section-6.3.4-2.1" class="pilcrow">¶</a>
+<span>[<a href="#I-D.draft-smith-quic-receive-ts" class="cite xref">I-D.draft-smith-quic-receive-ts</a>]</span> or <span>[<a href="#I-D.draft-huitema-quic-ts" class="cite xref">I-D.draft-huitema-quic-ts</a>]</span>.<a href="#section-8.3.4-2.1" class="pilcrow">¶</a>
 </li>
           </ul>
 </section>
 </div>
 <div id="XR-mappings">
-<section id="section-6.3.5">
+<section id="section-8.3.5">
           <h4 id="name-mapping-quic-feedback-to-rtcp-e">
-<a href="#section-6.3.5" class="section-number selfRef">6.3.5. </a><a href="#name-mapping-quic-feedback-to-rtcp-e" class="section-name selfRef">Mapping QUIC Feedback to RTCP Extended Report ("XR")</a>
+<a href="#section-8.3.5" class="section-number selfRef">8.3.5. </a><a href="#name-mapping-quic-feedback-to-rtcp-e" class="section-name selfRef">Mapping QUIC Feedback to RTCP Extended Report ("XR")</a>
           </h4>
-<p id="section-6.3.5-1">Considerations for mapping QUIC feedback into  <em>Extended Reports</em> (<code>PT=207</code>,
-<code>Name=XR</code>, <span>[<a href="#RFC3611" class="cite xref">RFC3611</a>]</span>) are:<a href="#section-6.3.5-1" class="pilcrow">¶</a></p>
+<p id="section-8.3.5-1">Considerations for mapping QUIC feedback into  <em>Extended Reports</em> (<code>PT=207</code>,
+<code>Name=XR</code>, <span>[<a href="#RFC3611" class="cite xref">RFC3611</a>]</span>) are:<a href="#section-8.3.5-1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-6.3.5-2.1">Extended Reports offer an extensible framework for a variety of different
+<li class="normal" id="section-8.3.5-2.1">Extended Reports offer an extensible framework for a variety of different
 control messages. Some of the standard report blocks which can be
 implemented in extended reports such as loss RLE or ECNs can be implemented
-in QUIC, too.<a href="#section-6.3.5-2.1" class="pilcrow">¶</a>
+in QUIC, too.<a href="#section-8.3.5-2.1" class="pilcrow">¶</a>
 </li>
-            <li class="normal" id="section-6.3.5-2.2">Other report blocks SHOULD be evaluated individually, to determine whether
-if the contained information can be transmitted using QUIC instead.<a href="#section-6.3.5-2.2" class="pilcrow">¶</a>
+            <li class="normal" id="section-8.3.5-2.2">Other report blocks SHOULD be evaluated individually, to determine whether
+if the contained information can be transmitted using QUIC instead.<a href="#section-8.3.5-2.2" class="pilcrow">¶</a>
 </li>
           </ul>
 </section>
@@ -2292,19 +2548,19 @@ if the contained information can be transmitted using QUIC instead.<a href="#sec
 </section>
 </div>
 <div id="al-repair">
-<section id="section-6.4">
+<section id="section-8.4">
         <h3 id="name-application-layer-repair-an">
-<a href="#section-6.4" class="section-number selfRef">6.4. </a><a href="#name-application-layer-repair-an" class="section-name selfRef">Application Layer Repair and other Control Messages</a>
+<a href="#section-8.4" class="section-number selfRef">8.4. </a><a href="#name-application-layer-repair-an" class="section-name selfRef">Application Layer Repair and other Control Messages</a>
         </h3>
-<p id="section-6.4-1">While <a href="#RR-mappings" class="auto internal xref">Section 6.3.1</a> presented some RTCP packets that can be replaced by QUIC
+<p id="section-8.4-1">While <a href="#RR-mappings" class="auto internal xref">Section 8.3.1</a> presented some RTCP packets that can be replaced by QUIC
 features, QUIC cannot replace all of the defined RTCP packet types. This mostly
 affects RTCP packet types which carry control information that is to be
 interpreted by the RTP application layer, rather than the underlying transport
-protocol itself.<a href="#section-6.4-1" class="pilcrow">¶</a></p>
+protocol itself.<a href="#section-8.4-1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-6.4-2.1">
+<li class="normal" id="section-8.4-2.1">
             <em>Sender Reports</em> (<code>PT=200</code>, <code>Name=SR</code>, <span>[<a href="#RFC3550" class="cite xref">RFC3550</a>]</span>) are similar to <em>Receiver
-Reports</em>, as described in <a href="#RR-mappings" class="auto internal xref">Section 6.3.1</a>. They are sent by media senders and
+Reports</em>, as described in <a href="#RR-mappings" class="auto internal xref">Section 8.3.1</a>. They are sent by media senders and
 additionally contain an NTP and a RTP timestamp and the number of packets and
 octets transmitted by the sender. The timestamps can be used by a receiver to
 synchronize streams. QUIC cannot provide a similar control information, since
@@ -2313,35 +2569,35 @@ packet or octet counts, since it does not know about lost datagrams. Thus,
 sender reports are required in RoQ to synchronize streams at the
 receiver. The sender reports SHOULD not contain any receiver report blocks, as
 the information can be inferred from the QUIC transport as explained in
-<a href="#RR-mappings" class="auto internal xref">Section 6.3.1</a>.<a href="#section-6.4-2.1" class="pilcrow">¶</a>
+<a href="#RR-mappings" class="auto internal xref">Section 8.3.1</a>.<a href="#section-8.4-2.1" class="pilcrow">¶</a>
 </li>
         </ul>
-<p id="section-6.4-3">In addition to carrying transmission statistics, RTCP packets can contain
+<p id="section-8.4-3">In addition to carrying transmission statistics, RTCP packets can contain
 application layer control information, that cannot directly be mapped to QUIC.
-Examples of this information may include:<a href="#section-6.4-3" class="pilcrow">¶</a></p>
+Examples of this information may include:<a href="#section-8.4-3" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-6.4-4.1">
+<li class="normal" id="section-8.4-4.1">
             <em>Source Description</em> (<code>PT=202</code>, <code>Name=SDES</code>), <em>Bye</em> (<code>PT=203</code>, <code>Name=BYE</code>) and
-<em>Application</em> (<code>PT=204</code>, <code>Name=APP</code>) packet types from <span>[<a href="#RFC3550" class="cite xref">RFC3550</a>]</span>, or<a href="#section-6.4-4.1" class="pilcrow">¶</a>
+<em>Application</em> (<code>PT=204</code>, <code>Name=APP</code>) packet types from <span>[<a href="#RFC3550" class="cite xref">RFC3550</a>]</span>, or<a href="#section-8.4-4.1" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-6.4-4.2">many of the payload specific feedback messages (<code>PT=206</code>) defined in
-<span>[<a href="#RFC4585" class="cite xref">RFC4585</a>]</span>, used to control the codec behavior of the sender.<a href="#section-6.4-4.2" class="pilcrow">¶</a>
+          <li class="normal" id="section-8.4-4.2">many of the payload specific feedback messages (<code>PT=206</code>) defined in
+<span>[<a href="#RFC4585" class="cite xref">RFC4585</a>]</span>, used to control the codec behavior of the sender.<a href="#section-8.4-4.2" class="pilcrow">¶</a>
 </li>
         </ul>
-<p id="section-6.4-5">Since QUIC does not provide any kind of application layer control messaging,
+<p id="section-8.4-5">Since QUIC does not provide any kind of application layer control messaging,
 QUIC feedback cannot be mapped into these RTCP packet types. If the RTP
 application needs this information, the RTCP packet types are used in the same
-way as they would be used over any other transport protocol.<a href="#section-6.4-5" class="pilcrow">¶</a></p>
+way as they would be used over any other transport protocol.<a href="#section-8.4-5" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="control-packets">
-<section id="section-6.5">
+<section id="section-8.5">
         <h3 id="name-rtcp-control-packet-types">
-<a href="#section-6.5" class="section-number selfRef">6.5. </a><a href="#name-rtcp-control-packet-types" class="section-name selfRef">RTCP Control Packet Types</a>
+<a href="#section-8.5" class="section-number selfRef">8.5. </a><a href="#name-rtcp-control-packet-types" class="section-name selfRef">RTCP Control Packet Types</a>
         </h3>
-<p id="section-6.5-1">Several but not all of these control packets and their attributes can be mapped
-from QUIC, as described in <a href="#RR-mappings" class="auto internal xref">Section 6.3.1</a>. "Mappable from QUIC" has one of
-three values: "yes", "QUIC extension required", and "no".<a href="#section-6.5-1" class="pilcrow">¶</a></p>
+<p id="section-8.5-1">Several but not all of these control packets and their attributes can be mapped
+from QUIC, as described in <a href="#RR-mappings" class="auto internal xref">Section 8.3.1</a>. "Mappable from QUIC" has one of
+three values: "yes", "QUIC extension required", and "no".<a href="#section-8.5-1" class="pilcrow">¶</a></p>
 <table class="center" id="table-2">
           <caption><a href="#table-2" class="selfRef">Table 2</a></caption>
 <thead>
@@ -2517,14 +2773,14 @@ three values: "yes", "QUIC extension required", and "no".<a href="#section-6.5-1
           </tbody>
         </table>
 <div id="notes">
-<section id="section-6.5.1">
+<section id="section-8.5.1">
           <h4 id="name-notes">
-<a href="#section-6.5.1" class="section-number selfRef">6.5.1. </a><a href="#name-notes" class="section-name selfRef">Notes</a>
+<a href="#section-8.5.1" class="section-number selfRef">8.5.1. </a><a href="#name-notes" class="section-name selfRef">Notes</a>
           </h4>
 <ul class="normal">
-<li class="normal" id="section-6.5.1-1.1">
+<li class="normal" id="section-8.5.1-1.1">
               <em>SR</em> NTP timestamps: We cannot send NTP timestamps in the same format the SRs
-use, but couldn't a QUIC timestamp extension provide the same information?<a href="#section-6.5.1-1.1" class="pilcrow">¶</a>
+use, but couldn't a QUIC timestamp extension provide the same information?<a href="#section-8.5.1-1.1" class="pilcrow">¶</a>
 </li>
           </ul>
 </section>
@@ -2532,9 +2788,9 @@ use, but couldn't a QUIC timestamp extension provide the same information?<a hre
 </section>
 </div>
 <div id="generic-feedback">
-<section id="section-6.6">
+<section id="section-8.6">
         <h3 id="name-generic-rtp-feedback-rtpfb">
-<a href="#section-6.6" class="section-number selfRef">6.6. </a><a href="#name-generic-rtp-feedback-rtpfb" class="section-name selfRef">Generic RTP Feedback (RTPFB)</a>
+<a href="#section-8.6" class="section-number selfRef">8.6. </a><a href="#name-generic-rtp-feedback-rtpfb" class="section-name selfRef">Generic RTP Feedback (RTPFB)</a>
         </h3>
 <table class="center" id="table-3">
           <caption><a href="#table-3" class="selfRef">Table 3</a></caption>
@@ -2643,12 +2899,12 @@ use, but couldn't a QUIC timestamp extension provide the same information?<a hre
 </section>
 </div>
 <div id="payload-specific-feedback">
-<section id="section-6.7">
+<section id="section-8.7">
         <h3 id="name-payload-specific-rtp-feedba">
-<a href="#section-6.7" class="section-number selfRef">6.7. </a><a href="#name-payload-specific-rtp-feedba" class="section-name selfRef">Payload-specific RTP Feedback (PSFB)</a>
+<a href="#section-8.7" class="section-number selfRef">8.7. </a><a href="#name-payload-specific-rtp-feedba" class="section-name selfRef">Payload-specific RTP Feedback (PSFB)</a>
         </h3>
-<p id="section-6.7-1">Because QUIC is a generic transport protocol, QUIC feedback cannot replace the
-following Payload-specific RTP Feedback (PSFB) feedback.<a href="#section-6.7-1" class="pilcrow">¶</a></p>
+<p id="section-8.7-1">Because QUIC is a generic transport protocol, QUIC feedback cannot replace the
+following Payload-specific RTP Feedback (PSFB) feedback.<a href="#section-8.7-1" class="pilcrow">¶</a></p>
 <table class="center" id="table-4">
           <caption><a href="#table-4" class="selfRef">Table 4</a></caption>
 <thead>
@@ -2741,9 +2997,9 @@ following Payload-specific RTP Feedback (PSFB) feedback.<a href="#section-6.7-1"
 </section>
 </div>
 <div id="extended-reports">
-<section id="section-6.8">
+<section id="section-8.8">
         <h3 id="name-extended-reports-xr">
-<a href="#section-6.8" class="section-number selfRef">6.8. </a><a href="#name-extended-reports-xr" class="section-name selfRef">Extended Reports (XR)</a>
+<a href="#section-8.8" class="section-number selfRef">8.8. </a><a href="#name-extended-reports-xr" class="section-name selfRef">Extended Reports (XR)</a>
         </h3>
 <table class="center" id="table-5">
           <caption><a href="#table-5" class="selfRef">Table 5</a></caption>
@@ -3039,279 +3295,162 @@ following Payload-specific RTP Feedback (PSFB) feedback.<a href="#section-6.7-1"
 </section>
 </div>
 <div id="rtp-header-extensions">
-<section id="section-6.9">
+<section id="section-8.9">
         <h3 id="name-rtp-header-extensions">
-<a href="#section-6.9" class="section-number selfRef">6.9. </a><a href="#name-rtp-header-extensions" class="section-name selfRef">RTP Header extensions</a>
+<a href="#section-8.9" class="section-number selfRef">8.9. </a><a href="#name-rtp-header-extensions" class="section-name selfRef">RTP Header extensions</a>
         </h3>
 <ul class="normal">
-<li class="normal" id="section-6.9-1.1">
+<li class="normal" id="section-8.9-1.1">
             <em>Transmission offset</em> <span>[<a href="#RFC5450" class="cite xref">RFC5450</a>]</span> is used for better jitter calculation. If
 we have QUIC timestamps, we don't need to work around RTP timestamps offsets
-because we can use the QUIC timestamps to calculate network jitter.<a href="#section-6.9-1.1" class="pilcrow">¶</a>
+because we can use the QUIC timestamps to calculate network jitter.<a href="#section-8.9-1.1" class="pilcrow">¶</a>
 </li>
         </ul>
-</section>
-</div>
-</section>
-</div>
-<div id="congestion-control">
-<section id="section-7">
-      <h2 id="name-congestion-control-and-rate">
-<a href="#section-7" class="section-number selfRef">7. </a><a href="#name-congestion-control-and-rate" class="section-name selfRef">Congestion Control and Rate Adaptation</a>
-      </h2>
-<p id="section-7-1">Like any other application on the internet, RoQ needs to perform
-congestion control to avoid overloading the network.<a href="#section-7-1" class="pilcrow">¶</a></p>
-<p id="section-7-2">QUIC is a congestion controlled transport protocol. Senders are required to
-employ some form of congestion control. The default congestion control specified
-for QUIC in <span>[<a href="#RFC9002" class="cite xref">RFC9002</a>]</span> is similar to TCP NewReno <span>[<a href="#RFC6582" class="cite xref">RFC6582</a>]</span>, but senders are free to choose
-any congestion control algorithm as long as they follow the guidelines specified
-in <span><a href="https://rfc-editor.org/rfc/rfc8085#section-3" class="relref">Section 3</a> of [<a href="#RFC8085" class="cite xref">RFC8085</a>]</span>.<a href="#section-7-2" class="pilcrow">¶</a></p>
-<p id="section-7-3">RTP itself does not specify a congestion control algorithm, but <span>[<a href="#RFC8888" class="cite xref">RFC8888</a>]</span> defines an RTCP
-feedback message intended to enable rate adaptation for interactive real-time traffic using RTP,
-and successful rate adaptation will accomoplish congestion control as well.
-Various rate adaptation algorithms for real-time media are defined in separate RFCs
-(e.g. SCReAM <span>[<a href="#RFC8298" class="cite xref">RFC8298</a>]</span> and NADA <span>[<a href="#RFC8698" class="cite xref">RFC8698</a>]</span>).
-The rate adaptation algorithms for RTP are specifically tailored for
-real-time transmissions at low latencies. The available rate adaptation
-algorithms for RTP expose a <code>target_bitrate</code> that can be used to dynamically
-reconfigure media codecs to produce media at a rate that can be sent in
-real-time under the observed network conditions.<a href="#section-7-3" class="pilcrow">¶</a></p>
-<p id="section-7-4">This section defines two architectures for congestion control and bandwidth
-estimation for RoQ, but it does not mandate any specific rate adaptation algorithm
-to use. The section also discusses congestion control
-implications of using shared or multiple separate QUIC connections to send and
-receive multiple independent data streams.<a href="#section-7-4" class="pilcrow">¶</a></p>
-<p id="section-7-5">It is assumed that the congestion controller in use provides a pacing mechanism
-to determine when a packet can be sent to avoid bursts. The currently proposed
-congestion control algorithms for real-time communications provide such pacing
-mechanisms. The use of congestion controllers which don't provide a pacing
-mechanism is out of scope of this document.<a href="#section-7-5" class="pilcrow">¶</a></p>
-<div id="cc-quic-layer">
-<section id="section-7.1">
-        <h3 id="name-congestion-control-at-the-q">
-<a href="#section-7.1" class="section-number selfRef">7.1. </a><a href="#name-congestion-control-at-the-q" class="section-name selfRef">Congestion Control at the QUIC layer</a>
-        </h3>
-<p id="section-7.1-1">If congestion control is to be applied at the transport layer, it is RECOMMENDED
-that the QUIC Implementation uses a congestion controller that keeps queueing
-delays short to keep the transmission latency for RTP and RTCP packets as low
-as possible.<a href="#section-7.1-1" class="pilcrow">¶</a></p>
-<p id="section-7.1-2">Many low latency congestion control algorithms depend on detailed arrival time
-feedback to estimate the current one-way delay between sender and receiver. QUIC
-does not provide arrival timestamps in its acknowledgments. The QUIC
-implementations of the sender and receiver can use an extension to add this
-information to QUICs acknowledgment frames, e.g.
-<span>[<a href="#I-D.draft-smith-quic-receive-ts" class="cite xref">I-D.draft-smith-quic-receive-ts</a>]</span> or <span>[<a href="#I-D.draft-huitema-quic-ts" class="cite xref">I-D.draft-huitema-quic-ts</a>]</span>.<a href="#section-7.1-2" class="pilcrow">¶</a></p>
-<p id="section-7.1-3">If congestion control is done by the QUIC implementation, the application needs
-a mechanism to query the currently available bandwidth to adapt media codec
-configurations. The employed congestion controller of the QUIC connection SHOULD
-expose such an API to the application. If a current bandwidth estimate is not
-available from the QUIC congestion controller, the sender can either implement
-an alternative bandwidth estimation at the application layer as described in
-<a href="#cc-application-layer" class="auto internal xref">Section 7.2</a> or a receiver can feedback the observed bandwidth
-through RTCP, e.g., using <span>[<a href="#I-D.draft-alvestrand-rmcat-remb" class="cite xref">I-D.draft-alvestrand-rmcat-remb</a>]</span>.<a href="#section-7.1-3" class="pilcrow">¶</a></p>
-</section>
-</div>
-<div id="cc-application-layer">
-<section id="section-7.2">
-        <h3 id="name-congestion-control-at-the-a">
-<a href="#section-7.2" class="section-number selfRef">7.2. </a><a href="#name-congestion-control-at-the-a" class="section-name selfRef">Congestion Control at the Application Layer</a>
-        </h3>
-<p id="section-7.2-1">If an application cannot access a bandwidth estimation from the QUIC layer, or
-the QUIC implementation does not support a delay-based, low-latency congestion
-control algorithm, the application can alternatively implement a bandwidth estimation
-algorithm at the application layer. Calculating a bandwidth estimation at the
-application layer can be done using the same bandwidth estimation algorithms as
-described in <a href="#congestion-control" class="auto internal xref">Section 7</a> (NADA, SCReAM). The bandwidth estimation
-algorithm typically needs some feedback on the transmission performance. This
-feedback can be collected following the guidelines in <a href="#rtcp-mapping" class="auto internal xref">Section 6</a>.<a href="#section-7.2-1" class="pilcrow">¶</a></p>
-<p id="section-7.2-2">If the application implements full congestion control rather than just a
-bandwidth estimation at the application layer using a congestion controller that
-satisfies the requirements of <span><a href="https://rfc-editor.org/rfc/rfc9002#section-7" class="relref">Section 7</a> of [<a href="#RFC9002" class="cite xref">RFC9002</a>]</span>, and the connection is
-only used to send real-time media which is subject to the application layer
-congestion control, it is RECOMMENDED to disable any other congestion control
-that is possibly running at the QUIC layer. Disabling the additional congestion
-controllers helps to avoid any interference between the different congestion
-controllers.<a href="#section-7.2-2" class="pilcrow">¶</a></p>
-</section>
-</div>
-<div id="shared-quic-connections">
-<section id="section-7.3">
-        <h3 id="name-shared-quic-connections">
-<a href="#section-7.3" class="section-number selfRef">7.3. </a><a href="#name-shared-quic-connections" class="section-name selfRef">Shared QUIC connections</a>
-        </h3>
-<p id="section-7.3-1">Two endpoints may want to establish channels to exchange more than one type of data simultaneously.
-The channels can be intended to carry real-time RTP data or other non-real-time data.
-This can be realized in different ways.  A straightforward solution is to establish multiple QUIC
-connections, one for each channel.  Or all real-time channels are mapped to one QUIC
-connection, while a separate QUIC connection is created for the non-real-time channels.
-In both cases, the congestion controllers can be chosen to match the demands of the respective
-channels and the different QUIC connections will compete for the same resources in the network.
-No local prioritization of data across the different (types of) channels would be necessary.<a href="#section-7.3-1" class="pilcrow">¶</a></p>
-<p id="section-7.3-2">Alternatively, (all or a subset of) real-time and non-real-time channels are multiplexed onto a single,
-shared QUIC connection, which can be done by using the flow identifier described
-in <a href="#encapsulation" class="auto internal xref">Section 5</a>.  Applications multiplexing multiple streams in one
-connection SHOULD implement some form of stream prioritization or bandwidth
-allocation.<a href="#section-7.3-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
 </div>
 <div id="error-handling">
-<section id="section-8">
+<section id="section-9">
       <h2 id="name-error-handling">
-<a href="#section-8" class="section-number selfRef">8. </a><a href="#name-error-handling" class="section-name selfRef">Error Handling</a>
+<a href="#section-9" class="section-number selfRef">9. </a><a href="#name-error-handling" class="section-name selfRef">Error Handling</a>
       </h2>
-<p id="section-8-1">The following error codes are defined for use when abruptly terminating streams,
-aborting reading of streams, or immediately closing RoQ connections.<a href="#section-8-1" class="pilcrow">¶</a></p>
-<div id="roq-error-codes">
-<section id="section-8.1">
-        <h3 id="name-roq-error-codes">
-<a href="#section-8.1" class="section-number selfRef">8.1. </a><a href="#name-roq-error-codes" class="section-name selfRef">RoQ Error Codes</a>
-        </h3>
-<span class="break"></span><dl class="dlParallel" id="section-8.1-1">
-          <dt id="section-8.1-1.1">ROQ_NO_ERROR (0x????):</dt>
-          <dd style="margin-left: 1.5em" id="section-8.1-1.2">
-            <p id="section-8.1-1.2.1">No error. This is used when the connection or stream needs to be closed, but
-there is no error to signal.<a href="#section-8.1-1.2.1" class="pilcrow">¶</a></p>
-</dd>
-          <dd class="break"></dd>
-<dt id="section-8.1-1.3">ROQ_GENERAL_PROTOCOL_ERROR (0x????):</dt>
-          <dd style="margin-left: 1.5em" id="section-8.1-1.4">
-            <p id="section-8.1-1.4.1">Peer violated protocol requirements in a way that does not match a more
-specific error code or endpoint declines to use the more specific error code.<a href="#section-8.1-1.4.1" class="pilcrow">¶</a></p>
-</dd>
-          <dd class="break"></dd>
-<dt id="section-8.1-1.5">ROQ_INTERNAL_ERROR (0x????):</dt>
-          <dd style="margin-left: 1.5em" id="section-8.1-1.6">
-            <p id="section-8.1-1.6.1">An internal error has occured in the RoQ stack.<a href="#section-8.1-1.6.1" class="pilcrow">¶</a></p>
-</dd>
-          <dd class="break"></dd>
-<dt id="section-8.1-1.7">ROQ_STREAM_CREATION_ERROR (0x????):</dt>
-          <dd style="margin-left: 1.5em" id="section-8.1-1.8">
-            <p id="section-8.1-1.8.1">The endpoint detected that its peer created a stream that it will not accept.<a href="#section-8.1-1.8.1" class="pilcrow">¶</a></p>
-</dd>
-          <dd class="break"></dd>
-<dt id="section-8.1-1.9">ROQ_PACKET_ERROR (0x????):</dt>
-          <dd style="margin-left: 1.5em" id="section-8.1-1.10">
-            <p id="section-8.1-1.10.1">Invalid payload format, e.g., length does not match packet, invalid flow id
-encoding, non-RTP on RTP-flow ID, etc.<a href="#section-8.1-1.10.1" class="pilcrow">¶</a></p>
-</dd>
-          <dd class="break"></dd>
-<dt id="section-8.1-1.11">ROQ_FRAME_CANCELLED (0x????):</dt>
-          <dd style="margin-left: 1.5em" id="section-8.1-1.12">
-            <p id="section-8.1-1.12.1">A receiving endpoint stopped reading a frame from a stream and requests new
-frames be sent on new streams using STOP_SENDING or a sender notifies a
-receiver that retransmissions of a frame were stopped using RESET_STREAM and
-new frames will be sent on new streams.<a href="#section-8.1-1.12.1" class="pilcrow">¶</a></p>
-</dd>
-          <dd class="break"></dd>
-<dt id="section-8.1-1.13">ROQ_UNKNOWN_FLOW_ID (0x????):</dt>
-          <dd style="margin-left: 1.5em" id="section-8.1-1.14">
-            <p id="section-8.1-1.14.1">An endpoint was unable to handle a flow identifier, e.g., because it was not
-signalled or it does not support multiplexing using arbitrary flow identifiers.<a href="#section-8.1-1.14.1" class="pilcrow">¶</a></p>
-</dd>
-          <dd class="break"></dd>
-<dt id="section-8.1-1.15">ROQ_SIGNALING_ERROR (0x????):</dt>
-          <dd style="margin-left: 1.5em" id="section-8.1-1.16">
-            <p id="section-8.1-1.16.1">Parameters that were set during out of band signaling are incompatible with
-the connection properties that were negotiated when the connection was
-established using transport parameters.<a href="#section-8.1-1.16.1" class="pilcrow">¶</a></p>
+<p id="section-9-1">The following error codes are defined for use when abruptly terminating streams,
+aborting reading of streams, or immediately closing RoQ connections.<a href="#section-9-1" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="section-9-2">
+        <dt id="section-9-2.1">ROQ_NO_ERROR (0x????):</dt>
+        <dd style="margin-left: 1.5em" id="section-9-2.2">
+          <p id="section-9-2.2.1">No error. This is used when the connection or stream needs to be closed, but
+there is no error to signal.<a href="#section-9-2.2.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
+<dt id="section-9-2.3">ROQ_GENERAL_PROTOCOL_ERROR (0x????):</dt>
+        <dd style="margin-left: 1.5em" id="section-9-2.4">
+          <p id="section-9-2.4.1">Peer violated protocol requirements in a way that does not match a more
+specific error code or endpoint declines to use the more specific error code.<a href="#section-9-2.4.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-9-2.5">ROQ_INTERNAL_ERROR (0x????):</dt>
+        <dd style="margin-left: 1.5em" id="section-9-2.6">
+          <p id="section-9-2.6.1">An internal error has occured in the RoQ stack.<a href="#section-9-2.6.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-9-2.7">ROQ_STREAM_CREATION_ERROR (0x????):</dt>
+        <dd style="margin-left: 1.5em" id="section-9-2.8">
+          <p id="section-9-2.8.1">The endpoint detected that its peer created a stream that it will not accept.<a href="#section-9-2.8.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-9-2.9">ROQ_PACKET_ERROR (0x????):</dt>
+        <dd style="margin-left: 1.5em" id="section-9-2.10">
+          <p id="section-9-2.10.1">Invalid payload format, e.g., length does not match packet, invalid flow id
+encoding, non-RTP on RTP-flow ID, etc.<a href="#section-9-2.10.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-9-2.11">ROQ_FRAME_CANCELLED (0x????):</dt>
+        <dd style="margin-left: 1.5em" id="section-9-2.12">
+          <p id="section-9-2.12.1">A receiving endpoint stopped reading a frame from a stream and requests new
+frames be sent on new streams using STOP_SENDING or a sender notifies a
+receiver that retransmissions of a frame were stopped using RESET_STREAM and
+new frames will be sent on new streams.<a href="#section-9-2.12.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-9-2.13">ROQ_UNKNOWN_FLOW_ID (0x????):</dt>
+        <dd style="margin-left: 1.5em" id="section-9-2.14">
+          <p id="section-9-2.14.1">An endpoint was unable to handle a flow identifier, e.g., because it was not
+signalled or it does not support multiplexing using arbitrary flow identifiers.<a href="#section-9-2.14.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-9-2.15">ROQ_SIGNALING_ERROR (0x????):</dt>
+        <dd style="margin-left: 1.5em" id="section-9-2.16">
+          <p id="section-9-2.16.1">Parameters that were set during out of band signaling are incompatible with
+the connection properties that were negotiated when the connection was
+established using transport parameters.<a href="#section-9-2.16.1" class="pilcrow">¶</a></p>
+</dd>
+      <dd class="break"></dd>
 </dl>
 </section>
 </div>
-</section>
-</div>
 <div id="api-considerations">
-<section id="section-9">
+<section id="section-10">
       <h2 id="name-api-considerations">
-<a href="#section-9" class="section-number selfRef">9. </a><a href="#name-api-considerations" class="section-name selfRef">API Considerations</a>
+<a href="#section-10" class="section-number selfRef">10. </a><a href="#name-api-considerations" class="section-name selfRef">API Considerations</a>
       </h2>
-<p id="section-9-1">The mapping described in the previous sections poses some interface requirements
+<p id="section-10-1">The mapping described in the previous sections poses some interface requirements
 on the QUIC implementation. Although a basic mapping should work without any of
 these requirements most of the optimizations regarding rate adaptation and
 RTCP mapping require certain functionalities to be exposed to the application.
 The following to sections contain a list of information that is required by an
-application to implement different optimizations (<a href="#quic-api-read" class="auto internal xref">Section 9.1</a>) and
+application to implement different optimizations (<a href="#quic-api-read" class="auto internal xref">Section 10.1</a>) and
 functions that a QUIC implementation SHOULD expose to an application
-(<a href="#quic-api-write" class="auto internal xref">Section 9.2</a>).<a href="#section-9-1" class="pilcrow">¶</a></p>
-<p id="section-9-2">Each item in the following list can be considered individually. Any exposed
+(<a href="#quic-api-write" class="auto internal xref">Section 10.2</a>).<a href="#section-10-1" class="pilcrow">¶</a></p>
+<p id="section-10-2">Each item in the following list can be considered individually. Any exposed
 information or function can be used by RoQ regardless of whether the
 other items are available. Thus, RoQ does not depend on the
 availability of all of the listed features but can apply different optimizations
-depending on the functionality exposed by the QUIC implementation.<a href="#section-9-2" class="pilcrow">¶</a></p>
+depending on the functionality exposed by the QUIC implementation.<a href="#section-10-2" class="pilcrow">¶</a></p>
 <div id="quic-api-read">
-<section id="section-9.1">
+<section id="section-10.1">
         <h3 id="name-information-to-be-exported-">
-<a href="#section-9.1" class="section-number selfRef">9.1. </a><a href="#name-information-to-be-exported-" class="section-name selfRef">Information to be exported from QUIC</a>
+<a href="#section-10.1" class="section-number selfRef">10.1. </a><a href="#name-information-to-be-exported-" class="section-name selfRef">Information to be exported from QUIC</a>
         </h3>
-<p id="section-9.1-1">This section provides a list of items that an application might want to export
+<p id="section-10.1-1">This section provides a list of items that an application might want to export
 from an underlying QUIC implementation. It is thus RECOMMENDED that a QUIC
-implementation exports the listed items to the application.<a href="#section-9.1-1" class="pilcrow">¶</a></p>
+implementation exports the listed items to the application.<a href="#section-10.1-1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-9.1-2.1">
+<li class="normal" id="section-10.1-2.1">
             <em>Maximum Datagram Size</em>: The maximum datagram size that the QUIC connection
-can transmit.<a href="#section-9.1-2.1" class="pilcrow">¶</a>
+can transmit.<a href="#section-10.1-2.1" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-9.1-2.2">
+          <li class="normal" id="section-10.1-2.2">
             <em>Datagram Acknowledgment and Loss</em>: <span><a href="https://rfc-editor.org/rfc/rfc9221#section-5.2" class="relref">Section 5.2</a> of [<a href="#RFC9221" class="cite xref">RFC9221</a>]</span> allows QUIC
 implementations to notify the application that a QUIC Datagram was
 acknowledged or that it believes a datagram was lost. The exposed information
 SHOULD include enough information to allow the application to maintain a
 mapping between the datagram that was acknowledged/lost and the RTP packet
-that was sent in that datagram.<a href="#section-9.1-2.2" class="pilcrow">¶</a>
+that was sent in that datagram.<a href="#section-10.1-2.2" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-9.1-2.3">
+          <li class="normal" id="section-10.1-2.3">
             <em>Stream States</em>: The QUIC implementation SHOULD expose to a sender, how much
 of the data that was sent on a stream was successfully delivered and how much
-data is still outstanding to be sent or retransmitted.<a href="#section-9.1-2.3" class="pilcrow">¶</a>
+data is still outstanding to be sent or retransmitted.<a href="#section-10.1-2.3" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-9.1-2.4">
+          <li class="normal" id="section-10.1-2.4">
             <em>Arrival timestamps</em>: If the QUIC connection uses a timestamp extension like
 <span>[<a href="#I-D.draft-smith-quic-receive-ts" class="cite xref">I-D.draft-smith-quic-receive-ts</a>]</span> or <span>[<a href="#I-D.draft-huitema-quic-ts" class="cite xref">I-D.draft-huitema-quic-ts</a>]</span>, the
-arrival timestamps or one-way delays SHOULD be exposed to the application.<a href="#section-9.1-2.4" class="pilcrow">¶</a>
+arrival timestamps or one-way delays SHOULD be exposed to the application.<a href="#section-10.1-2.4" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-9.1-2.5">
+          <li class="normal" id="section-10.1-2.5">
             <em>Bandwidth Estimation</em>: If congestion control is done at the transport layer
 in the QUIC implementation, the QUIC implementation SHOULD expose an
 estimation of the currently available bandwidth to the application. Exposing
 the bandwidth estimation avoids the implementation of an additional bandwidth
-estimation algorithm in the application.<a href="#section-9.1-2.5" class="pilcrow">¶</a>
+estimation algorithm in the application.<a href="#section-10.1-2.5" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-9.1-2.6">
-            <em>ECN</em>: If ECN marks are available, they SHOULD be exposed to the application.<a href="#section-9.1-2.6" class="pilcrow">¶</a>
+          <li class="normal" id="section-10.1-2.6">
+            <em>ECN</em>: If ECN marks are available, they SHOULD be exposed to the application.<a href="#section-10.1-2.6" class="pilcrow">¶</a>
 </li>
         </ul>
 </section>
 </div>
 <div id="quic-api-write">
-<section id="section-9.2">
+<section id="section-10.2">
         <h3 id="name-functions-to-be-exposed-by-">
-<a href="#section-9.2" class="section-number selfRef">9.2. </a><a href="#name-functions-to-be-exposed-by-" class="section-name selfRef">Functions to be exposed by QUIC</a>
+<a href="#section-10.2" class="section-number selfRef">10.2. </a><a href="#name-functions-to-be-exposed-by-" class="section-name selfRef">Functions to be exposed by QUIC</a>
         </h3>
-<p id="section-9.2-1">This sections lists functions that a QUIC implementation SHOULD expose to an
+<p id="section-10.2-1">This sections lists functions that a QUIC implementation SHOULD expose to an
 application to implement different features of the mapping described in the
-previous sections of this document.<a href="#section-9.2-1" class="pilcrow">¶</a></p>
+previous sections of this document.<a href="#section-10.2-1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-9.2-2.1">
+<li class="normal" id="section-10.2-2.1">
             <em>Cancel Streams</em>: To allow an application to cancel (re)transmission of
 packets that are no longer needed, the QUIC implementation MUST expose a way
-to cancel the corresponding QUIC streams.<a href="#section-9.2-2.1" class="pilcrow">¶</a>
+to cancel the corresponding QUIC streams.<a href="#section-10.2-2.1" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-9.2-2.2">
+          <li class="normal" id="section-10.2-2.2">
             <em>Configure Congestion Controller</em>: If congestion control is to be implemented
 at the QUIC connection layer as described in <a href="#cc-quic-layer" class="auto internal xref">Section 7.1</a>, the QUIC
 implementation SHOULD expose an API to allow the application to configure the
-specifics of the congestion controller.<a href="#section-9.2-2.2" class="pilcrow">¶</a>
-</li>
-          <li class="normal" id="section-9.2-2.3">
-            <em>Disable Congestion Controller</em>: If congestion control is to be implemented at
-the application layer as described in <a href="#cc-application-layer" class="auto internal xref">Section 7.2</a>, and the
-application layer is trusted to apply adequate congestion control as described
-in <span><a href="https://rfc-editor.org/rfc/rfc9002#section-7" class="relref">Section 7</a> of [<a href="#RFC9002" class="cite xref">RFC9002</a>]</span> and <span><a href="https://rfc-editor.org/rfc/rfc8085#section-3.1" class="relref">Section 3.1</a> of [<a href="#RFC8085" class="cite xref">RFC8085</a>]</span>, it is
-RECOMMENDED to allow the application to disable QUIC layer congestion control
-entirely.<a href="#section-9.2-2.3" class="pilcrow">¶</a>
+specifics of the congestion controller.<a href="#section-10.2-2.2" class="pilcrow">¶</a>
 </li>
         </ul>
 </section>
@@ -3319,75 +3458,60 @@ entirely.<a href="#section-9.2-2.3" class="pilcrow">¶</a>
 </section>
 </div>
 <div id="discussion">
-<section id="section-10">
+<section id="section-11">
       <h2 id="name-discussion">
-<a href="#section-10" class="section-number selfRef">10. </a><a href="#name-discussion" class="section-name selfRef">Discussion</a>
+<a href="#section-11" class="section-number selfRef">11. </a><a href="#name-discussion" class="section-name selfRef">Discussion</a>
       </h2>
-<div id="flow-identifier">
-<section id="section-10.1">
-        <h3 id="name-flow-identifier">
-<a href="#section-10.1" class="section-number selfRef">10.1. </a><a href="#name-flow-identifier" class="section-name selfRef">Flow Identifier</a>
-        </h3>
-<p id="section-10.1-1"><span>[<a href="#RFC9221" class="cite xref">RFC9221</a>]</span> suggests to use flow identifiers to multiplex different streams on
-QUIC Datagrams, which is implemented in <a href="#encapsulation" class="auto internal xref">Section 5</a>, but it is unclear how
-applications can combine RoQ with other data streams using the same
-QUIC connections. If the non-RTP data streams use the same flow identifies, too
-and the application can make sure, that flow identifiers are unique, there
-should be no problem. Flow identifiers could be problematic, if different
-specifications for RTP and non-RTP data streams over QUIC mandate different
-incompatible flow identifiers.<a href="#section-10.1-1" class="pilcrow">¶</a></p>
-</section>
-</div>
 <div id="impact-of-connection-migration">
-<section id="section-10.2">
+<section id="section-11.1">
         <h3 id="name-impact-of-connection-migrat">
-<a href="#section-10.2" class="section-number selfRef">10.2. </a><a href="#name-impact-of-connection-migrat" class="section-name selfRef">Impact of Connection Migration</a>
+<a href="#section-11.1" class="section-number selfRef">11.1. </a><a href="#name-impact-of-connection-migrat" class="section-name selfRef">Impact of Connection Migration</a>
         </h3>
-<p id="section-10.2-1">RTP sessions are characterized by a continuous flow of packets into either or
+<p id="section-11.1-1">RTP sessions are characterized by a continuous flow of packets into either or
 both directions.  A connection migration may lead to pausing media
 transmission until reachability of the peer under the new address is validated.
 This may lead to short breaks in media delivery in the order of RTT and, if
 RTCP is used for RTT measurements, may cause spikes in observed delays.
 Application layer congestion control mechanisms (and also packet repair schemes
-such as retransmissions) need to be prepared to cope with such spikes.<a href="#section-10.2-1" class="pilcrow">¶</a></p>
-<p id="section-10.2-2">If a QUIC connection is established via a signaling channel, this signaling
+such as retransmissions) need to be prepared to cope with such spikes.<a href="#section-11.1-1" class="pilcrow">¶</a></p>
+<p id="section-11.1-2">If a QUIC connection is established via a signaling channel, this signaling
 may have involved Interactive Connectivity Establishment (ICE) exchanges to
 determine and choose suitable (IP address, port number) pairs for the QUIC
 connection.  Subsequent address change events may be noticed by QUIC via its
 connection migration handling and/or at the ICE or other application layer,
 e.g., by noticing changing IP addresses at the network interface.  This may
-imply that the two signaling and data "layers" get (temporarily) out of sync.<a href="#section-10.2-2" class="pilcrow">¶</a></p>
+imply that the two signaling and data "layers" get (temporarily) out of sync.<a href="#section-11.1-2" class="pilcrow">¶</a></p>
 <ul class="normal ulEmpty">
-<li class="normal ulEmpty" id="section-10.2-3.1">
-            <p id="section-10.2-3.1.1"><strong>Editor's Note:</strong> It may be desirable that the API provides an indication
-of connection migration event for either case.<a href="#section-10.2-3.1.1" class="pilcrow">¶</a></p>
+<li class="normal ulEmpty" id="section-11.1-3.1">
+            <p id="section-11.1-3.1.1"><strong>Editor's Note:</strong> It may be desirable that the API provides an indication
+of connection migration event for either case.<a href="#section-11.1-3.1.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 </section>
 </div>
 <div id="rtt-considerations">
-<section id="section-10.3">
+<section id="section-11.2">
         <h3 id="name-0-rtt-considerations">
-<a href="#section-10.3" class="section-number selfRef">10.3. </a><a href="#name-0-rtt-considerations" class="section-name selfRef">0-RTT considerations</a>
+<a href="#section-11.2" class="section-number selfRef">11.2. </a><a href="#name-0-rtt-considerations" class="section-name selfRef">0-RTT considerations</a>
         </h3>
-<p id="section-10.3-1">For repeated connections between peers, the initiator of a QUIC connection can
+<p id="section-11.2-1">For repeated connections between peers, the initiator of a QUIC connection can
 use 0-RTT data for both QUIC streams and datagrams. As such packets are subject to
 replay attacks, applications shall carefully specify which data types and operations
 are allowed.  0-RTT data may be beneficial for use with RoQ to reduce the
-risk of media clipping, e.g., at the beginning of a conversation.<a href="#section-10.3-1" class="pilcrow">¶</a></p>
-<p id="section-10.3-2">This specification defines carrying RTP on top of QUIC and thus does not finally
+risk of media clipping, e.g., at the beginning of a conversation.<a href="#section-11.2-1" class="pilcrow">¶</a></p>
+<p id="section-11.2-2">This specification defines carrying RTP on top of QUIC and thus does not finally
 define what the actual application data are going to be.  RTP typically carries
 ephemeral media contents that is rendered and possibly recorded but otherwise
 causes no side effects. Moreover, the amount of data that can be carried as 0-RTT
 data is rather limited.  But it is the responsibility of the respective application
-to determine if 0-RTT data is permissible.<a href="#section-10.3-2" class="pilcrow">¶</a></p>
+to determine if 0-RTT data is permissible.<a href="#section-11.2-2" class="pilcrow">¶</a></p>
 <ul class="normal ulEmpty">
-<li class="normal ulEmpty" id="section-10.3-3.1">
-            <p id="section-10.3-3.1.1"><strong>Editor's Note:</strong> Since the QUIC connection will often be created in the context
+<li class="normal ulEmpty" id="section-11.2-3.1">
+            <p id="section-11.2-3.1.1"><strong>Editor's Note:</strong> Since the QUIC connection will often be created in the context
 of an existing signaling relationship (e.g., using WebRTC or SIP), specific 0-RTT
 keying material could be exchanged to prevent replays across sessions.  Within
 the same connection, replayed media packets would be discarded as duplicates by
-the receiver.<a href="#section-10.3-3.1.1" class="pilcrow">¶</a></p>
+the receiver.<a href="#section-11.2-3.1.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 </section>
@@ -3395,53 +3519,53 @@ the receiver.<a href="#section-10.3-3.1.1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="sec-considerations">
-<section id="section-11">
+<section id="section-12">
       <h2 id="name-security-considerations">
-<a href="#section-11" class="section-number selfRef">11. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
+<a href="#section-12" class="section-number selfRef">12. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
       </h2>
-<p id="section-11-1">RoQ is subject to the security considerations of RTP described in
+<p id="section-12-1">RoQ is subject to the security considerations of RTP described in
 <span><a href="https://rfc-editor.org/rfc/rfc3550#section-9" class="relref">Section 9</a> of [<a href="#RFC3550" class="cite xref">RFC3550</a>]</span> and the security considerations of any RTP profile in
-use.<a href="#section-11-1" class="pilcrow">¶</a></p>
-<p id="section-11-2">The security considerations for the QUIC protocol and datagram extension
-described in <span><a href="https://rfc-editor.org/rfc/rfc9000#section-21" class="relref">Section 21</a> of [<a href="#RFC9000" class="cite xref">RFC9000</a>]</span>, <span><a href="https://rfc-editor.org/rfc/rfc9001#section-9" class="relref">Section 9</a> of [<a href="#RFC9001" class="cite xref">RFC9001</a>]</span>, <span><a href="https://rfc-editor.org/rfc/rfc9002#section-8" class="relref">Section 8</a> of [<a href="#RFC9002" class="cite xref">RFC9002</a>]</span> and <span><a href="https://rfc-editor.org/rfc/rfc9221#section-6" class="relref">Section 6</a> of [<a href="#RFC9221" class="cite xref">RFC9221</a>]</span> also apply to RoQ.<a href="#section-11-2" class="pilcrow">¶</a></p>
-<p id="section-11-3">Note that RTP-over-QUIC provides mandatory security, and other RTP transports do
+use.<a href="#section-12-1" class="pilcrow">¶</a></p>
+<p id="section-12-2">The security considerations for the QUIC protocol and datagram extension
+described in <span><a href="https://rfc-editor.org/rfc/rfc9000#section-21" class="relref">Section 21</a> of [<a href="#RFC9000" class="cite xref">RFC9000</a>]</span>, <span><a href="https://rfc-editor.org/rfc/rfc9001#section-9" class="relref">Section 9</a> of [<a href="#RFC9001" class="cite xref">RFC9001</a>]</span>, <span><a href="https://rfc-editor.org/rfc/rfc9002#section-8" class="relref">Section 8</a> of [<a href="#RFC9002" class="cite xref">RFC9002</a>]</span> and <span><a href="https://rfc-editor.org/rfc/rfc9221#section-6" class="relref">Section 6</a> of [<a href="#RFC9221" class="cite xref">RFC9221</a>]</span> also apply to RoQ.<a href="#section-12-2" class="pilcrow">¶</a></p>
+<p id="section-12-3">Note that RTP-over-QUIC provides mandatory security, and other RTP transports do
 not. In order to prevent the inadvertent disclosure of RTP sessions to
 unintended third parties, RTP topologies described in <a href="#topologies" class="auto internal xref">Section 3.1</a> that
 include middleboxes supporting both RTP-over-QUIC and non-RTP-over-QUIC paths
 MUST forward RTP packets on non-RTP-over-QUIC paths using a secure AVP profile
 (<span>[<a href="#RFC3711" class="cite xref">RFC3711</a>]</span>, <span>[<a href="#RFC4585" class="cite xref">RFC4585</a>]</span>, or another AVP profile providing equivalent
 RTP-level security), whether or not RTP-over-QUIC senders are using a secure AVP
-profile for those RTP packets.<a href="#section-11-3" class="pilcrow">¶</a></p>
+profile for those RTP packets.<a href="#section-12-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="iana-considerations">
-<section id="section-12">
+<section id="section-13">
       <h2 id="name-iana-considerations">
-<a href="#section-12" class="section-number selfRef">12. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
+<a href="#section-13" class="section-number selfRef">13. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
       </h2>
 <div id="registration-of-a-roq-identification-string">
-<section id="section-12.1">
+<section id="section-13.1">
         <h3 id="name-registration-of-a-roq-ident">
-<a href="#section-12.1" class="section-number selfRef">12.1. </a><a href="#name-registration-of-a-roq-ident" class="section-name selfRef">Registration of a RoQ Identification String</a>
+<a href="#section-13.1" class="section-number selfRef">13.1. </a><a href="#name-registration-of-a-roq-ident" class="section-name selfRef">Registration of a RoQ Identification String</a>
         </h3>
-<p id="section-12.1-1">This document creates a new registration for the identification of RoQ
+<p id="section-13.1-1">This document creates a new registration for the identification of RoQ
 in the "TLS Application-Layer Protocol Negotiation (ALPN) Protocol IDs" registry
-<span>[<a href="#RFC7301" class="cite xref">RFC7301</a>]</span>.<a href="#section-12.1-1" class="pilcrow">¶</a></p>
-<p id="section-12.1-2">The "rtp-mux-quic" string identifies RoQ:<a href="#section-12.1-2" class="pilcrow">¶</a></p>
-<span class="break"></span><dl class="dlParallel" id="section-12.1-3">
-          <dt id="section-12.1-3.1">Protocol:</dt>
-          <dd style="margin-left: 1.5em" id="section-12.1-3.2">
-            <p id="section-12.1-3.2.1">RTP over QUIC (RoQ)<a href="#section-12.1-3.2.1" class="pilcrow">¶</a></p>
+<span>[<a href="#RFC7301" class="cite xref">RFC7301</a>]</span>.<a href="#section-13.1-1" class="pilcrow">¶</a></p>
+<p id="section-13.1-2">The "rtp-mux-quic" string identifies RoQ:<a href="#section-13.1-2" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="section-13.1-3">
+          <dt id="section-13.1-3.1">Protocol:</dt>
+          <dd style="margin-left: 1.5em" id="section-13.1-3.2">
+            <p id="section-13.1-3.2.1">RTP over QUIC (RoQ)<a href="#section-13.1-3.2.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
-<dt id="section-12.1-3.3">Identification Sequence:</dt>
-          <dd style="margin-left: 1.5em" id="section-12.1-3.4">
-            <p id="section-12.1-3.4.1">0x72 0x74 0x70 0x2D 0x6F 0x76 0x65 0x72 0x2D 0x71 0x75 0x69 0x63 ("rtp-mux-quic")<a href="#section-12.1-3.4.1" class="pilcrow">¶</a></p>
+<dt id="section-13.1-3.3">Identification Sequence:</dt>
+          <dd style="margin-left: 1.5em" id="section-13.1-3.4">
+            <p id="section-13.1-3.4.1">0x72 0x74 0x70 0x2D 0x6F 0x76 0x65 0x72 0x2D 0x71 0x75 0x69 0x63 ("rtp-mux-quic")<a href="#section-13.1-3.4.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
-<dt id="section-12.1-3.5">Specification:</dt>
-          <dd style="margin-left: 1.5em" id="section-12.1-3.6">
-            <p id="section-12.1-3.6.1">This document<a href="#section-12.1-3.6.1" class="pilcrow">¶</a></p>
+<dt id="section-13.1-3.5">Specification:</dt>
+          <dd style="margin-left: 1.5em" id="section-13.1-3.6">
+            <p id="section-13.1-3.6.1">This document<a href="#section-13.1-3.6.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
 </dl>
@@ -3449,13 +3573,13 @@ in the "TLS Application-Layer Protocol Negotiation (ALPN) Protocol IDs" registry
 </div>
 </section>
 </div>
-<section id="section-13">
+<section id="section-14">
       <h2 id="name-references">
-<a href="#section-13" class="section-number selfRef">13. </a><a href="#name-references" class="section-name selfRef">References</a>
+<a href="#section-14" class="section-number selfRef">14. </a><a href="#name-references" class="section-name selfRef">References</a>
       </h2>
-<section id="section-13.1">
+<section id="section-14.1">
         <h3 id="name-normative-references">
-<a href="#section-13.1" class="section-number selfRef">13.1. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
+<a href="#section-14.1" class="section-number selfRef">14.1. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
         </h3>
 <dl class="references">
 <dt id="I-D.draft-huitema-quic-ts">[I-D.draft-huitema-quic-ts]</dt>
@@ -3506,9 +3630,9 @@ in the "TLS Application-Layer Protocol Negotiation (ALPN) Protocol IDs" registry
         <dd>
 <span class="refAuthor">Westerlund, M.</span> and <span class="refAuthor">S. Wenger</span>, <span class="refTitle">"RTP Topologies"</span>, <span class="seriesInfo">RFC 7667</span>, <span class="seriesInfo">DOI 10.17487/RFC7667</span>, <time datetime="2015-11" class="refDate">November 2015</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc7667">https://www.rfc-editor.org/rfc/rfc7667</a>&gt;</span>. </dd>
 <dd class="break"></dd>
-<dt id="RFC8085">[RFC8085]</dt>
+<dt id="RFC768">[RFC768]</dt>
         <dd>
-<span class="refAuthor">Eggert, L.</span>, <span class="refAuthor">Fairhurst, G.</span>, and <span class="refAuthor">G. Shepherd</span>, <span class="refTitle">"UDP Usage Guidelines"</span>, <span class="seriesInfo">BCP 145</span>, <span class="seriesInfo">RFC 8085</span>, <span class="seriesInfo">DOI 10.17487/RFC8085</span>, <time datetime="2017-03" class="refDate">March 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8085">https://www.rfc-editor.org/rfc/rfc8085</a>&gt;</span>. </dd>
+<span class="refAuthor">Postel, J.</span>, <span class="refTitle">"User Datagram Protocol"</span>, <span class="seriesInfo">STD 6</span>, <span class="seriesInfo">RFC 768</span>, <span class="seriesInfo">DOI 10.17487/RFC0768</span>, <time datetime="1980-08" class="refDate">August 1980</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc768">https://www.rfc-editor.org/rfc/rfc768</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC8174">[RFC8174]</dt>
         <dd>
@@ -3521,6 +3645,10 @@ in the "TLS Application-Layer Protocol Negotiation (ALPN) Protocol IDs" registry
 <dt id="RFC8698">[RFC8698]</dt>
         <dd>
 <span class="refAuthor">Zhu, X.</span>, <span class="refAuthor">Pan, R.</span>, <span class="refAuthor">Ramalho, M.</span>, and <span class="refAuthor">S. Mena</span>, <span class="refTitle">"Network-Assisted Dynamic Adaptation (NADA): A Unified Congestion Control Scheme for Real-Time Media"</span>, <span class="seriesInfo">RFC 8698</span>, <span class="seriesInfo">DOI 10.17487/RFC8698</span>, <time datetime="2020-02" class="refDate">February 2020</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8698">https://www.rfc-editor.org/rfc/rfc8698</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC8836">[RFC8836]</dt>
+        <dd>
+<span class="refAuthor">Jesup, R.</span> and <span class="refAuthor">Z. Sarker, Ed.</span>, <span class="refTitle">"Congestion Control Requirements for Interactive Real-Time Media"</span>, <span class="seriesInfo">RFC 8836</span>, <span class="seriesInfo">DOI 10.17487/RFC8836</span>, <time datetime="2021-01" class="refDate">January 2021</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8836">https://www.rfc-editor.org/rfc/rfc8836</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC8888">[RFC8888]</dt>
         <dd>
@@ -3552,11 +3680,15 @@ in the "TLS Application-Layer Protocol Negotiation (ALPN) Protocol IDs" registry
 <dd class="break"></dd>
 </dl>
 </section>
-<section id="section-13.2">
+<section id="section-14.2">
         <h3 id="name-informative-references">
-<a href="#section-13.2" class="section-number selfRef">13.2. </a><a href="#name-informative-references" class="section-name selfRef">Informative References</a>
+<a href="#section-14.2" class="section-number selfRef">14.2. </a><a href="#name-informative-references" class="section-name selfRef">Informative References</a>
         </h3>
 <dl class="references">
+<dt id="I-D.cardwell-iccrg-bbr-congestion-control">[I-D.cardwell-iccrg-bbr-congestion-control]</dt>
+        <dd>
+<span class="refAuthor">Cardwell, N.</span>, <span class="refAuthor">Cheng, Y.</span>, <span class="refAuthor">Yeganeh, S. H.</span>, <span class="refAuthor">Swett, I.</span>, and <span class="refAuthor">V. Jacobson</span>, <span class="refTitle">"BBR Congestion Control"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-cardwell-iccrg-bbr-congestion-control-02</span>, <time datetime="2022-03-07" class="refDate">7 March 2022</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-cardwell-iccrg-bbr-congestion-control-02">https://datatracker.ietf.org/doc/html/draft-cardwell-iccrg-bbr-congestion-control-02</a>&gt;</span>. </dd>
+<dd class="break"></dd>
 <dt id="I-D.draft-alvestrand-rmcat-remb">[I-D.draft-alvestrand-rmcat-remb]</dt>
         <dd>
 <span class="refAuthor">Alvestrand, H. T.</span>, <span class="refTitle">"RTCP message for Receiver Estimated Maximum Bitrate"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-alvestrand-rmcat-remb-03</span>, <time datetime="2013-10-21" class="refDate">21 October 2013</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-alvestrand-rmcat-remb-03">https://datatracker.ietf.org/doc/html/draft-alvestrand-rmcat-remb-03</a>&gt;</span>. </dd>
@@ -3577,9 +3709,17 @@ in the "TLS Application-Layer Protocol Negotiation (ALPN) Protocol IDs" registry
         <dd>
 <span class="refAuthor">Schinazi, D.</span> and <span class="refAuthor">L. Pardue</span>, <span class="refTitle">"HTTP Datagrams and the Capsule Protocol"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-masque-h3-datagram-11</span>, <time datetime="2022-06-17" class="refDate">17 June 2022</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-masque-h3-datagram-11">https://datatracker.ietf.org/doc/html/draft-ietf-masque-h3-datagram-11</a>&gt;</span>. </dd>
 <dd class="break"></dd>
+<dt id="I-D.draft-ietf-rmcat-gcc">[I-D.draft-ietf-rmcat-gcc]</dt>
+        <dd>
+<span class="refAuthor">Holmer, S.</span>, <span class="refAuthor">Lundin, H.</span>, <span class="refAuthor">Carlucci, G.</span>, <span class="refAuthor">De Cicco, L.</span>, and <span class="refAuthor">S. Mascolo</span>, <span class="refTitle">"A Google Congestion Control Algorithm for Real-Time Communication"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-rmcat-gcc-02</span>, <time datetime="2016-07-08" class="refDate">8 July 2016</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-rmcat-gcc-02">https://datatracker.ietf.org/doc/html/draft-ietf-rmcat-gcc-02</a>&gt;</span>. </dd>
+<dd class="break"></dd>
 <dt id="I-D.draft-ietf-wish-whip">[I-D.draft-ietf-wish-whip]</dt>
         <dd>
 <span class="refAuthor">Murillo, S. G.</span> and <span class="refAuthor">A. Gouaillard</span>, <span class="refTitle">"WebRTC-HTTP ingestion protocol (WHIP)"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-wish-whip-08</span>, <time datetime="2023-03-30" class="refDate">30 March 2023</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-wish-whip-08">https://datatracker.ietf.org/doc/html/draft-ietf-wish-whip-08</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="I-D.draft-thomson-quic-enough-00">[I-D.draft-thomson-quic-enough-00]</dt>
+        <dd>
+<span class="refAuthor">Thomson, M.</span>, <span class="refTitle">"Signaling That a QUIC Receiver Has Enough Stream Data"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-thomson-quic-enough-00</span>, <time datetime="2023-03-30" class="refDate">30 March 2023</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-thomson-quic-enough-00">https://datatracker.ietf.org/doc/html/draft-thomson-quic-enough-00</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC3168">[RFC3168]</dt>
         <dd>
@@ -3729,6 +3869,10 @@ in the "TLS Application-Layer Protocol Negotiation (ALPN) Protocol IDs" registry
         <dd>
 <span class="refAuthor">Singh, V.</span>, <span class="refAuthor">Perkins, C.</span>, <span class="refAuthor">Clark, A.</span>, and <span class="refAuthor">R. Huang</span>, <span class="refTitle">"RTP Control Protocol (RTCP) Extended Report (XR) Block for Independent Reporting of Burst/Gap Discard Metrics"</span>, <span class="seriesInfo">RFC 8015</span>, <span class="seriesInfo">DOI 10.17487/RFC8015</span>, <time datetime="2016-11" class="refDate">November 2016</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8015">https://www.rfc-editor.org/rfc/rfc8015</a>&gt;</span>. </dd>
 <dd class="break"></dd>
+<dt id="RFC8085">[RFC8085]</dt>
+        <dd>
+<span class="refAuthor">Eggert, L.</span>, <span class="refAuthor">Fairhurst, G.</span>, and <span class="refAuthor">G. Shepherd</span>, <span class="refTitle">"UDP Usage Guidelines"</span>, <span class="seriesInfo">BCP 145</span>, <span class="seriesInfo">RFC 8085</span>, <span class="seriesInfo">DOI 10.17487/RFC8085</span>, <time datetime="2017-03" class="refDate">March 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8085">https://www.rfc-editor.org/rfc/rfc8085</a>&gt;</span>. </dd>
+<dd class="break"></dd>
 <dt id="RFC8286">[RFC8286]</dt>
         <dd>
 <span class="refAuthor">Xia, J.</span>, <span class="refAuthor">Even, R.</span>, <span class="refAuthor">Huang, R.</span>, and <span class="refAuthor">L. Deng</span>, <span class="refTitle">"RTP/RTCP Extension for RTP Splicing Notification"</span>, <span class="seriesInfo">RFC 8286</span>, <span class="seriesInfo">DOI 10.17487/RFC8286</span>, <time datetime="2017-10" class="refDate">October 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8286">https://www.rfc-editor.org/rfc/rfc8286</a>&gt;</span>. </dd>
@@ -3767,7 +3911,7 @@ implements the RoQ Datagrams mapping and implements SCReAM congestion
 control at the application layer. It can optionally disable the builtin QUIC
 congestion control (NewReno). The endpoints only use RTCP for congestion control
 feedback, which can optionally be disabled and replaced by the QUIC connection
-statistics as described in <a href="#transport-layer-feedback" class="auto internal xref">Section 6.3</a>.<a href="#appendix-A-1" class="pilcrow">¶</a></p>
+statistics as described in <a href="#transport-layer-feedback" class="auto internal xref">Section 8.3</a>.<a href="#appendix-A-1" class="pilcrow">¶</a></p>
 <p id="appendix-A-2">Experimental results of the implementation can be found on
 <a href="https://github.com/mengelbart/rtp-over-quic-mininet">Github</a>, too.<a href="#appendix-A-2" class="pilcrow">¶</a></p>
 </section>
