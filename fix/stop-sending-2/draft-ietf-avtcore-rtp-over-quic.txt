@@ -5,7 +5,7 @@
 Audio/Video Transport Core Maintenance                            J. Ott
 Internet-Draft                                              M. Engelbart
 Intended status: Standards Track             Technical University Munich
-Expires: 18 December 2023                                   16 June 2023
+Expires: 5 January 2024                                      4 July 2023
 
 
                              RTP over QUIC
@@ -46,7 +46,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 18 December 2023.
+   This Internet-Draft will expire on 5 January 2024.
 
 Copyright Notice
 
@@ -668,7 +668,7 @@ Table of Contents
    was not yet successfully and completely transmitted, is no longer
    needed.
 
-   A RoQ receiver that is no longer be interested in reading a certain
+   A RoQ receiver that is no longer interested in reading a certain
    partition of the media stream MAY signal this to the sending peer
    using a STOP_SENDING frame.
 
