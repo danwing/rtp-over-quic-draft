@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2023-07-04T00:21:53.748457+00:00",
+  "timestamp": "2023-07-06T00:22:39.835154+00:00",
   "repo": "mengelbart/rtp-over-quic-draft",
   "labels": [
     {
@@ -4350,13 +4350,13 @@
       "labels": [],
       "body": "Second attempt to clarify the behaviour of STOP_SENDING and RESET_STREAM. I hope this is easier to understand than the current text and #96. It also adds subsections to add more structure to the whole subsection.",
       "createdAt": "2023-06-16T14:10:21Z",
-      "updatedAt": "2023-06-16T14:10:21Z",
+      "updatedAt": "2023-07-04T09:00:00Z",
       "baseRepository": "mengelbart/rtp-over-quic-draft",
       "baseRefName": "main",
       "baseRefOid": "1e00eecd41353312fd66ab66b2536bc377d0d5c3",
       "headRepository": "mengelbart/rtp-over-quic-draft",
       "headRefName": "fix/stop-sending-2",
-      "headRefOid": "8ae70dce6588bbed2a9b7d975dd9aba515d02859",
+      "headRefOid": "363a296e15d4f199ac7fcd7ce7ba735c40be7e37",
       "closedAt": null,
       "mergedAt": null,
       "mergedBy": null,
@@ -4441,6 +4441,46 @@
       "mergeCommit": null,
       "comments": [],
       "reviews": []
+    },
+    {
+      "number": 102,
+      "id": "PR_kwDOFUmh7s5Ul4NN",
+      "title": "Add considerations for aggregating frames",
+      "url": "https://github.com/mengelbart/rtp-over-quic-draft/pull/102",
+      "state": "OPEN",
+      "author": "mengelbart",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "close #85 ",
+      "createdAt": "2023-07-04T08:30:32Z",
+      "updatedAt": "2023-07-04T16:32:10Z",
+      "baseRepository": "mengelbart/rtp-over-quic-draft",
+      "baseRefName": "main",
+      "baseRefOid": "1e00eecd41353312fd66ab66b2536bc377d0d5c3",
+      "headRepository": "mengelbart/rtp-over-quic-draft",
+      "headRefName": "fix/85-frame-aggregation",
+      "headRefOid": "117bf7d0ce7f21b576db5fd71a341bdcdd2ba858",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOFUmh7s5aMVK8",
+          "commit": {
+            "abbreviatedOid": "117bf7d"
+          },
+          "author": "joerg-ott",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2023-07-04T16:32:10Z",
+          "updatedAt": "2023-07-04T16:32:10Z",
+          "comments": []
+        }
+      ]
     }
   ]
 }
