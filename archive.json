@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2023-07-06T00:22:39.835154+00:00",
+  "timestamp": "2023-07-09T00:26:05.070972+00:00",
   "repo": "mengelbart/rtp-over-quic-draft",
   "labels": [
     {
@@ -1992,6 +1992,24 @@
       "body": "In #71 we added a section about header extensions to the RTCP analysis, but it does not include a table of all header extensions we considered. I think it makes sense to add one, just like we did for the RTCP packets, too.",
       "createdAt": "2023-05-19T05:17:31Z",
       "updatedAt": "2023-06-16T15:45:01Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 103,
+      "id": "I_kwDOFUmh7s5q87Zq",
+      "title": "Reference new CLOSE_STREAM draft",
+      "url": "https://github.com/mengelbart/rtp-over-quic-draft/issues/103",
+      "state": "OPEN",
+      "author": "mengelbart",
+      "authorAssociation": "OWNER",
+      "assignees": [
+        "mengelbart"
+      ],
+      "labels": [],
+      "body": "",
+      "createdAt": "2023-07-07T21:10:36Z",
+      "updatedAt": "2023-07-07T21:10:36Z",
       "closedAt": null,
       "comments": []
     }
@@ -4350,13 +4368,13 @@
       "labels": [],
       "body": "Second attempt to clarify the behaviour of STOP_SENDING and RESET_STREAM. I hope this is easier to understand than the current text and #96. It also adds subsections to add more structure to the whole subsection.",
       "createdAt": "2023-06-16T14:10:21Z",
-      "updatedAt": "2023-07-04T09:00:00Z",
+      "updatedAt": "2023-07-07T21:21:06Z",
       "baseRepository": "mengelbart/rtp-over-quic-draft",
       "baseRefName": "main",
       "baseRefOid": "1e00eecd41353312fd66ab66b2536bc377d0d5c3",
       "headRepository": "mengelbart/rtp-over-quic-draft",
       "headRefName": "fix/stop-sending-2",
-      "headRefOid": "363a296e15d4f199ac7fcd7ce7ba735c40be7e37",
+      "headRefOid": "4dd4ef703836c64cdfd2769db8c91be6e3111aaf",
       "closedAt": null,
       "mergedAt": null,
       "mergedBy": null,
