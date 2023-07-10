@@ -5,7 +5,9 @@
 Audio/Video Transport Core Maintenance                            J. Ott
 Internet-Draft                                              M. Engelbart
 Intended status: Standards Track             Technical University Munich
-Expires: 11 January 2024                                    10 July 2023
+Expires: 11 January 2024                                      S. Dawkins
+                                                     Tencent America LLC
+                                                            10 July 2023
 
 
                              RTP over QUIC
@@ -2206,3 +2208,8 @@ Authors' Addresses
    Mathis Engelbart
    Technical University Munich
    Email: mathis.engelbart@gmail.com
+
+
+   Spencer Dawkins
+   Tencent America LLC
+   Email: spencerdawkins.ietf@gmail.com
