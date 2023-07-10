@@ -661,7 +661,7 @@ Table of Contents
 
                 Figure 2: RTP/RTCP payload for QUIC streams
 
-   Length:  A QUIC variable length integer Section 16 of [RFC9000]
+   Length:  A QUIC variable length integer (see Section 16 of [RFC9000])
       describing the length of the following RTP/RTCP packets in bytes.
 
    RTP/RTCP Packet:  The RTP/RTCP packet to transmit.
