@@ -2117,12 +2117,25 @@ connection.<a href="#section-5.3-4.2.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
 </dl>
-<p id="section-5.3-5">Since QUIC datagrams are not retransmitted on loss (see also
+<p id="section-5.3-5">RoQ senders need to be aware that QUIC uses the concept of QUIC frames.
+Different kinds of QUIC frames are used for different application and control
+data types. A single QUIC packet can contain more than one QUIC frame,
+including, for example, QUIC stream or datagram frames carrying application data
+and acknowledgement frames carrying QUIC acknowledgements, as long as the
+overall size fits into the MTU. One implication is that the number of packets a
+QUIC stack transmits depends on whether it can fit acknowledgement and datagram
+frames in the same QUIC packet. Suppose the application creates many datagram
+frames that fill up the QUIC packet. In that case, the QUIC stack might have to
+create additional packets for acknowledgement- (and possibly other control-)
+frames. The additional overhead could, in some cases, be reduced if the
+application creates smaller RTP packets, such that the resulting datagram frame
+can fit into a QUIC packet that can also carry acknowledgement frames.<a href="#section-5.3-5" class="pilcrow">¶</a></p>
+<p id="section-5.3-6">Since QUIC datagrams are not retransmitted on loss (see also
 <a href="#transport-layer-feedback" class="auto internal xref">Section 7.3</a> for loss signaling), if an application wishes to
 retransmit lost RTP packets, the retransmission has to be implemented by the
 application. RTP retransmissions can be done in the same RTP session or a
 separate RTP session <span>[<a href="#RFC4588" class="cite xref">RFC4588</a>]</span> and the flow identifier MUST be set to the
-flow identifier of the RTP session in which the retransmission happens.<a href="#section-5.3-5" class="pilcrow">¶</a></p>
+flow identifier of the RTP session in which the retransmission happens.<a href="#section-5.3-6" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
