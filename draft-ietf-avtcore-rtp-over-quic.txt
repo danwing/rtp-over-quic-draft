@@ -5,7 +5,7 @@
 Audio/Video Transport Core Maintenance                            J. Ott
 Internet-Draft                                              M. Engelbart
 Intended status: Standards Track             Technical University Munich
-Expires: 19 November 2023                                    18 May 2023
+Expires: 11 January 2024                                    10 July 2023
 
 
                              RTP over QUIC
@@ -46,7 +46,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 19 November 2023.
+   This Internet-Draft will expire on 11 January 2024.
 
 Copyright Notice
 
@@ -76,6 +76,9 @@ Table of Contents
    5.  Encapsulation
      5.1.  Multiplexing
      5.2.  QUIC Streams
+       5.2.1.  Stream Encapsulation
+       5.2.2.  RESET_STREAM and STOP_SENDING
+       5.2.3.  Flow control and MAX_STREAMS
      5.3.  QUIC Datagrams
    6.  Congestion Control and Rate Adaptation
      6.1.  Congestion Control at the Transport Layer
@@ -615,9 +618,20 @@ Table of Contents
    To send RTP/RTCP packets over QUIC streams, a sender MUST open a new
    unidirectional QUIC stream.  Streams are unidirectional because there
    is no synchronous relationship between sent and received RTP/RTCP
-   packets.  A sender MAY open new QUIC streams for different packets
-   using the same flow identifier, for example, to avoid head-of-line
-   blocking.
+   packets.  A RoQ sender MAY open new QUIC streams for different
+   packets using the same flow identifier, for example, to avoid head-
+   of-line blocking.
+
+   A receiver MUST be prepared to receive RTP packets on any number of
+   QUIC streams (subject to its limit on parallel open streams) and
+   SHOULD not make assumptions which RTP sequence numbers are carried in
+   which streams.
+
+   Note: A sender may or may not decide to discontinue using a lower
+   stream number after starting packet transmission on a higher stream
+   number.
+
+5.2.1.  Stream Encapsulation
 
    Figure 1 shows the encapsulation format for RoQ Streams.
 
@@ -652,32 +666,32 @@ Table of Contents
 
    RTP/RTCP Packet:  The RTP/RTCP packet to transmit.
 
-   If a sender knows that a packet, which was not yet successfully and
-   completely transmitted, is no longer needed, the sender MAY close the
-   stream by sending a RESET_STREAM frame.
+5.2.2.  RESET_STREAM and STOP_SENDING
 
-   QUIC allows an application to abort reading the stream and specify an
-   error code Section 3.5 of [RFC9000].  An RTP receiver can signal this
-   to the RTP sender by sending a QUIC STOP_SENDING frame, which is
-   exported to the RTP sender through the ROQ API, as described in
-   Section 8.  The RTP-sender SHOULD not interpret the reception of
-   STOP_SENDING as an indication that the RTP receiver lost interest in
-   the media stream as a whole, but rather that a part of the media
-   stream was not received timely.  In this case, the late data could
-   also delay the following media frames due to head-of-line blocking,
-   which the sender can avoid by transmitting new media frames on new
-   QUIC streams.  A sender that receives STOP_SENDING MUST NOT
-   retransmit any media frames already sent on the QUIC stream, on which
-   it received the STOP_SENDING, on a new QUIC stream.  An RTP sender
-   SHOULD instead continue to send media frames on new QUIC streams
-   starting with the first frame that was not transmitted on the stream
-   that received STOP_SENDING.
+   QUIC uses RESET_STREAM and STOP_SENDING frames to terminate the
+   sending part of a stream and to request termination of an incoming
+   stream by the sending peer respectively.
+
+   A RoQ sender MAY use RESET_STREAM if it knows that a packet, which
+   was not yet successfully and completely transmitted, is no longer
+   needed.
+
+   A RoQ receiver that is no longer interested in reading a certain
+   partition of the media stream MAY signal this to the sending peer
+   using a STOP_SENDING frame.
+
+   When a RoQ sender receives a STOP_SENDING frame, the RoQ sender MUST
+   open one or more new QUIC streams to send new media frames.  Any
+   media frame that has already been sent on the QUIC stream that
+   received the STOP_SENDING frame, MUST NOT be sent again on the new
+   QUIC stream(s).
 
    Note that an RTP receiver cannot request a reset of only a particular
    media frame because the sending QUIC implementation might already
    have sent data for the following frame on the same stream.  In that
-   case, STOP_SENDING might lead to unintentionally skipping one or more
-   frames.
+   case, STOP_SENDING and the following RESET_STREAM would also drop the
+   following media frame and thus lead to unintentionally skipping one
+   or more frames.
 
       *Editor's note:* A receiver cannot cancel a certain frame but
       still receive retransmissions for a frame the was following on the
@@ -698,6 +712,8 @@ Table of Contents
    the stream as long as the stream is not closed with a RESET_STREAM
    frame.  No retransmission has to be implemented by the application
    since QUIC frames lost in transit are retransmitted by QUIC.
+
+5.2.3.  Flow control and MAX_STREAMS
 
    Opening new streams for new packets MAY implicitly limit the number
    of packets concurrently in transit because the QUIC receiver provides
@@ -1730,9 +1746,9 @@ Table of Contents
    [I-D.draft-ietf-quic-ack-frequency]
               Iyengar, J., Swett, I., and M. Kühlewind, "QUIC
               Acknowledgement Frequency", Work in Progress, Internet-
-              Draft, draft-ietf-quic-ack-frequency-04, 26 March 2023,
+              Draft, draft-ietf-quic-ack-frequency-05, 10 July 2023,
               <https://datatracker.ietf.org/doc/html/draft-ietf-quic-
-              ack-frequency-04>.
+              ack-frequency-05>.
 
    [I-D.draft-smith-quic-receive-ts]
               Smith, C. and I. Swett, "QUIC Extension for Reporting

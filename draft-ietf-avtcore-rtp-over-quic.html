@@ -15,21 +15,21 @@ endpoints, in order to reduce the need to exchange RTCP packets and how to
 implement congestion control and rate adaptation without relying on RTCP
 feedback. 
     " name="description">
-<meta content="xml2rfc 3.17.1" name="generator">
+<meta content="xml2rfc 3.17.4" name="generator">
 <meta content="Internet-Draft" name="keyword">
 <meta content="draft-ietf-avtcore-rtp-over-quic-latest" name="ietf.draft">
 <!-- Generator version information:
-  xml2rfc 3.17.1
-    Python 3.11.3
-    appdirs 1.4.4
+  xml2rfc 3.17.4
+    Python 3.11.4
     ConfigArgParse 1.5.3
-    google-i18n-address 2.5.2
+    google-i18n-address 3.1.0
     intervaltree 3.1.0
     Jinja2 3.1.2
     lxml 4.9.2
+    platformdirs 3.8.0
     pycountry 22.3.5
     PyYAML 6.0
-    requests 2.30.0
+    requests 2.31.0
     setuptools 67.7.2
     six 1.16.0
     wcwidth 0.2.6
@@ -1039,11 +1039,11 @@ svg :is([stroke="fill"], [fill^="#fff"]) {
 <thead><tr>
 <td class="left">Internet-Draft</td>
 <td class="center">RTP over QUIC</td>
-<td class="right">May 2023</td>
+<td class="right">July 2023</td>
 </tr></thead>
 <tfoot><tr>
 <td class="left">Ott &amp; Engelbart</td>
-<td class="center">Expires 19 November 2023</td>
+<td class="center">Expires 11 January 2024</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1056,12 +1056,12 @@ svg :is([stroke="fill"], [fill^="#fff"]) {
 <dd class="internet-draft">draft-ietf-avtcore-rtp-over-quic-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2023-05-18" class="published">18 May 2023</time>
+<time datetime="2023-07-10" class="published">10 July 2023</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2023-11-19">19 November 2023</time></dd>
+<dd class="expires"><time datetime="2024-01-11">11 January 2024</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1115,7 +1115,7 @@ feedback.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 19 November 2023.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 11 January 2024.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1185,6 +1185,17 @@ feedback.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.2">
                 <p id="section-toc.1-1.5.2.2.1"><a href="#section-5.2" class="auto internal xref">5.2</a>.  <a href="#name-quic-streams" class="internal xref">QUIC Streams</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.2.2.1">
+                    <p id="section-toc.1-1.5.2.2.2.1.1"><a href="#section-5.2.1" class="auto internal xref">5.2.1</a>.  <a href="#name-stream-encapsulation" class="internal xref">Stream Encapsulation</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.2.2.2">
+                    <p id="section-toc.1-1.5.2.2.2.2.1"><a href="#section-5.2.2" class="auto internal xref">5.2.2</a>.  <a href="#name-reset_stream-and-stop_sendi" class="internal xref">RESET_STREAM and STOP_SENDING</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.2.2.3">
+                    <p id="section-toc.1-1.5.2.2.2.3.1"><a href="#section-5.2.3" class="auto internal xref">5.2.3</a>.  <a href="#name-flow-control-and-max_stream" class="internal xref">Flow control and MAX_STREAMS</a></p>
+</li>
+                </ul>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.3">
                 <p id="section-toc.1-1.5.2.3.1"><a href="#section-5.3" class="auto internal xref">5.3</a>.  <a href="#name-quic-datagrams" class="internal xref">QUIC Datagrams</a></p>
@@ -1921,13 +1932,23 @@ of flows.<a href="#section-5.1-7" class="pilcrow">¶</a></p>
         </h3>
 <p id="section-5.2-1">To send RTP/RTCP packets over QUIC streams, a sender MUST open a new
 unidirectional QUIC stream. Streams are unidirectional because there is no
-synchronous relationship between sent and received RTP/RTCP packets. A sender
-MAY open new QUIC streams for different packets using the same flow identifier,
-for example, to avoid head-of-line blocking.<a href="#section-5.2-1" class="pilcrow">¶</a></p>
-<p id="section-5.2-2"><a href="#fig-stream-payload" class="auto internal xref">Figure 1</a> shows the encapsulation format for RoQ Streams.<a href="#section-5.2-2" class="pilcrow">¶</a></p>
+synchronous relationship between sent and received RTP/RTCP packets. A RoQ
+sender MAY open new QUIC streams for different packets using the same flow
+identifier, for example, to avoid head-of-line blocking.<a href="#section-5.2-1" class="pilcrow">¶</a></p>
+<p id="section-5.2-2">A receiver MUST be prepared to receive RTP packets on any number of QUIC streams
+(subject to its limit on parallel open streams) and SHOULD not make assumptions
+which RTP sequence numbers are carried in which streams.<a href="#section-5.2-2" class="pilcrow">¶</a></p>
+<p id="section-5.2-3">Note: A sender may or may not decide to discontinue using a lower stream number
+after starting packet transmission on a higher stream number.<a href="#section-5.2-3" class="pilcrow">¶</a></p>
+<div id="stream-encapsulation">
+<section id="section-5.2.1">
+          <h4 id="name-stream-encapsulation">
+<a href="#section-5.2.1" class="section-number selfRef">5.2.1. </a><a href="#name-stream-encapsulation" class="section-name selfRef">Stream Encapsulation</a>
+          </h4>
+<p id="section-5.2.1-1"><a href="#fig-stream-payload" class="auto internal xref">Figure 1</a> shows the encapsulation format for RoQ Streams.<a href="#section-5.2.1-1" class="pilcrow">¶</a></p>
 <span id="name-roq-streams-payload-format"></span><div id="fig-stream-payload">
 <figure id="figure-1">
-          <div class="alignLeft art-text artwork" id="section-5.2-3.1">
+            <div class="alignLeft art-text artwork" id="section-5.2.1-2.1">
 <pre>
 Payload {
   Flow Identifier (i),
@@ -1937,29 +1958,29 @@ Payload {
 </div>
 <figcaption><a href="#figure-1" class="selfRef">Figure 1</a>:
 <a href="#name-roq-streams-payload-format" class="selfRef">RoQ Streams Payload Format</a>
-          </figcaption></figure>
+            </figcaption></figure>
 </div>
-<span class="break"></span><dl class="dlParallel" id="section-5.2-4">
-          <dt id="section-5.2-4.1">Flow Identifier:</dt>
-          <dd style="margin-left: 1.5em" id="section-5.2-4.2">
-            <p id="section-5.2-4.2.1">Flow identifier to demultiplex different data flows on the same QUIC
-connection.<a href="#section-5.2-4.2.1" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="section-5.2.1-3">
+            <dt id="section-5.2.1-3.1">Flow Identifier:</dt>
+            <dd style="margin-left: 1.5em" id="section-5.2.1-3.2">
+              <p id="section-5.2.1-3.2.1">Flow identifier to demultiplex different data flows on the same QUIC
+connection.<a href="#section-5.2.1-3.2.1" class="pilcrow">¶</a></p>
+</dd>
+            <dd class="break"></dd>
+<dt id="section-5.2.1-3.3">RTP/RTCP Payload:</dt>
+            <dd style="margin-left: 1.5em" id="section-5.2.1-3.4">
+              <p id="section-5.2.1-3.4.1">Contains the RTP/RTCP payload; see <a href="#fig-rtp-stream-payload" class="auto internal xref">Figure 2</a><a href="#section-5.2.1-3.4.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
-<dt id="section-5.2-4.3">RTP/RTCP Payload:</dt>
-          <dd style="margin-left: 1.5em" id="section-5.2-4.4">
-            <p id="section-5.2-4.4.1">Contains the RTP/RTCP payload; see <a href="#fig-rtp-stream-payload" class="auto internal xref">Figure 2</a><a href="#section-5.2-4.4.1" class="pilcrow">¶</a></p>
-</dd>
-        <dd class="break"></dd>
 </dl>
-<p id="section-5.2-5">The payload in a QUIC stream starts with the flow identifier followed by one or
+<p id="section-5.2.1-4">The payload in a QUIC stream starts with the flow identifier followed by one or
 more RTP/RTCP payloads. All RTP/RTCP payloads sent on a stream MUST belong to
-the RTP session with the same flow identifier.<a href="#section-5.2-5" class="pilcrow">¶</a></p>
-<p id="section-5.2-6">Each payload begins with a length field indicating the length of the RTP/RTCP
-packet, followed by the packet itself, see <a href="#fig-rtp-stream-payload" class="auto internal xref">Figure 2</a>.<a href="#section-5.2-6" class="pilcrow">¶</a></p>
+the RTP session with the same flow identifier.<a href="#section-5.2.1-4" class="pilcrow">¶</a></p>
+<p id="section-5.2.1-5">Each payload begins with a length field indicating the length of the RTP/RTCP
+packet, followed by the packet itself, see <a href="#fig-rtp-stream-payload" class="auto internal xref">Figure 2</a>.<a href="#section-5.2.1-5" class="pilcrow">¶</a></p>
 <span id="name-rtp-rtcp-payload-for-quic-s"></span><div id="fig-rtp-stream-payload">
 <figure id="figure-2">
-          <div class="alignLeft art-text artwork" id="section-5.2-7.1">
+            <div class="alignLeft art-text artwork" id="section-5.2.1-6.1">
 <pre>
 RTP/RTCP Payload {
   Length(i),
@@ -1969,62 +1990,72 @@ RTP/RTCP Payload {
 </div>
 <figcaption><a href="#figure-2" class="selfRef">Figure 2</a>:
 <a href="#name-rtp-rtcp-payload-for-quic-s" class="selfRef">RTP/RTCP payload for QUIC streams</a>
-          </figcaption></figure>
+            </figcaption></figure>
 </div>
-<span class="break"></span><dl class="dlParallel" id="section-5.2-8">
-          <dt id="section-5.2-8.1">Length:</dt>
-          <dd style="margin-left: 1.5em" id="section-5.2-8.2">
-            <p id="section-5.2-8.2.1">A QUIC variable length integer <span><a href="https://rfc-editor.org/rfc/rfc9000#section-16" class="relref">Section 16</a> of [<a href="#RFC9000" class="cite xref">RFC9000</a>]</span> describing the
-length of the following RTP/RTCP packets in bytes.<a href="#section-5.2-8.2.1" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="section-5.2.1-7">
+            <dt id="section-5.2.1-7.1">Length:</dt>
+            <dd style="margin-left: 1.5em" id="section-5.2.1-7.2">
+              <p id="section-5.2.1-7.2.1">A QUIC variable length integer <span><a href="https://rfc-editor.org/rfc/rfc9000#section-16" class="relref">Section 16</a> of [<a href="#RFC9000" class="cite xref">RFC9000</a>]</span> describing the
+length of the following RTP/RTCP packets in bytes.<a href="#section-5.2.1-7.2.1" class="pilcrow">¶</a></p>
+</dd>
+            <dd class="break"></dd>
+<dt id="section-5.2.1-7.3">RTP/RTCP Packet:</dt>
+            <dd style="margin-left: 1.5em" id="section-5.2.1-7.4">
+              <p id="section-5.2.1-7.4.1">The RTP/RTCP packet to transmit.<a href="#section-5.2.1-7.4.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
-<dt id="section-5.2-8.3">RTP/RTCP Packet:</dt>
-          <dd style="margin-left: 1.5em" id="section-5.2-8.4">
-            <p id="section-5.2-8.4.1">The RTP/RTCP packet to transmit.<a href="#section-5.2-8.4.1" class="pilcrow">¶</a></p>
-</dd>
-        <dd class="break"></dd>
 </dl>
-<p id="section-5.2-9">If a sender knows that a packet, which was not yet successfully and completely
-transmitted, is no longer needed, the sender MAY close the stream by sending a
-RESET_STREAM frame.<a href="#section-5.2-9" class="pilcrow">¶</a></p>
-<p id="section-5.2-10">QUIC allows an application to abort reading the stream and specify an error code
-<span><a href="https://rfc-editor.org/rfc/rfc9000#section-3.5" class="relref">Section 3.5</a> of [<a href="#RFC9000" class="cite xref">RFC9000</a>]</span>. An RTP receiver can signal this to the RTP sender
-by sending a QUIC STOP_SENDING frame, which is exported to the RTP sender
-through the ROQ API, as described in <a href="#api-considerations" class="auto internal xref">Section 8</a>. The RTP-sender
-SHOULD not interpret the reception of STOP_SENDING as an indication that the
-RTP receiver lost interest in the media stream as a whole, but rather that a
-part of the media stream was not received timely. In this case, the late data
-could also delay the following media frames due to head-of-line blocking, which
-the sender can avoid by transmitting new media frames on new QUIC streams. A
-sender that receives STOP_SENDING MUST NOT retransmit any media frames already
-sent on the QUIC stream, on which it received the STOP_SENDING, on a new QUIC
-stream. An RTP sender SHOULD instead continue to send media frames on new QUIC
-streams starting with the first frame that was not transmitted on the stream
-that received STOP_SENDING.<a href="#section-5.2-10" class="pilcrow">¶</a></p>
-<p id="section-5.2-11">Note that an RTP receiver cannot request a reset of only a particular media
+</section>
+</div>
+<div id="resetstream-and-stopsending">
+<section id="section-5.2.2">
+          <h4 id="name-reset_stream-and-stop_sendi">
+<a href="#section-5.2.2" class="section-number selfRef">5.2.2. </a><a href="#name-reset_stream-and-stop_sendi" class="section-name selfRef">RESET_STREAM and STOP_SENDING</a>
+          </h4>
+<p id="section-5.2.2-1">QUIC uses RESET_STREAM and STOP_SENDING frames to terminate the sending part
+of a stream and to request termination of an incoming stream by the sending
+peer respectively.<a href="#section-5.2.2-1" class="pilcrow">¶</a></p>
+<p id="section-5.2.2-2">A RoQ sender MAY use RESET_STREAM if it knows that a packet, which was not yet
+successfully and completely transmitted, is no longer needed.<a href="#section-5.2.2-2" class="pilcrow">¶</a></p>
+<p id="section-5.2.2-3">A RoQ receiver that is no longer interested in reading a certain partition of
+the media stream MAY signal this to the sending peer using a STOP_SENDING
+frame.<a href="#section-5.2.2-3" class="pilcrow">¶</a></p>
+<p id="section-5.2.2-4">When a RoQ sender receives a STOP_SENDING frame, the RoQ sender MUST open one
+or more new QUIC streams to send new media frames. Any media frame that has
+already been sent on the QUIC stream that received the STOP_SENDING frame, MUST
+NOT be sent again on the new QUIC stream(s).<a href="#section-5.2.2-4" class="pilcrow">¶</a></p>
+<p id="section-5.2.2-5">Note that an RTP receiver cannot request a reset of only a particular media
 frame because the sending QUIC implementation might already have sent data for
-the following frame on the same stream. In that case, STOP_SENDING might lead
-to unintentionally skipping one or more frames.<a href="#section-5.2-11" class="pilcrow">¶</a></p>
+the following frame on the same stream. In that case, STOP_SENDING and the
+following RESET_STREAM would also drop the following media frame and thus lead
+to unintentionally skipping one or more frames.<a href="#section-5.2.2-5" class="pilcrow">¶</a></p>
 <ul class="normal ulEmpty">
-<li class="normal ulEmpty" id="section-5.2-12.1">
-            <p id="section-5.2-12.1.1"><strong>Editor's note:</strong> A receiver cannot cancel a certain frame but still receive
+<li class="normal ulEmpty" id="section-5.2.2-6.1">
+              <p id="section-5.2.2-6.1.1"><strong>Editor's note:</strong> A receiver cannot cancel a certain frame but still receive
 retransmissions for a frame the was following on the same stream using
 STOP_SENDING, because STOP_SENDING does not include an offset which would
 allow signaling where retransmissions should continue. If this is a required
 feature for RoQ, it could be implemented using an extended STOP_SENDING frame
-as, for example, proposed in <span>[<a href="#I-D.draft-thomson-quic-enough-00" class="cite xref">I-D.draft-thomson-quic-enough-00</a>]</span>.<a href="#section-5.2-12.1.1" class="pilcrow">¶</a></p>
+as, for example, proposed in <span>[<a href="#I-D.draft-thomson-quic-enough-00" class="cite xref">I-D.draft-thomson-quic-enough-00</a>]</span>.<a href="#section-5.2.2-6.1.1" class="pilcrow">¶</a></p>
 </li>
-        </ul>
-<p id="section-5.2-13">A translator that translates between two endpoints, both connected via QUIC,
+          </ul>
+<p id="section-5.2.2-7">A translator that translates between two endpoints, both connected via QUIC,
 MUST forward RESET_STREAM frames received from one end to the other unless it
-forwards the RTP packets on QUIC datagrams.<a href="#section-5.2-13" class="pilcrow">¶</a></p>
-<p id="section-5.2-14">Large RTP packets sent on a stream will be fragmented into smaller QUIC frames.
+forwards the RTP packets on QUIC datagrams.<a href="#section-5.2.2-7" class="pilcrow">¶</a></p>
+<p id="section-5.2.2-8">Large RTP packets sent on a stream will be fragmented into smaller QUIC frames.
 The QUIC frames are transmitted reliably and in order such that a receiving
 application can read a complete RTP packet from the stream as long as the stream
 is not closed with a RESET_STREAM frame. No retransmission has to be
 implemented by the application since QUIC frames lost in transit are
-retransmitted by QUIC.<a href="#section-5.2-14" class="pilcrow">¶</a></p>
-<p id="section-5.2-15">Opening new streams for new packets MAY implicitly limit the number of packets
+retransmitted by QUIC.<a href="#section-5.2.2-8" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="flow-control-and-maxstreams">
+<section id="section-5.2.3">
+          <h4 id="name-flow-control-and-max_stream">
+<a href="#section-5.2.3" class="section-number selfRef">5.2.3. </a><a href="#name-flow-control-and-max_stream" class="section-name selfRef">Flow control and MAX_STREAMS</a>
+          </h4>
+<p id="section-5.2.3-1">Opening new streams for new packets MAY implicitly limit the number of packets
 concurrently in transit because the QUIC receiver provides an upper bound of
 parallel streams, which it can update using QUIC MAX_STREAMS frames. The number
 of packets that have to be transmitted concurrently depends on several factors,
@@ -2041,7 +2072,9 @@ second. In addition, the receiver should also consider the requirements of
 protocols into account that are multiplexed with RTP, including RTCP and data
 streams. These considerations may also be relevant when implementing signaling
 since it may be necessary to inform the receiver about how fast and how much
-stream credits it will have to provide to the media-sending peer.<a href="#section-5.2-15" class="pilcrow">¶</a></p>
+stream credits it will have to provide to the media-sending peer.<a href="#section-5.2.3-1" class="pilcrow">¶</a></p>
+</section>
+</div>
 </section>
 </div>
 <div id="quic-datagrams">
@@ -3470,7 +3503,7 @@ in the "TLS Application-Layer Protocol Negotiation (ALPN) Protocol IDs" registry
 <dd class="break"></dd>
 <dt id="I-D.draft-ietf-quic-ack-frequency">[I-D.draft-ietf-quic-ack-frequency]</dt>
         <dd>
-<span class="refAuthor">Iyengar, J.</span>, <span class="refAuthor">Swett, I.</span>, and <span class="refAuthor">M. Kühlewind</span>, <span class="refTitle">"QUIC Acknowledgement Frequency"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-quic-ack-frequency-04</span>, <time datetime="2023-03-26" class="refDate">26 March 2023</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-quic-ack-frequency-04">https://datatracker.ietf.org/doc/html/draft-ietf-quic-ack-frequency-04</a>&gt;</span>. </dd>
+<span class="refAuthor">Iyengar, J.</span>, <span class="refAuthor">Swett, I.</span>, and <span class="refAuthor">M. Kühlewind</span>, <span class="refTitle">"QUIC Acknowledgement Frequency"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-quic-ack-frequency-05</span>, <time datetime="2023-07-10" class="refDate">10 July 2023</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-quic-ack-frequency-05">https://datatracker.ietf.org/doc/html/draft-ietf-quic-ack-frequency-05</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="I-D.draft-smith-quic-receive-ts">[I-D.draft-smith-quic-receive-ts]</dt>
         <dd>
