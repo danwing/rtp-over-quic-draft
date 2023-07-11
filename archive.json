@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2023-07-09T00:26:05.070972+00:00",
+  "timestamp": "2023-07-11T00:20:41.853234+00:00",
   "repo": "mengelbart/rtp-over-quic-draft",
   "labels": [
     {
@@ -1850,7 +1850,7 @@
       "id": "I_kwDOFUmh7s5ltkx1",
       "title": "Add MTU vs. extra packet considerations for Acknowledgements when using datagrams",
       "url": "https://github.com/mengelbart/rtp-over-quic-draft/issues/85",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "mengelbart",
       "authorAssociation": "OWNER",
       "assignees": [
@@ -1859,8 +1859,8 @@
       "labels": [],
       "body": "QUIC acknowledgment frames can be sent in the same packet as stream or datagram frames, which adds overhead and reduces the maximum size of datagram frames. If a packetizer is configured to produce packets at a fixed maximum MTU, the sender may need to send many extra QUIC packets for acknowledgments. It may be helpful to reference the acknowledgment frequency draft, which could help to reduce the overhead somewhat.\r\n\r\nMaybe relevant: https://www.rfc-editor.org/rfc/rfc9000#section-13\r\n",
       "createdAt": "2023-05-11T19:49:29Z",
-      "updatedAt": "2023-06-16T16:18:14Z",
-      "closedAt": null,
+      "updatedAt": "2023-07-10T16:29:52Z",
+      "closedAt": "2023-07-10T16:29:52Z",
       "comments": [
         {
           "author": "SpencerDawkins",
@@ -2011,6 +2011,24 @@
       "createdAt": "2023-07-07T21:10:36Z",
       "updatedAt": "2023-07-07T21:10:36Z",
       "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 104,
+      "id": "I_kwDOFUmh7s5rGQIx",
+      "title": "Add @spencerdawkins as co-author",
+      "url": "https://github.com/mengelbart/rtp-over-quic-draft/issues/104",
+      "state": "CLOSED",
+      "author": "SpencerDawkins",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [
+        "SpencerDawkins"
+      ],
+      "labels": [],
+      "body": "",
+      "createdAt": "2023-07-10T13:35:33Z",
+      "updatedAt": "2023-07-10T19:42:09Z",
+      "closedAt": "2023-07-10T19:42:09Z",
       "comments": []
     }
   ],
@@ -4176,21 +4194,21 @@
       "id": "PR_kwDOFUmh7s5Q_R3C",
       "title": "Fix normative language about STOP_SENDING",
       "url": "https://github.com/mengelbart/rtp-over-quic-draft/pull/96",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "mengelbart",
       "authorAssociation": "OWNER",
       "assignees": [],
       "labels": [],
       "body": "",
       "createdAt": "2023-05-22T08:12:43Z",
-      "updatedAt": "2023-06-16T15:14:35Z",
+      "updatedAt": "2023-07-10T16:38:01Z",
       "baseRepository": "mengelbart/rtp-over-quic-draft",
       "baseRefName": "main",
       "baseRefOid": "1e00eecd41353312fd66ab66b2536bc377d0d5c3",
       "headRepository": "mengelbart/rtp-over-quic-draft",
       "headRefName": "fix/normative-language-stop-sending",
       "headRefOid": "2412b01b874d39560a4a519ae94250def296672c",
-      "closedAt": null,
+      "closedAt": "2023-07-10T16:38:01Z",
       "mergedAt": null,
       "mergedBy": null,
       "mergeCommit": null,
@@ -4335,24 +4353,26 @@
       "id": "PR_kwDOFUmh7s5TMUqU",
       "title": "Fix reference to variable length integer encoding",
       "url": "https://github.com/mengelbart/rtp-over-quic-draft/pull/97",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "mengelbart",
       "authorAssociation": "OWNER",
       "assignees": [],
       "labels": [],
       "body": "",
       "createdAt": "2023-06-16T13:36:39Z",
-      "updatedAt": "2023-06-16T13:36:49Z",
+      "updatedAt": "2023-07-10T16:39:01Z",
       "baseRepository": "mengelbart/rtp-over-quic-draft",
       "baseRefName": "main",
       "baseRefOid": "1e00eecd41353312fd66ab66b2536bc377d0d5c3",
       "headRepository": "mengelbart/rtp-over-quic-draft",
       "headRefName": "fix/varint-reference",
       "headRefOid": "62f13d83c65a40377f6e525df79ae6e22d52d5a2",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "closedAt": "2023-07-10T16:39:00Z",
+      "mergedAt": "2023-07-10T16:39:00Z",
+      "mergedBy": "mengelbart",
+      "mergeCommit": {
+        "oid": "f09a2b523932612817fe08821d7cc09dd55e5d67"
+      },
       "comments": [],
       "reviews": []
     },
@@ -4361,26 +4381,42 @@
       "id": "PR_kwDOFUmh7s5TMiWM",
       "title": "Clarify behaviour of STOP_SENDING and RESET_STREAM",
       "url": "https://github.com/mengelbart/rtp-over-quic-draft/pull/98",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "mengelbart",
       "authorAssociation": "OWNER",
       "assignees": [],
       "labels": [],
       "body": "Second attempt to clarify the behaviour of STOP_SENDING and RESET_STREAM. I hope this is easier to understand than the current text and #96. It also adds subsections to add more structure to the whole subsection.",
       "createdAt": "2023-06-16T14:10:21Z",
-      "updatedAt": "2023-07-07T21:21:06Z",
+      "updatedAt": "2023-07-10T16:29:21Z",
       "baseRepository": "mengelbart/rtp-over-quic-draft",
       "baseRefName": "main",
       "baseRefOid": "1e00eecd41353312fd66ab66b2536bc377d0d5c3",
       "headRepository": "mengelbart/rtp-over-quic-draft",
       "headRefName": "fix/stop-sending-2",
       "headRefOid": "4dd4ef703836c64cdfd2769db8c91be6e3111aaf",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "closedAt": "2023-07-10T16:29:20Z",
+      "mergedAt": "2023-07-10T16:29:20Z",
+      "mergedBy": "mengelbart",
+      "mergeCommit": {
+        "oid": "800fd223a9fa4daa5048bfa3ae6c1ad45e1817c0"
+      },
       "comments": [],
-      "reviews": []
+      "reviews": [
+        {
+          "id": "PRR_kwDOFUmh7s5auVUy",
+          "commit": {
+            "abbreviatedOid": "4dd4ef7"
+          },
+          "author": "SpencerDawkins",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "I sent some comments via email, but I think the current text is close enough to merge for IETF 117.",
+          "createdAt": "2023-07-10T13:29:31Z",
+          "updatedAt": "2023-07-10T13:29:31Z",
+          "comments": []
+        }
+      ]
     },
     {
       "number": 99,
@@ -4465,24 +4501,26 @@
       "id": "PR_kwDOFUmh7s5Ul4NN",
       "title": "Add considerations for aggregating frames",
       "url": "https://github.com/mengelbart/rtp-over-quic-draft/pull/102",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "mengelbart",
       "authorAssociation": "OWNER",
       "assignees": [],
       "labels": [],
       "body": "close #85 ",
       "createdAt": "2023-07-04T08:30:32Z",
-      "updatedAt": "2023-07-04T16:32:10Z",
+      "updatedAt": "2023-07-10T16:29:52Z",
       "baseRepository": "mengelbart/rtp-over-quic-draft",
       "baseRefName": "main",
       "baseRefOid": "1e00eecd41353312fd66ab66b2536bc377d0d5c3",
       "headRepository": "mengelbart/rtp-over-quic-draft",
       "headRefName": "fix/85-frame-aggregation",
       "headRefOid": "117bf7d0ce7f21b576db5fd71a341bdcdd2ba858",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "closedAt": "2023-07-10T16:29:51Z",
+      "mergedAt": "2023-07-10T16:29:51Z",
+      "mergedBy": "mengelbart",
+      "mergeCommit": {
+        "oid": "5ee2df7bae1af902318cd3caf76db6b502ba820c"
+      },
       "comments": [],
       "reviews": [
         {
@@ -4499,6 +4537,91 @@
           "comments": []
         }
       ]
+    },
+    {
+      "number": 105,
+      "id": "PR_kwDOFUmh7s5VFxsc",
+      "title": "Add @spencerdawkins as third author",
+      "url": "https://github.com/mengelbart/rtp-over-quic-draft/pull/105",
+      "state": "MERGED",
+      "author": "SpencerDawkins",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [
+        "SpencerDawkins"
+      ],
+      "labels": [],
+      "body": "Just FYI, it's fine with me (and perhaps preferable for @adoba and @JonathanLennox, since WG chairs are responsible for assigning authors/editors to working group drafts) if you wait to merge this PR, and we present it as an open issue at IETF 117. \r\n\r\nBut at least it's in the repo now. \r\n\r\nclose #104 ",
+      "createdAt": "2023-07-10T13:51:11Z",
+      "updatedAt": "2023-07-10T19:45:59Z",
+      "baseRepository": "mengelbart/rtp-over-quic-draft",
+      "baseRefName": "main",
+      "baseRefOid": "1e00eecd41353312fd66ab66b2536bc377d0d5c3",
+      "headRepository": "mengelbart/rtp-over-quic-draft",
+      "headRefName": "issue-104",
+      "headRefOid": "e69f5ffdf1d45f579773262f335567f28085d6d9",
+      "closedAt": "2023-07-10T19:42:08Z",
+      "mergedAt": "2023-07-10T19:42:08Z",
+      "mergedBy": "mengelbart",
+      "mergeCommit": {
+        "oid": "46c8dc0bfa9f60564a6717977c10c94687337ebd"
+      },
+      "comments": [
+        {
+          "author": "JonathanLennox",
+          "authorAssociation": "NONE",
+          "body": "As chair, I'm happy to have Spencer be a co-author of this draft.",
+          "createdAt": "2023-07-10T17:43:12Z",
+          "updatedAt": "2023-07-10T17:43:12Z"
+        },
+        {
+          "author": "mengelbart",
+          "authorAssociation": "OWNER",
+          "body": "Thanks, @JonathanLennox , I submitted another version, including this PR :)",
+          "createdAt": "2023-07-10T19:45:58Z",
+          "updatedAt": "2023-07-10T19:45:58Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "PRR_kwDOFUmh7s5av5er",
+          "commit": {
+            "abbreviatedOid": "e69f5ff"
+          },
+          "author": "mengelbart",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2023-07-10T16:28:57Z",
+          "updatedAt": "2023-07-10T16:28:57Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 106,
+      "id": "PR_kwDOFUmh7s5VGzgr",
+      "title": "Add proposal from e-mail discussion",
+      "url": "https://github.com/mengelbart/rtp-over-quic-draft/pull/106",
+      "state": "OPEN",
+      "author": "mengelbart",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2023-07-10T16:37:26Z",
+      "updatedAt": "2023-07-10T16:37:27Z",
+      "baseRepository": "mengelbart/rtp-over-quic-draft",
+      "baseRefName": "main",
+      "baseRefOid": "5ee2df7bae1af902318cd3caf76db6b502ba820c",
+      "headRepository": "mengelbart/rtp-over-quic-draft",
+      "headRefName": "open-new-stream-after-stop-sending",
+      "headRefOid": "f9d8a6046e965418afa361e01b5c0c46a26883ba",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": []
     }
   ]
 }
