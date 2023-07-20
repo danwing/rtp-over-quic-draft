@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2023-07-11T00:20:41.853234+00:00",
+  "timestamp": "2023-07-20T00:20:27.293588+00:00",
   "repo": "mengelbart/rtp-over-quic-draft",
   "labels": [
     {
@@ -2030,6 +2030,32 @@
       "updatedAt": "2023-07-10T19:42:09Z",
       "closedAt": "2023-07-10T19:42:09Z",
       "comments": []
+    },
+    {
+      "number": 107,
+      "id": "I_kwDOFUmh7s5r5MRf",
+      "title": "Clean up introduction of \"RTP over QUIC\" and \"RoQ\" terms in the draft",
+      "url": "https://github.com/mengelbart/rtp-over-quic-draft/issues/107",
+      "state": "OPEN",
+      "author": "SpencerDawkins",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [
+        "SpencerDawkins"
+      ],
+      "labels": [],
+      "body": "ISTM that \"RTP over QUIC\" and \"RoQ\" should appear in the Abstract and Introduction, but neither does, and we don't actually say that we're going to be referring to \"RTP over QUIC\" as \"RoQ\" in the document. ",
+      "createdAt": "2023-07-18T15:21:14Z",
+      "updatedAt": "2023-07-18T16:04:08Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "mengelbart",
+          "authorAssociation": "OWNER",
+          "body": "We have the following in the introduction:\r\n\r\n> The mapping described in this document is called RTP over QUIC (RoQ).\r\n\r\nBut adding it to the abstract might be good, too.",
+          "createdAt": "2023-07-18T16:04:08Z",
+          "updatedAt": "2023-07-18T16:04:08Z"
+        }
+      ]
     }
   ],
   "pulls": [
@@ -4201,7 +4227,7 @@
       "labels": [],
       "body": "",
       "createdAt": "2023-05-22T08:12:43Z",
-      "updatedAt": "2023-07-10T16:38:01Z",
+      "updatedAt": "2023-07-18T13:54:33Z",
       "baseRepository": "mengelbart/rtp-over-quic-draft",
       "baseRefName": "main",
       "baseRefOid": "1e00eecd41353312fd66ab66b2536bc377d0d5c3",
@@ -4616,6 +4642,88 @@
       "headRepository": "mengelbart/rtp-over-quic-draft",
       "headRefName": "open-new-stream-after-stop-sending",
       "headRefOid": "f9d8a6046e965418afa361e01b5c0c46a26883ba",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 108,
+      "id": "PR_kwDOFUmh7s5Vzakn",
+      "title": "Add references to close stream and enough drafts",
+      "url": "https://github.com/mengelbart/rtp-over-quic-draft/pull/108",
+      "state": "OPEN",
+      "author": "mengelbart",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "Add references and a paragraph to explain how the CLOSE_STREAM and ENOUGH frames could be used.\r\n\r\nClose #103 ",
+      "createdAt": "2023-07-18T16:07:30Z",
+      "updatedAt": "2023-07-18T16:07:31Z",
+      "baseRepository": "mengelbart/rtp-over-quic-draft",
+      "baseRefName": "main",
+      "baseRefOid": "ee91e1f83f52a833a843aeda7cdbed06b4f7001d",
+      "headRepository": "mengelbart/rtp-over-quic-draft",
+      "headRefName": "fix/103-close-stream-enough",
+      "headRefOid": "377b9eaa8d62095e6f8da9922b2026712d340930",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 109,
+      "id": "PR_kwDOFUmh7s5V7Z0F",
+      "title": "Add motivations section",
+      "url": "https://github.com/mengelbart/rtp-over-quic-draft/pull/109",
+      "state": "OPEN",
+      "author": "SpencerDawkins",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [
+        "SpencerDawkins"
+      ],
+      "labels": [],
+      "body": "@mengelbart and @gchandok - I'm sure I'm leaving motivations out, so I'd appreciate your comments on this PR even more than usual!\r\n\r\ncloses #77 ",
+      "createdAt": "2023-07-19T19:37:05Z",
+      "updatedAt": "2023-07-19T19:37:05Z",
+      "baseRepository": "mengelbart/rtp-over-quic-draft",
+      "baseRefName": "main",
+      "baseRefOid": "ee91e1f83f52a833a843aeda7cdbed06b4f7001d",
+      "headRepository": "mengelbart/rtp-over-quic-draft",
+      "headRefName": "issue-77",
+      "headRefOid": "5f86ba8de4ad999f1f4ecf4e2acd6b3b6c714eba",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 110,
+      "id": "PR_kwDOFUmh7s5V7eyS",
+      "title": "Clean up \"RTP-over-QUIC\" terminology",
+      "url": "https://github.com/mengelbart/rtp-over-quic-draft/pull/110",
+      "state": "OPEN",
+      "author": "SpencerDawkins",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [
+        "SpencerDawkins"
+      ],
+      "labels": [],
+      "body": "I also added \"(RoQ)\" to the document title, to make this easier to spot for readers. \r\n\r\nfixes #107 ",
+      "createdAt": "2023-07-19T19:53:33Z",
+      "updatedAt": "2023-07-19T19:53:34Z",
+      "baseRepository": "mengelbart/rtp-over-quic-draft",
+      "baseRefName": "main",
+      "baseRefOid": "ee91e1f83f52a833a843aeda7cdbed06b4f7001d",
+      "headRepository": "mengelbart/rtp-over-quic-draft",
+      "headRefName": "issue-107",
+      "headRefOid": "72e7c42677ce00d6fddf488792af04a96b976d59",
       "closedAt": null,
       "mergedAt": null,
       "mergedBy": null,
