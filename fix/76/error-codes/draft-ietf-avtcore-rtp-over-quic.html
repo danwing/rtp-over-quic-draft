@@ -7,6 +7,7 @@
 <title>RTP over QUIC</title>
 <meta content="Jörg Ott" name="author">
 <meta content="Mathis Engelbart" name="author">
+<meta content="Spencer Dawkins" name="author">
 <meta content="
        This document specifies a minimal mapping for encapsulating Real-time Transport
 Protocol (RTP) and RTP Control Protocol (RTCP) packets within the QUIC protocol.
@@ -25,8 +26,8 @@ feedback.
     google-i18n-address 3.1.0
     intervaltree 3.1.0
     Jinja2 3.1.2
-    lxml 4.9.2
-    platformdirs 3.8.0
+    lxml 4.9.3
+    platformdirs 3.9.1
     pycountry 22.3.5
     PyYAML 6.0
     requests 2.31.0
@@ -363,7 +364,7 @@ ul.empty li, .ulEmpty li {
   margin-top: 0.5em;
 }
 :is(ul, ol).compact, .ulCompact, .olCompact {
-  line-height: 100%;
+  line-height: 1;
   margin: 0 0 0 2em;
 }
 
@@ -373,10 +374,13 @@ dl {
   --indent: 3ch;
   /* --indent: attr(indent ch); not supported in any browser, but we can dream */
 }
+dl.olPercent {
+  --indent: 5ch;
+}
 dl > dt {
   float: left;
-  margin-right: 1em;
-  min-width: 12ch;
+  margin-right: 2ch;
+  min-width: 8ch;
 }
 dl.dlNewline > dt {
   float: none;
@@ -385,6 +389,9 @@ dl > dd {
   margin-bottom: .8em;
   margin-left: var(--indent) !important; /* stupid element overrides */
   min-height: 2ex;
+}
+dl.olPercent > dt {
+  min-width: calc(var(--indent) - 2ch);
 }
 :is(dl.compact, .dlCompact) > dd {
   margin-bottom: 0;
@@ -399,7 +406,7 @@ dl > dd > dl {
   margin-top: 0.5em;
   margin-bottom: 0;
 }
-dl .break {
+:is(dd, span).break {
   display: none;
 }
 
@@ -407,11 +414,11 @@ dl .break {
 a, a[href].selfRef:hover {
   text-decoration: none;
 }
-a[href].selfRef {
-  color: var(--text-color);
-}
 a[href] {
   color: var(--link-color);
+}
+a[href].selfRef, .iref + a[href].internal {
+  color: var(--text-color);
 }
 a[href]:hover {
   text-decoration: underline;
@@ -419,7 +426,7 @@ a[href]:hover {
 a[href].selfRef:hover {
   background-color: var(--highlight-color);
 }
-a.xref {
+a.xref:is(.cite, .auto), :is(#status-of-memo, #copyright) a {
   white-space: nowrap;
 }
 
@@ -431,7 +438,9 @@ tt, code, pre {
 tt, code {
   /* changing the font for inline elements leads to different ascender
      and descender heights; as we want to retain baseline alignment,
-     remove leading to avoid altering the final height of lines */
+     remove leading to avoid altering the final height of lines
+     note: this fails if these blocks take an entire line,
+     a different solution would be great */
   line-height: 0;
 }
 :is(h1, h2, h3, h4, h5, h6) :is(tt, code) {
@@ -583,10 +592,14 @@ hr {
 .bcp14 {
   font-variant: small-caps;
   font-weight: 600;
-  font-size: 14.5px;
+  font-size: var(--small-font-size);
 }
 .role {
   font-variant: all-small-caps;
+}
+sub, sup {
+  line-height: 1;
+  font-size: 80%;
 }
 
 /* info block */
@@ -602,6 +615,7 @@ hr {
   clear: left;
   float: left;
   text-align: right;
+  margin-right: 1ch;
 }
 #identifiers dd {
   margin: 0;
@@ -653,7 +667,8 @@ hr {
 .references dt {
   text-align: right;
   font-weight: bold;
-  min-width: 7em;
+  min-width: 10ch;
+  margin-right: 1.5ch;
 }
 .references dt:target::before {
   content: "⇒";
@@ -661,7 +676,7 @@ hr {
   margin: 0 10px 0 -25px;
 }
 .references dd {
-  margin-left: 8em !important;
+  margin-left: 12ch !important;
   overflow: auto;
 }
 
@@ -1028,7 +1043,7 @@ svg :is([stroke="white"], [stroke^="#fff"]) {
 svg :is([fill="black"], [fill^="#000"], :not([fill])) {
   fill: var(--text-color);
 }
-svg :is([stroke="fill"], [fill^="#fff"]) {
+svg :is([fill="white"], [fill^="#fff"]) {
   fill: var(--background-color);
 }
 </style>
@@ -1042,8 +1057,8 @@ svg :is([stroke="fill"], [fill^="#fff"]) {
 <td class="right">July 2023</td>
 </tr></thead>
 <tfoot><tr>
-<td class="left">Ott &amp; Engelbart</td>
-<td class="center">Expires 4 January 2024</td>
+<td class="left">Ott, et al.</td>
+<td class="center">Expires 23 January 2024</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1056,12 +1071,12 @@ svg :is([stroke="fill"], [fill^="#fff"]) {
 <dd class="internet-draft">draft-ietf-avtcore-rtp-over-quic-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2023-07-03" class="published">3 July 2023</time>
+<time datetime="2023-07-22" class="published">22 July 2023</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2024-01-04">4 January 2024</time></dd>
+<dd class="expires"><time datetime="2024-01-23">23 January 2024</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1071,6 +1086,10 @@ svg :is([stroke="fill"], [fill^="#fff"]) {
 <div class="author">
       <div class="author-name">M. Engelbart</div>
 <div class="org">Technical University Munich</div>
+</div>
+<div class="author">
+      <div class="author-name">S. Dawkins</div>
+<div class="org">Tencent America LLC</div>
 </div>
 </dd>
 </dl>
@@ -1115,7 +1134,7 @@ feedback.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 4 January 2024.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 23 January 2024.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1938,16 +1957,20 @@ of flows.<a href="#section-5.1-7" class="pilcrow">¶</a></p>
         <h3 id="name-quic-streams">
 <a href="#section-5.2" class="section-number selfRef">5.2. </a><a href="#name-quic-streams" class="section-name selfRef">QUIC Streams</a>
         </h3>
-<p id="section-5.2-1">To send RTP/RTCP packets over QUIC streams, a sender opens a new QUIC stream.
-The new QUIC stream MUST be a unidirectional QUIC stream. Streams are
-unidirectional because there is no synchronous relationship between sent and
-received RTP/RTCP packets. A peer that receives a bidirectional stream with a
-flow identifier that is associated with an RTP or RTCP stream, SHOULD stop
-reading from the stream and send a STOP_SENDING frame with the application
-protocol error code set to ROQ_STREAM_CREATION_ERROR.<a href="#section-5.2-1" class="pilcrow">¶</a></p>
+<p id="section-5.2-1">To send RTP/RTCP packets over QUIC streams, a sender MUST open a
+new unidirectional QUIC stream. Streams are unidirectional because there is no
+synchronous relationship between sent and received RTP/RTCP packets. A peer that
+receives a bidirectional stream with a flow identifier that is associated with
+an RTP or RTCP stream, SHOULD stop reading from the stream and send a
+STOP_SENDING frame with the application protocol error code set to
+ROQ_STREAM_CREATION_ERROR.<a href="#section-5.2-1" class="pilcrow">¶</a></p>
 <p id="section-5.2-2">A RoQ sender MAY open new QUIC streams for different packets using the same flow
-identifier, for example, to avoid head-of-line blocking. A RoQ receiver MUST be
-able to receive packets of a single RTP/RTCP stream on multiple QUIC streams.<a href="#section-5.2-2" class="pilcrow">¶</a></p>
+identifier, for example, to avoid head-of-line blocking.<a href="#section-5.2-2" class="pilcrow">¶</a></p>
+<p id="section-5.2-3">A receiver MUST be prepared to receive RTP packets on any number of QUIC streams
+(subject to its limit on parallel open streams) and SHOULD not make assumptions
+which RTP sequence numbers are carried in which streams.<a href="#section-5.2-3" class="pilcrow">¶</a></p>
+<p id="section-5.2-4">Note: A sender may or may not decide to discontinue using a lower stream number
+after starting packet transmission on a higher stream number.<a href="#section-5.2-4" class="pilcrow">¶</a></p>
 <div id="stream-encapsulation">
 <section id="section-5.2.1">
           <h4 id="name-stream-encapsulation">
@@ -2003,7 +2026,7 @@ RTP/RTCP Payload {
 <span class="break"></span><dl class="dlParallel" id="section-5.2.1-7">
             <dt id="section-5.2.1-7.1">Length:</dt>
             <dd style="margin-left: 1.5em" id="section-5.2.1-7.2">
-              <p id="section-5.2.1-7.2.1">A QUIC variable length integer <span><a href="https://rfc-editor.org/rfc/rfc9000#section-16" class="relref">Section 16</a> of [<a href="#RFC9000" class="cite xref">RFC9000</a>]</span> describing the
+              <p id="section-5.2.1-7.2.1">A QUIC variable length integer (see <span><a href="https://rfc-editor.org/rfc/rfc9000#section-16" class="relref">Section 16</a> of [<a href="#RFC9000" class="cite xref">RFC9000</a>]</span>) describing the
 length of the following RTP/RTCP packets in bytes.<a href="#section-5.2.1-7.2.1" class="pilcrow">¶</a></p>
 </dd>
             <dd class="break"></dd>
@@ -2025,7 +2048,7 @@ of a stream and to request termination of an incoming stream by the sending
 peer respectively.<a href="#section-5.2.2-1" class="pilcrow">¶</a></p>
 <p id="section-5.2.2-2">A RoQ sender MAY use RESET_STREAM if it knows that a packet, which was not yet
 successfully and completely transmitted, is no longer needed.<a href="#section-5.2.2-2" class="pilcrow">¶</a></p>
-<p id="section-5.2.2-3">A RoQ receiver that is no longer be interested in reading a certain partition of
+<p id="section-5.2.2-3">A RoQ receiver that is no longer interested in reading a certain partition of
 the media stream MAY signal this to the sending peer using a STOP_SENDING
 frame.<a href="#section-5.2.2-3" class="pilcrow">¶</a></p>
 <p id="section-5.2.2-4">In both cases, the error code of the RESET_STREAM frame or the STOP_SENDING
@@ -2132,12 +2155,25 @@ connection.<a href="#section-5.3-5.2.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
 </dl>
-<p id="section-5.3-6">Since QUIC datagrams are not retransmitted on loss (see also
+<p id="section-5.3-6">RoQ senders need to be aware that QUIC uses the concept of QUIC frames.
+Different kinds of QUIC frames are used for different application and control
+data types. A single QUIC packet can contain more than one QUIC frame,
+including, for example, QUIC stream or datagram frames carrying application data
+and acknowledgement frames carrying QUIC acknowledgements, as long as the
+overall size fits into the MTU. One implication is that the number of packets a
+QUIC stack transmits depends on whether it can fit acknowledgement and datagram
+frames in the same QUIC packet. Suppose the application creates many datagram
+frames that fill up the QUIC packet. In that case, the QUIC stack might have to
+create additional packets for acknowledgement- (and possibly other control-)
+frames. The additional overhead could, in some cases, be reduced if the
+application creates smaller RTP packets, such that the resulting datagram frame
+can fit into a QUIC packet that can also carry acknowledgement frames.<a href="#section-5.3-6" class="pilcrow">¶</a></p>
+<p id="section-5.3-7">Since QUIC datagrams are not retransmitted on loss (see also
 <a href="#transport-layer-feedback" class="auto internal xref">Section 8.3</a> for loss signaling), if an application wishes to
 retransmit lost RTP packets, the retransmission has to be implemented by the
 application. RTP retransmissions can be done in the same RTP session or a
 separate RTP session <span>[<a href="#RFC4588" class="cite xref">RFC4588</a>]</span> and the flow identifier MUST be set to the
-flow identifier of the RTP session in which the retransmission happens.<a href="#section-5.3-6" class="pilcrow">¶</a></p>
+flow identifier of the RTP session in which the retransmission happens.<a href="#section-5.3-7" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -3324,15 +3360,15 @@ aborting reading of streams, or immediately closing RoQ connections.<a href="#se
 there is no error to signal.<a href="#section-9-2.2.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
-<dt id="section-9-2.3">ROQ_GENERAL_PROTOCOL_ERROR (0x????):</dt>
+<dt id="section-9-2.3">ROQ_INTERNAL_ERROR (0x????):</dt>
         <dd style="margin-left: 1.5em" id="section-9-2.4">
-          <p id="section-9-2.4.1">Peer violated protocol requirements in a way that does not match a more
-specific error code or endpoint declines to use the more specific error code.<a href="#section-9-2.4.1" class="pilcrow">¶</a></p>
+          <p id="section-9-2.4.1">An internal error has occured in the RoQ stack.<a href="#section-9-2.4.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
-<dt id="section-9-2.5">ROQ_INTERNAL_ERROR (0x????):</dt>
+<dt id="section-9-2.5">ROQ_PACKET_ERROR (0x????):</dt>
         <dd style="margin-left: 1.5em" id="section-9-2.6">
-          <p id="section-9-2.6.1">An internal error has occured in the RoQ stack.<a href="#section-9-2.6.1" class="pilcrow">¶</a></p>
+          <p id="section-9-2.6.1">Invalid payload format, e.g., length does not match packet, invalid flow id
+encoding, non-RTP on RTP-flow ID, etc.<a href="#section-9-2.6.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
 <dt id="section-9-2.7">ROQ_STREAM_CREATION_ERROR (0x????):</dt>
@@ -3340,31 +3376,25 @@ specific error code or endpoint declines to use the more specific error code.<a 
           <p id="section-9-2.8.1">The endpoint detected that its peer created a stream that it will not accept.<a href="#section-9-2.8.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
-<dt id="section-9-2.9">ROQ_PACKET_ERROR (0x????):</dt>
+<dt id="section-9-2.9">ROQ_FRAME_CANCELLED (0x????):</dt>
         <dd style="margin-left: 1.5em" id="section-9-2.10">
-          <p id="section-9-2.10.1">Invalid payload format, e.g., length does not match packet, invalid flow id
-encoding, non-RTP on RTP-flow ID, etc.<a href="#section-9-2.10.1" class="pilcrow">¶</a></p>
-</dd>
-        <dd class="break"></dd>
-<dt id="section-9-2.11">ROQ_FRAME_CANCELLED (0x????):</dt>
-        <dd style="margin-left: 1.5em" id="section-9-2.12">
-          <p id="section-9-2.12.1">A receiving endpoint stopped reading a frame from a stream and requests new
+          <p id="section-9-2.10.1">A receiving endpoint stopped reading a frame from a stream and requests new
 frames be sent on new streams using STOP_SENDING or a sender notifies a
 receiver that retransmissions of a frame were stopped using RESET_STREAM and
-new frames will be sent on new streams.<a href="#section-9-2.12.1" class="pilcrow">¶</a></p>
+new frames will be sent on new streams.<a href="#section-9-2.10.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
-<dt id="section-9-2.13">ROQ_UNKNOWN_FLOW_ID (0x????):</dt>
+<dt id="section-9-2.11">ROQ_UNKNOWN_FLOW_ID (0x????):</dt>
+        <dd style="margin-left: 1.5em" id="section-9-2.12">
+          <p id="section-9-2.12.1">An endpoint was unable to handle a flow identifier, e.g., because it was not
+signalled or it does not support multiplexing using arbitrary flow identifiers.<a href="#section-9-2.12.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-9-2.13">ROQ_SIGNALING_ERROR (0x????):</dt>
         <dd style="margin-left: 1.5em" id="section-9-2.14">
-          <p id="section-9-2.14.1">An endpoint was unable to handle a flow identifier, e.g., because it was not
-signalled or it does not support multiplexing using arbitrary flow identifiers.<a href="#section-9-2.14.1" class="pilcrow">¶</a></p>
-</dd>
-        <dd class="break"></dd>
-<dt id="section-9-2.15">ROQ_SIGNALING_ERROR (0x????):</dt>
-        <dd style="margin-left: 1.5em" id="section-9-2.16">
-          <p id="section-9-2.16.1">Parameters that were set during out of band signaling are incompatible with
+          <p id="section-9-2.14.1">Parameters that were set during out of band signaling are incompatible with
 the connection properties that were negotiated when the connection was
-established using transport parameters.<a href="#section-9-2.16.1" class="pilcrow">¶</a></p>
+established using transport parameters.<a href="#section-9-2.14.1" class="pilcrow">¶</a></p>
 </dd>
       <dd class="break"></dd>
 </dl>
@@ -3588,7 +3618,7 @@ in the "TLS Application-Layer Protocol Negotiation (ALPN) Protocol IDs" registry
 <dd class="break"></dd>
 <dt id="I-D.draft-ietf-quic-ack-frequency">[I-D.draft-ietf-quic-ack-frequency]</dt>
         <dd>
-<span class="refAuthor">Iyengar, J.</span>, <span class="refAuthor">Swett, I.</span>, and <span class="refAuthor">M. Kühlewind</span>, <span class="refTitle">"QUIC Acknowledgement Frequency"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-quic-ack-frequency-04</span>, <time datetime="2023-03-26" class="refDate">26 March 2023</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-quic-ack-frequency-04">https://datatracker.ietf.org/doc/html/draft-ietf-quic-ack-frequency-04</a>&gt;</span>. </dd>
+<span class="refAuthor">Iyengar, J.</span>, <span class="refAuthor">Swett, I.</span>, and <span class="refAuthor">M. Kühlewind</span>, <span class="refTitle">"QUIC Acknowledgement Frequency"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-quic-ack-frequency-05</span>, <time datetime="2023-07-10" class="refDate">10 July 2023</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-quic-ack-frequency-05">https://datatracker.ietf.org/doc/html/draft-ietf-quic-ack-frequency-05</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="I-D.draft-smith-quic-receive-ts">[I-D.draft-smith-quic-receive-ts]</dt>
         <dd>
@@ -3949,6 +3979,14 @@ comments and suggestions contributing to this document.<a href="#appendix-B-2" c
 <div class="email">
 <span>Email:</span>
 <a href="mailto:mathis.engelbart@gmail.com" class="email">mathis.engelbart@gmail.com</a>
+</div>
+</address>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Spencer Dawkins</span></div>
+<div dir="auto" class="left"><span class="org">Tencent America LLC</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:spencerdawkins.ietf@gmail.com" class="email">spencerdawkins.ietf@gmail.com</a>
 </div>
 </address>
 </section>

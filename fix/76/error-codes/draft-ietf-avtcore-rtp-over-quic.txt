@@ -5,7 +5,9 @@
 Audio/Video Transport Core Maintenance                            J. Ott
 Internet-Draft                                              M. Engelbart
 Intended status: Standards Track             Technical University Munich
-Expires: 4 January 2024                                      3 July 2023
+Expires: 23 January 2024                                      S. Dawkins
+                                                     Tencent America LLC
+                                                            22 July 2023
 
 
                              RTP over QUIC
@@ -46,7 +48,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 4 January 2024.
+   This Internet-Draft will expire on 23 January 2024.
 
 Copyright Notice
 
@@ -619,19 +621,26 @@ Table of Contents
 
 5.2.  QUIC Streams
 
-   To send RTP/RTCP packets over QUIC streams, a sender opens a new QUIC
-   stream.  The new QUIC stream MUST be a unidirectional QUIC stream.
-   Streams are unidirectional because there is no synchronous
-   relationship between sent and received RTP/RTCP packets.  A peer that
-   receives a bidirectional stream with a flow identifier that is
-   associated with an RTP or RTCP stream, SHOULD stop reading from the
-   stream and send a STOP_SENDING frame with the application protocol
-   error code set to ROQ_STREAM_CREATION_ERROR.
+   To send RTP/RTCP packets over QUIC streams, a sender MUST open a new
+   unidirectional QUIC stream.  Streams are unidirectional because there
+   is no synchronous relationship between sent and received RTP/RTCP
+   packets.  A peer that receives a bidirectional stream with a flow
+   identifier that is associated with an RTP or RTCP stream, SHOULD stop
+   reading from the stream and send a STOP_SENDING frame with the
+   application protocol error code set to ROQ_STREAM_CREATION_ERROR.
 
    A RoQ sender MAY open new QUIC streams for different packets using
    the same flow identifier, for example, to avoid head-of-line
-   blocking.  A RoQ receiver MUST be able to receive packets of a single
-   RTP/RTCP stream on multiple QUIC streams.
+   blocking.
+
+   A receiver MUST be prepared to receive RTP packets on any number of
+   QUIC streams (subject to its limit on parallel open streams) and
+   SHOULD not make assumptions which RTP sequence numbers are carried in
+   which streams.
+
+   Note: A sender may or may not decide to discontinue using a lower
+   stream number after starting packet transmission on a higher stream
+   number.
 
 5.2.1.  Stream Encapsulation
 
@@ -663,7 +672,7 @@ Table of Contents
 
                 Figure 2: RTP/RTCP payload for QUIC streams
 
-   Length:  A QUIC variable length integer Section 16 of [RFC9000]
+   Length:  A QUIC variable length integer (see Section 16 of [RFC9000])
       describing the length of the following RTP/RTCP packets in bytes.
 
    RTP/RTCP Packet:  The RTP/RTCP packet to transmit.
@@ -678,7 +687,7 @@ Table of Contents
    was not yet successfully and completely transmitted, is no longer
    needed.
 
-   A RoQ receiver that is no longer be interested in reading a certain
+   A RoQ receiver that is no longer interested in reading a certain
    partition of the media stream MAY signal this to the sending peer
    using a STOP_SENDING frame.
 
@@ -773,6 +782,22 @@ Table of Contents
       on the same QUIC connection.
 
    RTP/RTCP Packet:  The RTP/RTCP packet to transmit.
+
+   RoQ senders need to be aware that QUIC uses the concept of QUIC
+   frames.  Different kinds of QUIC frames are used for different
+   application and control data types.  A single QUIC packet can contain
+   more than one QUIC frame, including, for example, QUIC stream or
+   datagram frames carrying application data and acknowledgement frames
+   carrying QUIC acknowledgements, as long as the overall size fits into
+   the MTU.  One implication is that the number of packets a QUIC stack
+   transmits depends on whether it can fit acknowledgement and datagram
+   frames in the same QUIC packet.  Suppose the application creates many
+   datagram frames that fill up the QUIC packet.  In that case, the QUIC
+   stack might have to create additional packets for acknowledgement-
+   (and possibly other control-) frames.  The additional overhead could,
+   in some cases, be reduced if the application creates smaller RTP
+   packets, such that the resulting datagram frame can fit into a QUIC
+   packet that can also carry acknowledgement frames.
 
    Since QUIC datagrams are not retransmitted on loss (see also
    Section 8.3 for loss signaling), if an application wishes to
@@ -1598,19 +1623,15 @@ Table of Contents
    ROQ_NO_ERROR (0x????):  No error.  This is used when the connection
       or stream needs to be closed, but there is no error to signal.
 
-   ROQ_GENERAL_PROTOCOL_ERROR (0x????):  Peer violated protocol
-      requirements in a way that does not match a more specific error
-      code or endpoint declines to use the more specific error code.
-
    ROQ_INTERNAL_ERROR (0x????):  An internal error has occured in the
       RoQ stack.
-
-   ROQ_STREAM_CREATION_ERROR (0x????):  The endpoint detected that its
-      peer created a stream that it will not accept.
 
    ROQ_PACKET_ERROR (0x????):  Invalid payload format, e.g., length does
       not match packet, invalid flow id encoding, non-RTP on RTP-flow
       ID, etc.
+
+   ROQ_STREAM_CREATION_ERROR (0x????):  The endpoint detected that its
+      peer created a stream that it will not accept.
 
    ROQ_FRAME_CANCELLED (0x????):  A receiving endpoint stopped reading a
       frame from a stream and requests new frames be sent on new streams
@@ -1802,9 +1823,9 @@ Table of Contents
    [I-D.draft-ietf-quic-ack-frequency]
               Iyengar, J., Swett, I., and M. Kühlewind, "QUIC
               Acknowledgement Frequency", Work in Progress, Internet-
-              Draft, draft-ietf-quic-ack-frequency-04, 26 March 2023,
+              Draft, draft-ietf-quic-ack-frequency-05, 10 July 2023,
               <https://datatracker.ietf.org/doc/html/draft-ietf-quic-
-              ack-frequency-04>.
+              ack-frequency-05>.
 
    [I-D.draft-smith-quic-receive-ts]
               Smith, C. and I. Swett, "QUIC Extension for Reporting
@@ -2246,3 +2267,8 @@ Authors' Addresses
    Mathis Engelbart
    Technical University Munich
    Email: mathis.engelbart@gmail.com
+
+
+   Spencer Dawkins
+   Tencent America LLC
+   Email: spencerdawkins.ietf@gmail.com
