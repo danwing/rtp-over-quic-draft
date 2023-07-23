@@ -118,7 +118,8 @@ Table of Contents
    12. References
      12.1.  Normative References
      12.2.  Informative References
-   Appendix A.  Experimental Results
+   Appendix A.  List of optional QUIC Extensions
+   Appendix B.  Experimental Results
    Acknowledgments
    Authors' Addresses
 
@@ -1954,6 +1955,13 @@ Table of Contents
               <https://datatracker.ietf.org/doc/html/draft-ietf-masque-
               h3-datagram-11>.
 
+   [I-D.draft-ietf-quic-reliable-stream-reset]
+              Seemann, M. and K. Oku, "Reliable QUIC Stream Resets",
+              Work in Progress, Internet-Draft, draft-ietf-quic-
+              reliable-stream-reset-01, 3 July 2023,
+              <https://datatracker.ietf.org/doc/html/draft-ietf-quic-
+              reliable-stream-reset-01>.
+
    [I-D.draft-ietf-rmcat-gcc]
               Holmer, S., Lundin, H., Carlucci, G., De Cicco, L., and S.
               Mascolo, "A Google Congestion Control Algorithm for Real-
@@ -1968,6 +1976,13 @@ Table of Contents
               ietf-wish-whip-08, 30 March 2023,
               <https://datatracker.ietf.org/doc/html/draft-ietf-wish-
               whip-08>.
+
+   [I-D.draft-thomson-quic-enough]
+              Thomson, M., "Signaling That a QUIC Receiver Has Enough
+              Stream Data", Work in Progress, Internet-Draft, draft-
+              thomson-quic-enough-00, 30 March 2023,
+              <https://datatracker.ietf.org/doc/html/draft-thomson-quic-
+              enough-00>.
 
    [I-D.draft-thomson-quic-enough-00]
               Thomson, M., "Signaling That a QUIC Receiver Has Enough
@@ -2206,7 +2221,40 @@ Table of Contents
               <(https://portal.3gpp.org/desktopmodules/Specifications/
               specificationId=1404)>.
 
-Appendix A.  Experimental Results
+Appendix A.  List of optional QUIC Extensions
+
+   The following is a list of QUIC protocol extensions that might be
+   beneficial for RoQ, but are not required by RoQ.
+
+   *  _An Unreliable Datagram Extension to QUIC_ [RFC9221].  Without
+      support for unreliable datagrams, RoQ cannot use the encapsulation
+      specified in Section 5.3, but can still use QUIC streams as
+      specified in Section 5.2.
+
+   *  A version of QUIC receive timestamps can be helpful for improved
+      jitter calculations and congestion control.
+
+      -  _Quic Timestamps For Measuring One-Way Delays_
+         [I-D.draft-huitema-quic-ts]
+
+      -  _QUIC Extension for Reporting Packet Receive Timestamps_
+         [I-D.draft-smith-quic-receive-ts]
+
+   *  _QUIC Acknowledgement Frequency_
+      [I-D.draft-ietf-quic-ack-frequency] can be used by a sender to
+      optimize the acknowledgement behaviour of the receiver, e.g., to
+      optimize congestion control.
+
+   *  _Signaling That a QUIC Receiver Has Enough Stream Data_
+      [I-D.draft-thomson-quic-enough] and _Reliable QUIC Stream Resets_
+      [I-D.draft-ietf-quic-reliable-stream-reset] would allow RoQ
+      senders and receivers to use versions of CLOSE_STREAM and
+      STOP_SENDING that contain offsets.  The offset could be used to
+      reliably retransmit all frames up to a certain frame that should
+      be cancelled before resuming transmission of further frames on new
+      QUIC streams.
+
+Appendix B.  Experimental Results
 
    An experimental implementation of the mapping described in this
    document can be found on Github (https://github.com/mengelbart/rtp-
