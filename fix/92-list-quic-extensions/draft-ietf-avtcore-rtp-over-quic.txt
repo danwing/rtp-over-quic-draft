@@ -5,7 +5,7 @@
 Audio/Video Transport Core Maintenance                            J. Ott
 Internet-Draft                                              M. Engelbart
 Intended status: Standards Track             Technical University Munich
-Expires: 4 January 2024                                      3 July 2023
+Expires: 24 January 2024                                    23 July 2023
 
 
                              RTP over QUIC
@@ -46,7 +46,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 4 January 2024.
+   This Internet-Draft will expire on 24 January 2024.
 
 Copyright Notice
 
@@ -1731,9 +1731,9 @@ Table of Contents
    [I-D.draft-ietf-quic-ack-frequency]
               Iyengar, J., Swett, I., and M. Kühlewind, "QUIC
               Acknowledgement Frequency", Work in Progress, Internet-
-              Draft, draft-ietf-quic-ack-frequency-04, 26 March 2023,
+              Draft, draft-ietf-quic-ack-frequency-05, 10 July 2023,
               <https://datatracker.ietf.org/doc/html/draft-ietf-quic-
-              ack-frequency-04>.
+              ack-frequency-05>.
 
    [I-D.draft-smith-quic-receive-ts]
               Smith, C. and I. Swett, "QUIC Extension for Reporting
@@ -1886,6 +1886,13 @@ Table of Contents
               draft-ietf-masque-h3-datagram-11, 17 June 2022,
               <https://datatracker.ietf.org/doc/html/draft-ietf-masque-
               h3-datagram-11>.
+
+   [I-D.draft-ietf-quic-reliable-stream-reset]
+              Seemann, M. and K. Oku, "Reliable QUIC Stream Resets",
+              Work in Progress, Internet-Draft, draft-ietf-quic-
+              reliable-stream-reset-01, 3 July 2023,
+              <https://datatracker.ietf.org/doc/html/draft-ietf-quic-
+              reliable-stream-reset-01>.
 
    [I-D.draft-ietf-rmcat-gcc]
               Holmer, S., Lundin, H., Carlucci, G., De Cicco, L., and S.
@@ -2171,9 +2178,13 @@ Appendix A.  List of optional QUIC Extensions
       optimize congestion control.
 
    *  _Signaling That a QUIC Receiver Has Enough Stream Data_
-      [I-D.draft-thomson-quic-enough] would allow an RoQ receiver to use
-      an offset in STOP_SENDING, to tell the RoQ sender which media
-      frame does not need to be retransmitted.
+      [I-D.draft-thomson-quic-enough] and _Reliable QUIC Stream Resets_
+      [I-D.draft-ietf-quic-reliable-stream-reset] would allow RoQ
+      senders and receivers to use versions of CLOSE_STREAM and
+      STOP_SENDING that contain offsets.  The offset could be used to
+      reliably retransmit all frames up to a certain frame that should
+      be cancelled before resuming transmission of further frames on new
+      QUIC streams.
 
 Appendix B.  Experimental Results
 
