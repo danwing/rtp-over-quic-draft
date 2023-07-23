@@ -5,9 +5,9 @@
 Audio/Video Transport Core Maintenance                            J. Ott
 Internet-Draft                                              M. Engelbart
 Intended status: Standards Track             Technical University Munich
-Expires: 13 January 2024                                      S. Dawkins
+Expires: 24 January 2024                                      S. Dawkins
                                                      Tencent America LLC
-                                                            12 July 2023
+                                                            23 July 2023
 
 
                              RTP over QUIC
@@ -48,7 +48,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 13 January 2024.
+   This Internet-Draft will expire on 24 January 2024.
 
 Copyright Notice
 
@@ -1376,42 +1376,68 @@ Table of Contents
    Because QUIC is a generic transport protocol, QUIC feedback cannot
    replace the following Payload-specific RTP Feedback (PSFB) feedback.
 
-    +=======+========================+================================+
-    | Name  | Long Name              | Document                       |
-    +=======+========================+================================+
-    | PLI   | Picture Loss           | [RFC4585]                      |
-    |       | Indication             |                                |
-    +-------+------------------------+--------------------------------+
-    | SLI   | Slice Loss Indication  | [RFC4585]                      |
-    +-------+------------------------+--------------------------------+
-    | RPSI  | Reference Picture      | [RFC4585]                      |
-    |       | Selection Indication   |                                |
-    +-------+------------------------+--------------------------------+
-    | FIR   | Full Intra Request     | [RFC5104]                      |
-    |       | Command                |                                |
-    +-------+------------------------+--------------------------------+
-    | TSTR  | Temporal-Spatial       | [RFC5104]                      |
-    |       | Trade-off Request      |                                |
-    +-------+------------------------+--------------------------------+
-    | TSTN  | Temporal-Spatial       | [RFC5104]                      |
-    |       | Trade-off Notification |                                |
-    +-------+------------------------+--------------------------------+
-    | VBCM  | Video Back Channel     | [RFC5104]                      |
-    |       | Message                |                                |
-    +-------+------------------------+--------------------------------+
-    | PSLEI | Payload-Specific       | [RFC6642]                      |
-    |       | Third-Party Loss Early |                                |
-    |       | Indication             |                                |
-    +-------+------------------------+--------------------------------+
-    | ROI   | Video region-of-       | [_3GPP-TS-26.114]              |
-    |       | interest (ROI)         |                                |
-    +-------+------------------------+--------------------------------+
-    | LRR   | Layer Refresh Request  | [I-D.draft-ietf-avtext-lrr-07] |
-    |       | Command                |                                |
-    +-------+------------------------+--------------------------------+
-    | AFB   | Application Layer      | [RFC4585]                      |
-    |       | Feedback               |                                |
-    +-------+------------------------+--------------------------------+
+    +=====+============+==============================================+
+    |Name |Long Name   | Document                                     |
+    +=====+============+==============================================+
+    |PLI  |Picture Loss| [RFC4585]                                    |
+    |     |Indication  |                                              |
+    +-----+------------+----------------------------------------------+
+    |SLI  |Slice Loss  | [RFC4585]                                    |
+    |     |Indication  |                                              |
+    +-----+------------+----------------------------------------------+
+    |RPSI |Reference   | [RFC4585]                                    |
+    |     |Picture     |                                              |
+    |     |Selection   |                                              |
+    |     |Indication  |                                              |
+    +-----+------------+----------------------------------------------+
+    |FIR  |Full Intra  | [RFC5104]                                    |
+    |     |Request     |                                              |
+    |     |Command     |                                              |
+    +-----+------------+----------------------------------------------+
+    |TSTR |Temporal-   | [RFC5104]                                    |
+    |     |Spatial     |                                              |
+    |     |Trade-off   |                                              |
+    |     |Request     |                                              |
+    +-----+------------+----------------------------------------------+
+    |TSTN |Temporal-   | [RFC5104]                                    |
+    |     |Spatial     |                                              |
+    |     |Trade-off   |                                              |
+    |     |Notification|                                              |
+    +-----+------------+----------------------------------------------+
+    |VBCM |Video Back  | [RFC5104]                                    |
+    |     |Channel     |                                              |
+    |     |Message     |                                              |
+    +-----+------------+----------------------------------------------+
+    |PSLEI|Payload-    | [RFC6642]                                    |
+    |     |Specific    |                                              |
+    |     |Third-Party |                                              |
+    |     |Loss Early  |                                              |
+    |     |Indication  |                                              |
+    +-----+------------+----------------------------------------------+
+    |ROI  |Video       | [_3GPP-TS-26.114]                            |
+    |     |region-of-  |                                              |
+    |     |interest    |                                              |
+    |     |(ROI)       |                                              |
+    +-----+------------+----------------------------------------------+
+    |LRR  |Layer       | [I-D.draft-ietf-avtext-lrr-07]               |
+    |     |Refresh     |                                              |
+    |     |Request     |                                              |
+    |     |Command     |                                              |
+    +-----+------------+----------------------------------------------+
+    |AFB  |Application | [RFC4585]                                    |
+    |     |Layer       |                                              |
+    |     |Feedback    |                                              |
+    +-----+------------+----------------------------------------------+
+    |TSRR |Temporal-   | [I-D.draft-ietf-avtcore-rtcp-green-metadata] |
+    |     |Spatial     |                                              |
+    |     |Resolution  |                                              |
+    |     |Request     |                                              |
+    +-----+------------+----------------------------------------------+
+    |TSRN |Temporal-   | [I-D.draft-ietf-avtcore-rtcp-green-metadata] |
+    |     |Spatial     |                                              |
+    |     |Resolution  |                                              |
+    |     |Notification|                                              |
+    +-----+------------+----------------------------------------------+
 
                                   Table 4
 
@@ -1904,6 +1930,14 @@ Table of Contents
               Internet-Draft, draft-hurst-quic-rtp-tunnelling-01, 28
               January 2021, <https://datatracker.ietf.org/doc/html/
               draft-hurst-quic-rtp-tunnelling-01>.
+
+   [I-D.draft-ietf-avtcore-rtcp-green-metadata]
+              He, Y., Herglotz, C., and E. Francois, "RTP Control
+              Protocol (RTCP) Messages for Temporal-Spatial Resolution",
+              Work in Progress, Internet-Draft, draft-ietf-avtcore-rtcp-
+              green-metadata-01, 13 April 2023,
+              <https://datatracker.ietf.org/doc/html/draft-ietf-avtcore-
+              rtcp-green-metadata-01>.
 
    [I-D.draft-ietf-avtext-lrr-07]
               Lennox, J., Hong, D., Uberti, J., Holmer, S., and M.
