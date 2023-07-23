@@ -5,9 +5,9 @@
 Audio/Video Transport Core Maintenance                            J. Ott
 Internet-Draft                                              M. Engelbart
 Intended status: Standards Track             Technical University Munich
-Expires: 19 January 2024                                      S. Dawkins
+Expires: 24 January 2024                                      S. Dawkins
                                                      Tencent America LLC
-                                                            18 July 2023
+                                                            23 July 2023
 
 
                              RTP over QUIC
@@ -48,7 +48,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 19 January 2024.
+   This Internet-Draft will expire on 24 January 2024.
 
 Copyright Notice
 
@@ -701,17 +701,18 @@ Table of Contents
       include an offset which would allow signaling where
       retransmissions should continue.
 
-   Instead of using RESET_STREAM and STOP_SENDING frames, RoQ senders
-   and receivers might benefit from negotiating the use of
-   [I-D.draft-ietf-quic-reliable-stream-reset-01] and
-   [I-D.draft-thomson-quic-enough-00].  These extensions provide two new
-   frame types, the CLOSE_STREAM and the ENOUGH frame, equivalent to
-   RESET_STREAM and STOP_SENDING, respectively, but with an additional
-   offset.  The offset indicates the point to which data will be
-   reliably retransmitted, while everything following might be dropped.
-   Using CLOSE_STREAM and ENOUGH instead of RESET_STREAM and
-   STOP_SENDING could prevent accidentally stopping retransmissions for
-   preceding frames.
+      *Editor's note:* Instead of using RESET_STREAM and STOP_SENDING
+      frames, RoQ senders and receivers might benefit from negotiating
+      the use of the QUIC extensions defined in
+      [I-D.draft-ietf-quic-reliable-stream-reset-01] and
+      [I-D.draft-thomson-quic-enough-00].  These extensions provide two
+      new frame types, the CLOSE_STREAM and the ENOUGH frame, equivalent
+      to RESET_STREAM and STOP_SENDING, respectively, but with an
+      additional offset.  The offset indicates the point to which data
+      will be reliably retransmitted, while everything following might
+      be dropped.  Using CLOSE_STREAM and ENOUGH instead of RESET_STREAM
+      and STOP_SENDING could prevent accidentally stopping
+      retransmissions for preceding frames.
 
    A translator that translates between two endpoints, both connected
    via QUIC, MUST forward RESET_STREAM frames received from one end to
