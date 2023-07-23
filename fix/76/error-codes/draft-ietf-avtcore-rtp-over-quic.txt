@@ -757,10 +757,10 @@ Table of Contents
    Senders can also transmit RTP packets in QUIC datagrams.  QUIC
    datagrams are an extension to QUIC described in [RFC9221].  QUIC
    datagrams can only be used if the use of the extension was
-   successfully negotiated during the QUIC handshake.  If the use of
-   datagrams was signalled using a signalling protocol, but the datagram
-   extension was not negotiated during the handshake, a peer MAY close
-   the connection with the ROQ_SIGNALING_ERROR error code.
+   successfully negotiated during the QUIC handshake.  If the use of an
+   extension was signaled using a signaling protocol, but the extension
+   was not negotiated during the QUIC handshake, a peer MAY close the
+   connection with the ROQ_SIGNALING_ERROR error code.
 
    QUIC datagrams preserve frame boundaries.  Thus, a single RTP packet
    can be mapped to a single QUIC datagram without additional framing.
@@ -1647,7 +1647,7 @@ Table of Contents
    ROQ_SIGNALING_ERROR (0x????):  Parameters that were set during out of
       band signaling are incompatible with the connection properties
       that were negotiated when the connection was established using
-      transport parameters.
+      QUIC transport parameters.
 
 10.  API Considerations
 
