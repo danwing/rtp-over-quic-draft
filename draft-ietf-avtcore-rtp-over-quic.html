@@ -2154,20 +2154,32 @@ to unintentionally skipping one or more frames.<a href="#section-5.2.2-5" class=
               <p id="section-5.2.2-6.1.1"><strong>Editor's note:</strong> A receiver cannot cancel a certain frame but still receive
 retransmissions for a frame the was following on the same stream using
 STOP_SENDING, because STOP_SENDING does not include an offset which would
-allow signaling where retransmissions should continue. If this is a required
-feature for RoQ, it could be implemented using an extended STOP_SENDING frame
-as, for example, proposed in <span>[<a href="#I-D.draft-thomson-quic-enough-00" class="cite xref">I-D.draft-thomson-quic-enough-00</a>]</span>.<a href="#section-5.2.2-6.1.1" class="pilcrow">¶</a></p>
+allow signaling where retransmissions should continue.<a href="#section-5.2.2-6.1.1" class="pilcrow">¶</a></p>
 </li>
           </ul>
-<p id="section-5.2.2-7">A translator that translates between two endpoints, both connected via QUIC,
+<ul class="normal ulEmpty">
+<li class="normal ulEmpty" id="section-5.2.2-7.1">
+              <p id="section-5.2.2-7.1.1"><strong>Editor's note:</strong> Instead of using RESET_STREAM and STOP_SENDING frames,
+RoQ senders and receivers might benefit from negotiating the use of the QUIC
+extensions defined in <span>[<a href="#I-D.draft-ietf-quic-reliable-stream-reset-01" class="cite xref">I-D.draft-ietf-quic-reliable-stream-reset-01</a>]</span> and
+<span>[<a href="#I-D.draft-thomson-quic-enough-00" class="cite xref">I-D.draft-thomson-quic-enough-00</a>]</span>. These extensions provide two new frame
+types, the CLOSE_STREAM and the ENOUGH frame, equivalent to RESET_STREAM and
+STOP_SENDING, respectively, but with an additional offset. The offset
+indicates the point to which data will be reliably retransmitted, while
+everything following might be dropped. Using CLOSE_STREAM and ENOUGH instead
+of RESET_STREAM and STOP_SENDING could prevent accidentally stopping
+retransmissions for preceding frames.<a href="#section-5.2.2-7.1.1" class="pilcrow">¶</a></p>
+</li>
+          </ul>
+<p id="section-5.2.2-8">A translator that translates between two endpoints, both connected via QUIC,
 MUST forward RESET_STREAM frames received from one end to the other unless it
-forwards the RTP packets on QUIC datagrams.<a href="#section-5.2.2-7" class="pilcrow">¶</a></p>
-<p id="section-5.2.2-8">Large RTP packets sent on a stream will be fragmented into smaller QUIC frames.
+forwards the RTP packets on QUIC datagrams.<a href="#section-5.2.2-8" class="pilcrow">¶</a></p>
+<p id="section-5.2.2-9">Large RTP packets sent on a stream will be fragmented into smaller QUIC frames.
 The QUIC frames are transmitted reliably and in order such that a receiving
 application can read a complete RTP packet from the stream as long as the stream
 is not closed with a RESET_STREAM frame. No retransmission has to be
 implemented by the application since QUIC frames lost in transit are
-retransmitted by QUIC.<a href="#section-5.2.2-8" class="pilcrow">¶</a></p>
+retransmitted by QUIC.<a href="#section-5.2.2-9" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="flow-control-and-maxstreams">
@@ -3780,6 +3792,10 @@ in the "TLS Application-Layer Protocol Negotiation (ALPN) Protocol IDs" registry
 <span class="refAuthor">Liu, Y.</span>, <span class="refAuthor">Ma, Y.</span>, <span class="refAuthor">De Coninck, Q.</span>, <span class="refAuthor">Bonaventure, O.</span>, <span class="refAuthor">Huitema, C.</span>, and <span class="refAuthor">M. Kühlewind</span>, <span class="refTitle">"Multipath Extension for QUIC"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-quic-multipath-05</span>, <time datetime="2023-07-10" class="refDate">10 July 2023</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-quic-multipath-05">https://datatracker.ietf.org/doc/html/draft-ietf-quic-multipath-05</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="I-D.draft-ietf-quic-reliable-stream-reset">[I-D.draft-ietf-quic-reliable-stream-reset]</dt>
+        <dd>
+<span class="refAuthor">Seemann, M.</span> and <span class="refAuthor">K. Oku</span>, <span class="refTitle">"Reliable QUIC Stream Resets"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-quic-reliable-stream-reset-01</span>, <time datetime="2023-07-03" class="refDate">3 July 2023</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-quic-reliable-stream-reset-01">https://datatracker.ietf.org/doc/html/draft-ietf-quic-reliable-stream-reset-01</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="I-D.draft-ietf-quic-reliable-stream-reset-01">[I-D.draft-ietf-quic-reliable-stream-reset-01]</dt>
         <dd>
 <span class="refAuthor">Seemann, M.</span> and <span class="refAuthor">K. Oku</span>, <span class="refTitle">"Reliable QUIC Stream Resets"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-quic-reliable-stream-reset-01</span>, <time datetime="2023-07-03" class="refDate">3 July 2023</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-quic-reliable-stream-reset-01">https://datatracker.ietf.org/doc/html/draft-ietf-quic-reliable-stream-reset-01</a>&gt;</span>. </dd>
 <dd class="break"></dd>

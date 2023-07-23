@@ -840,10 +840,20 @@ Table of Contents
       still receive retransmissions for a frame the was following on the
       same stream using STOP_SENDING, because STOP_SENDING does not
       include an offset which would allow signaling where
-      retransmissions should continue.  If this is a required feature
-      for RoQ, it could be implemented using an extended STOP_SENDING
-      frame as, for example, proposed in
-      [I-D.draft-thomson-quic-enough-00].
+      retransmissions should continue.
+
+      *Editor's note:* Instead of using RESET_STREAM and STOP_SENDING
+      frames, RoQ senders and receivers might benefit from negotiating
+      the use of the QUIC extensions defined in
+      [I-D.draft-ietf-quic-reliable-stream-reset-01] and
+      [I-D.draft-thomson-quic-enough-00].  These extensions provide two
+      new frame types, the CLOSE_STREAM and the ENOUGH frame, equivalent
+      to RESET_STREAM and STOP_SENDING, respectively, but with an
+      additional offset.  The offset indicates the point to which data
+      will be reliably retransmitted, while everything following might
+      be dropped.  Using CLOSE_STREAM and ENOUGH instead of RESET_STREAM
+      and STOP_SENDING could prevent accidentally stopping
+      retransmissions for preceding frames.
 
    A translator that translates between two endpoints, both connected
    via QUIC, MUST forward RESET_STREAM frames received from one end to
@@ -2102,6 +2112,13 @@ Table of Contents
               draft-ietf-quic-multipath-05>.
 
    [I-D.draft-ietf-quic-reliable-stream-reset]
+              Seemann, M. and K. Oku, "Reliable QUIC Stream Resets",
+              Work in Progress, Internet-Draft, draft-ietf-quic-
+              reliable-stream-reset-01, 3 July 2023,
+              <https://datatracker.ietf.org/doc/html/draft-ietf-quic-
+              reliable-stream-reset-01>.
+
+   [I-D.draft-ietf-quic-reliable-stream-reset-01]
               Seemann, M. and K. Oku, "Reliable QUIC Stream Resets",
               Work in Progress, Internet-Draft, draft-ietf-quic-
               reliable-stream-reset-01, 3 July 2023,
