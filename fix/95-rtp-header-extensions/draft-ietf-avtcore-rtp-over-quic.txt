@@ -5,7 +5,7 @@
 Audio/Video Transport Core Maintenance                            J. Ott
 Internet-Draft                                              M. Engelbart
 Intended status: Standards Track             Technical University Munich
-Expires: 4 January 2024                                      3 July 2023
+Expires: 24 January 2024                                    23 July 2023
 
 
                              RTP over QUIC
@@ -46,7 +46,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 4 January 2024.
+   This Internet-Draft will expire on 24 January 2024.
 
 Copyright Notice
 
@@ -1553,10 +1553,11 @@ Table of Contents
 7.9.  RTP Header extensions
 
    Like the payload-specific feedback packets, QUIC cannot directly
-   replace the control information in any of the following header
-   extensions.  However, some extensions, such as Transmission Time
-   offsets [RFC5450] are used to improve network jitter calculation,
-   which can be done in QUIC if a timestamp extension is used.
+   replace the control information in the following header extensions.
+   RoQ does not place restrictions on sending any RTP header extensions.
+   However, some extensions, such as Transmission Time offsets [RFC5450]
+   are used to improve network jitter calculation, which can be done in
+   QUIC if a timestamp extension is used.
 
 7.9.1.  Compact Header Extensions
 
@@ -1845,9 +1846,9 @@ Table of Contents
    [I-D.draft-ietf-quic-ack-frequency]
               Iyengar, J., Swett, I., and M. Kühlewind, "QUIC
               Acknowledgement Frequency", Work in Progress, Internet-
-              Draft, draft-ietf-quic-ack-frequency-04, 26 March 2023,
+              Draft, draft-ietf-quic-ack-frequency-05, 10 July 2023,
               <https://datatracker.ietf.org/doc/html/draft-ietf-quic-
-              ack-frequency-04>.
+              ack-frequency-05>.
 
    [I-D.draft-smith-quic-receive-ts]
               Smith, C. and I. Swett, "QUIC Extension for Reporting
