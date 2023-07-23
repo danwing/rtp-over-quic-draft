@@ -5,9 +5,9 @@
 Audio/Video Transport Core Maintenance                            J. Ott
 Internet-Draft                                              M. Engelbart
 Intended status: Standards Track             Technical University Munich
-Expires: 23 January 2024                                      S. Dawkins
+Expires: 24 January 2024                                      S. Dawkins
                                                      Tencent America LLC
-                                                            22 July 2023
+                                                            23 July 2023
 
 
                              RTP over QUIC
@@ -48,7 +48,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 23 January 2024.
+   This Internet-Draft will expire on 24 January 2024.
 
 Copyright Notice
 
@@ -809,7 +809,7 @@ Table of Contents
 
 6.  Connection Shutdown
 
-   Both peers MAY close the connection for variety of reasons.  If one
+   Either peers MAY close the connection for variety of reasons.  If one
    of the peers wants to close the RoQ connection, the peer can use a
    QUIC CONNECTION_CLOSE frame with one of the error codes defined in
    Section 9.
@@ -1631,17 +1631,18 @@ Table of Contents
       ID, etc.
 
    ROQ_STREAM_CREATION_ERROR (0x????):  The endpoint detected that its
-      peer created a stream that it will not accept.
+      peer created a stream that violates the ROQ protocol.
 
-   ROQ_FRAME_CANCELLED (0x????):  A receiving endpoint stopped reading a
-      frame from a stream and requests new frames be sent on new streams
-      using STOP_SENDING or a sender notifies a receiver that
+   ROQ_FRAME_CANCELLED (0x????):  A receiving endpoint is using
+      STOP_SENDING on the current stream to request new frames be sent
+      on new streams.  Similarly, a sender notifies a receiver that
       retransmissions of a frame were stopped using RESET_STREAM and new
       frames will be sent on new streams.
 
    ROQ_UNKNOWN_FLOW_ID (0x????):  An endpoint was unable to handle a
-      flow identifier, e.g., because it was not signalled or it does not
-      support multiplexing using arbitrary flow identifiers.
+      flow identifier, e.g., because it was not signalled or because the
+      endpoint does not support multiplexing using arbitrary flow
+      identifiers.
 
    ROQ_SIGNALING_ERROR (0x????):  Parameters that were set during out of
       band signaling are incompatible with the connection properties
