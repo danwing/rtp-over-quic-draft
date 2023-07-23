@@ -171,6 +171,10 @@ Table of Contents
    a better answer than "because we can".  Upon reflection, the
    following motivations seem useful to state.
 
+   The motivations in this section are in no particular order, and this
+   reflects the reality that not all implementers and deployers would
+   agree on "the most important motivations".
+
 1.2.1.  "Always-On" Transport-level Authentication and Encryption
 
    Although application-level mechanisms to encrypt RTP and RTCP
