@@ -117,6 +117,8 @@ Table of Contents
      7.7.  Payload-specific RTP Feedback (PSFB)
      7.8.  Extended Reports (XR)
      7.9.  RTP Header extensions
+       7.9.1.  Compact Header Extensions
+       7.9.2.  SDES Compact Header Extensions
    8.  API Considerations
      8.1.  Information to be exported from QUIC
      8.2.  Functions to be exposed by QUIC
@@ -1761,10 +1763,124 @@ Table of Contents
 
 7.9.  RTP Header extensions
 
-   *  _Transmission offset_ [RFC5450] is used for better jitter
-      calculation.  If we have QUIC timestamps, we don't need to work
-      around RTP timestamps offsets because we can use the QUIC
-      timestamps to calculate network jitter.
+   Like the payload-specific feedback packets, QUIC cannot directly
+   replace the control information in the following header extensions.
+   RoQ does not place restrictions on sending any RTP header extensions.
+   However, some extensions, such as Transmission Time offsets [RFC5450]
+   are used to improve network jitter calculation, which can be done in
+   QUIC if a timestamp extension is used.
+
+7.9.1.  Compact Header Extensions
+
+   +======================+==================+===========+=============+
+   | Extension URI        | Description      | Reference | QUIC        |
+   +======================+==================+===========+=============+
+   | urn:ietf:params:rtp- | Transmission     | [RFC5450] | no          |
+   | hdrext:toffset       | Time offsets     |           |             |
+   +----------------------+------------------+-----------+-------------+
+   | urn:ietf:params:rtp- | Audio Level      | [RFC6464] | no          |
+   | hdrext:ssrc-audio-   |                  |           |             |
+   | level                |                  |           |             |
+   +----------------------+------------------+-----------+-------------+
+   | urn:ietf:params:rtp- | Splicing         | [RFC8286] | no          |
+   | hdrext:splicing-     | Interval         |           |             |
+   | interval             |                  |           |             |
+   +----------------------+------------------+-----------+-------------+
+   | urn:ietf:params:rtp- | SMPTE time-code  | [RFC5484] | no          |
+   | hdrext:smpte-tc      | mapping          |           |             |
+   +----------------------+------------------+-----------+-------------+
+   | urn:ietf:params:rtp- | Reserved as      | [RFC7941] | no          |
+   | hdrext:sdes          | base URN for     |           |             |
+   |                      | RTCP SDES items  |           |             |
+   |                      | that are also    |           |             |
+   |                      | defined as RTP   |           |             |
+   |                      | compact header   |           |             |
+   |                      | extensions.      |           |             |
+   +----------------------+------------------+-----------+-------------+
+   | urn:ietf:params:rtp- | Synchronisation  | [RFC6051] | no          |
+   | hdrext:ntp-64        | metadata:        |           |             |
+   |                      | 64-bit           |           |             |
+   |                      | timestamp        |           |             |
+   |                      | format           |           |             |
+   +----------------------+------------------+-----------+-------------+
+   | urn:ietf:params:rtp- | Synchronisation  | [RFC6051] | no          |
+   | hdrext:ntp-56        | metadata:        |           |             |
+   |                      | 56-bit           |           |             |
+   |                      | timestamp        |           |             |
+   |                      | format           |           |             |
+   +----------------------+------------------+-----------+-------------+
+   | urn:ietf:params:rtp- | Encrypted        | [RFC6904] | no, but     |
+   | hdrext:encrypt       | extension        |           | maybe       |
+   |                      | header element   |           | irrelevant? |
+   +----------------------+------------------+-----------+-------------+
+   | urn:ietf:params:rtp- | Mixer-to-client  | [RFC6465] | no          |
+   | hdrext:csrc-audio-   | audio level      |           |             |
+   | level                | indicators       |           |             |
+   +----------------------+------------------+-----------+-------------+
+   | urn:3gpp:video-      | Higher           | [3GPP TS  | probably    |
+   | orientation:6        | granularity      | 26.114,   | not(?)      |
+   |                      | (6-bit)          | version   |             |
+   |                      | coordination of  | 12.5.0]   |             |
+   |                      | video            |           |             |
+   |                      | orientation      |           |             |
+   |                      | (CVO) feature,   |           |             |
+   |                      | see clause       |           |             |
+   |                      | 6.2.3            |           |             |
+   +----------------------+------------------+-----------+-------------+
+   | urn:3gpp:video-      | Coordination of  | [3GPP TS  | probably    |
+   | orientation          | video            | 26.114,   | not(?)      |
+   |                      | orientation      | version   |             |
+   |                      | (CVO) feature,   | 12.5.0]   |             |
+   |                      | see clause       |           |             |
+   |                      | 6.2.3            |           |             |
+   +----------------------+------------------+-----------+-------------+
+   | urn:3gpp:roi-sent    | Signalling of    | [3GPP TS  | probably    |
+   |                      | the arbitrary    | 26.114,   | not(?)      |
+   |                      | region-of-       | version   |             |
+   |                      | interest (ROI)   | 13.1.0]   |             |
+   |                      | information for  |           |             |
+   |                      | the sent video,  |           |             |
+   |                      | see clause       |           |             |
+   |                      | 6.2.3.4          |           |             |
+   +----------------------+------------------+-----------+-------------+
+   | urn:3gpp:predefined- | Signalling of    | [3GPP TS  | probably    |
+   | roi-sent             | the predefined   | 26.114,   | not(?)      |
+   |                      | region-of-       | version   |             |
+   |                      | interest (ROI)   | 13.1.0]   |             |
+   |                      | information for  |           |             |
+   |                      | the sent video,  |           |             |
+   |                      | see clause       |           |             |
+   |                      | 6.2.3.4          |           |             |
+   +----------------------+------------------+-----------+-------------+
+
+                                  Table 6
+
+7.9.2.  SDES Compact Header Extensions
+
+    +=======================+=====================+===========+======+
+    | Extension URI         | Description         | Reference | QUIC |
+    +=======================+=====================+===========+======+
+    | urn:ietf:params:rtp-  | Source Description: | [RFC7941] | no   |
+    | hdrext:sdes:cname     | Canonical End-Point |           |      |
+    |                       | Identifier (SDES    |           |      |
+    |                       | CNAME)              |           |      |
+    +-----------------------+---------------------+-----------+------+
+    | urn:ietf:params:rtp-  | RTP Stream          | [RFC8852] | no   |
+    | hdrext:sdes:rtp-      | Identifier          |           |      |
+    | stream-id             |                     |           |      |
+    +-----------------------+---------------------+-----------+------+
+    | urn:ietf:params:rtp-  | RTP Repaired Stream | [RFC8852] | no   |
+    | hdrext:sdes:repaired- | Identifier          |           |      |
+    | rtp-stream-id         |                     |           |      |
+    +-----------------------+---------------------+-----------+------+
+    | urn:ietf:params:rtp-  | CLUE CaptId         | [RFC8849] | no   |
+    | hdrext:sdes:CaptId    |                     |           |      |
+    +-----------------------+---------------------+-----------+------+
+    | urn:ietf:params:rtp-  | Media               | [RFC9143] | no   |
+    | hdrext:sdes:mid       | identification      |           |      |
+    +-----------------------+---------------------+-----------+------+
+
+                                 Table 7
 
 8.  API Considerations
 

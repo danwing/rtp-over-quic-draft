@@ -1317,6 +1317,14 @@ feedback.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.9">
                 <p id="section-toc.1-1.7.2.9.1"><a href="#section-7.9" class="auto internal xref">7.9</a>.  <a href="#name-rtp-header-extensions" class="internal xref">RTP Header extensions</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.9.2.1">
+                    <p id="section-toc.1-1.7.2.9.2.1.1"><a href="#section-7.9.1" class="auto internal xref">7.9.1</a>.  <a href="#name-compact-header-extensions" class="internal xref">Compact Header Extensions</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.9.2.2">
+                    <p id="section-toc.1-1.7.2.9.2.2.1"><a href="#section-7.9.2" class="auto internal xref">7.9.2</a>.  <a href="#name-sdes-compact-header-extensi" class="internal xref">SDES Compact Header Extensions</a></p>
+</li>
+                </ul>
 </li>
             </ul>
 </li>
@@ -3433,13 +3441,169 @@ following Payload-specific RTP Feedback (PSFB) feedback.<a href="#section-7.7-1"
         <h3 id="name-rtp-header-extensions">
 <a href="#section-7.9" class="section-number selfRef">7.9. </a><a href="#name-rtp-header-extensions" class="section-name selfRef">RTP Header extensions</a>
         </h3>
-<ul class="normal">
-<li class="normal" id="section-7.9-1.1">
-            <em>Transmission offset</em> <span>[<a href="#RFC5450" class="cite xref">RFC5450</a>]</span> is used for better jitter calculation. If
-we have QUIC timestamps, we don't need to work around RTP timestamps offsets
-because we can use the QUIC timestamps to calculate network jitter.<a href="#section-7.9-1.1" class="pilcrow">¶</a>
-</li>
-        </ul>
+<p id="section-7.9-1">Like the payload-specific feedback packets, QUIC cannot directly replace the
+control information in the following header extensions. RoQ does not place
+restrictions on sending any RTP header extensions. However, some extensions,
+such as Transmission Time offsets <span>[<a href="#RFC5450" class="cite xref">RFC5450</a>]</span> are used to improve network
+jitter calculation, which can be done in QUIC if a timestamp extension is used.<a href="#section-7.9-1" class="pilcrow">¶</a></p>
+<div id="compact-header-extensions">
+<section id="section-7.9.1">
+          <h4 id="name-compact-header-extensions">
+<a href="#section-7.9.1" class="section-number selfRef">7.9.1. </a><a href="#name-compact-header-extensions" class="section-name selfRef">Compact Header Extensions</a>
+          </h4>
+<table class="center" id="table-6">
+            <caption><a href="#table-6" class="selfRef">Table 6</a></caption>
+<thead>
+              <tr>
+                <th class="text-left" rowspan="1" colspan="1">Extension URI</th>
+                <th class="text-left" rowspan="1" colspan="1">Description</th>
+                <th class="text-left" rowspan="1" colspan="1">Reference</th>
+                <th class="text-left" rowspan="1" colspan="1">QUIC</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="text-left" rowspan="1" colspan="1">urn:ietf:params:rtp-hdrext:toffset</td>
+                <td class="text-left" rowspan="1" colspan="1">Transmission Time offsets</td>
+                <td class="text-left" rowspan="1" colspan="1">
+                  <span>[<a href="#RFC5450" class="cite xref">RFC5450</a>]</span>
+</td>
+                <td class="text-left" rowspan="1" colspan="1">no</td>
+              </tr>
+              <tr>
+                <td class="text-left" rowspan="1" colspan="1">urn:ietf:params:rtp-hdrext:ssrc-audio-level</td>
+                <td class="text-left" rowspan="1" colspan="1">Audio Level</td>
+                <td class="text-left" rowspan="1" colspan="1">[RFC6464]</td>
+                <td class="text-left" rowspan="1" colspan="1">no</td>
+              </tr>
+              <tr>
+                <td class="text-left" rowspan="1" colspan="1">urn:ietf:params:rtp-hdrext:splicing-interval</td>
+                <td class="text-left" rowspan="1" colspan="1">Splicing Interval</td>
+                <td class="text-left" rowspan="1" colspan="1">
+                  <span>[<a href="#RFC8286" class="cite xref">RFC8286</a>]</span>
+</td>
+                <td class="text-left" rowspan="1" colspan="1">no</td>
+              </tr>
+              <tr>
+                <td class="text-left" rowspan="1" colspan="1">urn:ietf:params:rtp-hdrext:smpte-tc</td>
+                <td class="text-left" rowspan="1" colspan="1">SMPTE time-code mapping</td>
+                <td class="text-left" rowspan="1" colspan="1">
+                  <span>[<a href="#RFC5484" class="cite xref">RFC5484</a>]</span>
+</td>
+                <td class="text-left" rowspan="1" colspan="1">no</td>
+              </tr>
+              <tr>
+                <td class="text-left" rowspan="1" colspan="1">urn:ietf:params:rtp-hdrext:sdes</td>
+                <td class="text-left" rowspan="1" colspan="1">Reserved as base URN for RTCP SDES items that are also defined as RTP compact header extensions.</td>
+                <td class="text-left" rowspan="1" colspan="1">[RFC7941]</td>
+                <td class="text-left" rowspan="1" colspan="1">no</td>
+              </tr>
+              <tr>
+                <td class="text-left" rowspan="1" colspan="1">urn:ietf:params:rtp-hdrext:ntp-64</td>
+                <td class="text-left" rowspan="1" colspan="1">Synchronisation metadata: 64-bit timestamp format</td>
+                <td class="text-left" rowspan="1" colspan="1">
+                  <span>[<a href="#RFC6051" class="cite xref">RFC6051</a>]</span>
+</td>
+                <td class="text-left" rowspan="1" colspan="1">no</td>
+              </tr>
+              <tr>
+                <td class="text-left" rowspan="1" colspan="1">urn:ietf:params:rtp-hdrext:ntp-56</td>
+                <td class="text-left" rowspan="1" colspan="1">Synchronisation metadata: 56-bit timestamp format</td>
+                <td class="text-left" rowspan="1" colspan="1">
+                  <span>[<a href="#RFC6051" class="cite xref">RFC6051</a>]</span>
+</td>
+                <td class="text-left" rowspan="1" colspan="1">no</td>
+              </tr>
+              <tr>
+                <td class="text-left" rowspan="1" colspan="1">urn:ietf:params:rtp-hdrext:encrypt</td>
+                <td class="text-left" rowspan="1" colspan="1">Encrypted extension header element</td>
+                <td class="text-left" rowspan="1" colspan="1">[RFC6904]</td>
+                <td class="text-left" rowspan="1" colspan="1">no, but maybe irrelevant?</td>
+              </tr>
+              <tr>
+                <td class="text-left" rowspan="1" colspan="1">urn:ietf:params:rtp-hdrext:csrc-audio-level</td>
+                <td class="text-left" rowspan="1" colspan="1">Mixer-to-client audio level indicators</td>
+                <td class="text-left" rowspan="1" colspan="1">[RFC6465]</td>
+                <td class="text-left" rowspan="1" colspan="1">no</td>
+              </tr>
+              <tr>
+                <td class="text-left" rowspan="1" colspan="1">urn:3gpp:video-orientation:6</td>
+                <td class="text-left" rowspan="1" colspan="1">Higher granularity (6-bit) coordination of video orientation (CVO) feature, see clause 6.2.3</td>
+                <td class="text-left" rowspan="1" colspan="1">[3GPP TS 26.114, version 12.5.0]</td>
+                <td class="text-left" rowspan="1" colspan="1">probably not(?)</td>
+              </tr>
+              <tr>
+                <td class="text-left" rowspan="1" colspan="1">urn:3gpp:video-orientation</td>
+                <td class="text-left" rowspan="1" colspan="1">Coordination of video orientation (CVO) feature, see clause 6.2.3</td>
+                <td class="text-left" rowspan="1" colspan="1">[3GPP TS 26.114, version 12.5.0]</td>
+                <td class="text-left" rowspan="1" colspan="1">probably not(?)</td>
+              </tr>
+              <tr>
+                <td class="text-left" rowspan="1" colspan="1">urn:3gpp:roi-sent</td>
+                <td class="text-left" rowspan="1" colspan="1">Signalling of the arbitrary region-of-interest (ROI) information for the sent video, see clause 6.2.3.4</td>
+                <td class="text-left" rowspan="1" colspan="1">[3GPP TS 26.114, version 13.1.0]</td>
+                <td class="text-left" rowspan="1" colspan="1">probably not(?)</td>
+              </tr>
+              <tr>
+                <td class="text-left" rowspan="1" colspan="1">urn:3gpp:predefined-roi-sent</td>
+                <td class="text-left" rowspan="1" colspan="1">Signalling of the predefined region-of-interest (ROI) information for the sent video, see clause 6.2.3.4</td>
+                <td class="text-left" rowspan="1" colspan="1">[3GPP TS 26.114, version 13.1.0]</td>
+                <td class="text-left" rowspan="1" colspan="1">probably not(?)</td>
+              </tr>
+            </tbody>
+          </table>
+</section>
+</div>
+<div id="sdes-compact-header-extensions">
+<section id="section-7.9.2">
+          <h4 id="name-sdes-compact-header-extensi">
+<a href="#section-7.9.2" class="section-number selfRef">7.9.2. </a><a href="#name-sdes-compact-header-extensi" class="section-name selfRef">SDES Compact Header Extensions</a>
+          </h4>
+<table class="center" id="table-7">
+            <caption><a href="#table-7" class="selfRef">Table 7</a></caption>
+<thead>
+              <tr>
+                <th class="text-left" rowspan="1" colspan="1">Extension URI</th>
+                <th class="text-left" rowspan="1" colspan="1">Description</th>
+                <th class="text-left" rowspan="1" colspan="1">Reference</th>
+                <th class="text-left" rowspan="1" colspan="1">QUIC</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="text-left" rowspan="1" colspan="1">urn:ietf:params:rtp-hdrext:sdes:cname</td>
+                <td class="text-left" rowspan="1" colspan="1">Source Description: Canonical End-Point Identifier (SDES CNAME)</td>
+                <td class="text-left" rowspan="1" colspan="1">[RFC7941]</td>
+                <td class="text-left" rowspan="1" colspan="1">no</td>
+              </tr>
+              <tr>
+                <td class="text-left" rowspan="1" colspan="1">urn:ietf:params:rtp-hdrext:sdes:rtp-stream-id</td>
+                <td class="text-left" rowspan="1" colspan="1">RTP Stream Identifier</td>
+                <td class="text-left" rowspan="1" colspan="1">[RFC8852]</td>
+                <td class="text-left" rowspan="1" colspan="1">no</td>
+              </tr>
+              <tr>
+                <td class="text-left" rowspan="1" colspan="1">urn:ietf:params:rtp-hdrext:sdes:repaired-rtp-stream-id</td>
+                <td class="text-left" rowspan="1" colspan="1">RTP Repaired Stream Identifier</td>
+                <td class="text-left" rowspan="1" colspan="1">[RFC8852]</td>
+                <td class="text-left" rowspan="1" colspan="1">no</td>
+              </tr>
+              <tr>
+                <td class="text-left" rowspan="1" colspan="1">urn:ietf:params:rtp-hdrext:sdes:CaptId</td>
+                <td class="text-left" rowspan="1" colspan="1">CLUE CaptId</td>
+                <td class="text-left" rowspan="1" colspan="1">[RFC8849]</td>
+                <td class="text-left" rowspan="1" colspan="1">no</td>
+              </tr>
+              <tr>
+                <td class="text-left" rowspan="1" colspan="1">urn:ietf:params:rtp-hdrext:sdes:mid</td>
+                <td class="text-left" rowspan="1" colspan="1">Media identification</td>
+                <td class="text-left" rowspan="1" colspan="1">[RFC9143]</td>
+                <td class="text-left" rowspan="1" colspan="1">no</td>
+              </tr>
+            </tbody>
+          </table>
+</section>
+</div>
 </section>
 </div>
 </section>
