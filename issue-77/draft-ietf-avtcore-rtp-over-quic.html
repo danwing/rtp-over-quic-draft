@@ -1058,7 +1058,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Ott, et al.</td>
-<td class="center">Expires 20 January 2024</td>
+<td class="center">Expires 24 January 2024</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1071,12 +1071,12 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dd class="internet-draft">draft-ietf-avtcore-rtp-over-quic-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2023-07-19" class="published">19 July 2023</time>
+<time datetime="2023-07-23" class="published">23 July 2023</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2024-01-20">20 January 2024</time></dd>
+<dd class="expires"><time datetime="2024-01-24">24 January 2024</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1134,7 +1134,7 @@ feedback.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 20 January 2024.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 24 January 2024.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1176,13 +1176,22 @@ feedback.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
                     <p id="section-toc.1-1.1.2.2.2.1.1" class="keepWithNext"><a href="#section-1.2.1" class="auto internal xref">1.2.1</a>.  <a href="#name-always-on-transport-level-a" class="internal xref">"Always-On" Transport-level Authentication and Encryption</a></p>
 </li>
                   <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.2.2.2">
-                    <p id="section-toc.1-1.1.2.2.2.2.1" class="keepWithNext"><a href="#section-1.2.2" class="auto internal xref">1.2.2</a>.  <a href="#name-path-mtu-discovery-and-rtp-" class="internal xref">Path MTU Discovery and RTP Media Coalescence</a></p>
+                    <p id="section-toc.1-1.1.2.2.2.2.1" class="keepWithNext"><a href="#section-1.2.2" class="auto internal xref">1.2.2</a>.  <a href="#name-always-on-internet-safe-con" class="internal xref">"Always-On" Internet-Safe Congestion Avoidance</a></p>
 </li>
                   <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.2.2.3">
-                    <p id="section-toc.1-1.1.2.2.2.3.1"><a href="#section-1.2.3" class="auto internal xref">1.2.3</a>.  <a href="#name-exploiting-multiple-connect" class="internal xref">Exploiting Multiple Connections</a></p>
+                    <p id="section-toc.1-1.1.2.2.2.3.1"><a href="#section-1.2.3" class="auto internal xref">1.2.3</a>.  <a href="#name-rate-adaptation-based-on-qu" class="internal xref">Rate Adaptation Based on QUIC Feedback</a></p>
 </li>
                   <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.2.2.4">
-                    <p id="section-toc.1-1.1.2.2.2.4.1"><a href="#section-1.2.4" class="auto internal xref">1.2.4</a>.  <a href="#name-exploiting-new-quic-capabil" class="internal xref">Exploiting New QUIC Capabilities</a></p>
+                    <p id="section-toc.1-1.1.2.2.2.4.1"><a href="#section-1.2.4" class="auto internal xref">1.2.4</a>.  <a href="#name-path-mtu-discovery-and-rtp-" class="internal xref">Path MTU Discovery and RTP Media Coalescence</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.2.2.5">
+                    <p id="section-toc.1-1.1.2.2.2.5.1"><a href="#section-1.2.5" class="auto internal xref">1.2.5</a>.  <a href="#name-multiplexing-rtp-rtcp-and-n" class="internal xref">Multiplexing RTP, RTCP, and Non-RTP Flows on a Single QUIC Connection</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.2.2.6">
+                    <p id="section-toc.1-1.1.2.2.2.6.1"><a href="#section-1.2.6" class="auto internal xref">1.2.6</a>.  <a href="#name-exploiting-multiple-connect" class="internal xref">Exploiting Multiple Connections</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.2.2.7">
+                    <p id="section-toc.1-1.1.2.2.2.7.1"><a href="#section-1.2.7" class="auto internal xref">1.2.7</a>.  <a href="#name-exploiting-new-quic-capabil" class="internal xref">Exploiting New QUIC Capabilities</a></p>
 </li>
                 </ul>
 </li>
@@ -1414,38 +1423,58 @@ blocking).<a href="#section-1.1-2" class="pilcrow">¶</a></p>
 <p id="section-1.2.1-2">This is in sharp contrast to "always-on" transport-level encryption in the QUIC protocol, using Transport Layer Security (TLS 1.3) as described in <span>[<a href="#RFC9001" class="cite xref">RFC9001</a>]</span>. QUIC implementations always authenticate the entirety of each packet, and encrypt as much of each packet as is practical, even switching from "long headers", which expose more QUIC header fields needed to establish a connection, to "short headers", which only expose the absolute minimum QUIC header fields needed to identify the connection to the receiver, so that the QUIC payload is presented to the right QUIC application <span>[<a href="#RFC8999" class="cite xref">RFC8999</a>]</span>.<a href="#section-1.2.1-2" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="mtu-coal">
+<div id="always-on-internet-safe-congestion-avoidance">
 <section id="section-1.2.2">
-          <h4 id="name-path-mtu-discovery-and-rtp-">
-<a href="#section-1.2.2" class="section-number selfRef">1.2.2. </a><a href="#name-path-mtu-discovery-and-rtp-" class="section-name selfRef">Path MTU Discovery and RTP Media Coalescence</a>
+          <h4 id="name-always-on-internet-safe-con">
+<a href="#section-1.2.2" class="section-number selfRef">1.2.2. </a><a href="#name-always-on-internet-safe-con" class="section-name selfRef">"Always-On" Internet-Safe Congestion Avoidance</a>
           </h4>
-<p id="section-1.2.2-1">The minimum Path MTU supported by conformant QUIC implementations is 1200 bytes <span>[<a href="#RFC9000" class="cite xref">RFC9000</a>]</span>, and in addition, QUIC implementations allow senders to use either DPLPMTUD (<span>[<a href="#RFC8899" class="cite xref">RFC8899</a>]</span>) or PMTUD (<span>[<a href="#RFC1191" class="cite xref">RFC1191</a>]</span>, <span>[<a href="#RFC8201" class="cite xref">RFC8201</a>]</span>) to determine the actual MTU size that the receiver and path between sender and receiver support, which can be even larger.<a href="#section-1.2.2-1" class="pilcrow">¶</a></p>
-<p id="section-1.2.2-2">This is especially useful in certain conferencing topologies, where otherwise senders have no choice but to use the lowest path MTU for all conference participants, but even in point-to-point RTP sessions, this also allows senders to piggyback audio media in the same UDP packet as video media, for example, and also allows QUIC receivers to piggyback QUIC ACK frames on any QUIC frames being transmitted in the other direction.<a href="#section-1.2.2-2" class="pilcrow">¶</a></p>
-<div id="single-path">
-<section id="section-1.2.2.1">
-            <h5 id="name-multiplexing-rtp-rtcp-and-n">
-<a href="#section-1.2.2.1" class="section-number selfRef">1.2.2.1. </a><a href="#name-multiplexing-rtp-rtcp-and-n" class="section-name selfRef">Multiplexing RTP, RTCP, and Non-RTP Flows on a Single QUIC Connection</a>
-            </h5>
-<p id="section-1.2.2.1-1">In order to conserve ports, especially at NATs and Firewalls, this specification defines a flow identifier, so that multiple RTP flows, RTCP flows, and non-RTP flows can be distinguished even if they are carried on the same QUIC connection.<a href="#section-1.2.2.1-1" class="pilcrow">¶</a></p>
+<p id="section-1.2.2-1">When RTP is carried directly over UDP, as is commonly done, the underlying UDP protocol provides no transport services beyond path multiplexing using UDP ports. All congestion avoidance behavior is up to the RTP application itself, and if anything goes wrong with the application resulting in an RTP sender failing to recognize that it is contributing to path congestion, the "worst case" response is to invoke RTP "circuit breaker" procedures <span>[<a href="#RFC8083" class="cite xref">RFC8083</a>]</span>, resulting in "ceasing transmission", as described in <span><a href="https://rfc-editor.org/rfc/rfc8083#section-4.5" class="relref">Section 4.5</a> of [<a href="#RFC8083" class="cite xref">RFC8083</a>]</span>. Because RTCP-based circuit breakers only detect long-lived congestion, a response based on these mechanisms will not happen quickly.<a href="#section-1.2.2-1" class="pilcrow">¶</a></p>
+<p id="section-1.2.2-2">In contrast, when RTP is carried over QUIC, QUIC implementations maintain their own estimates of key transport parameters needed to detect and respond to possible congestion, and these are independent of any measurements RTP senders and receivers are maintaining. The result is that even if an RTP sender continues to "send", QUIC congestion avoidance procedures (for example, the procedures defined in <span>[<a href="#RFC9002" class="cite xref">RFC9002</a>]</span>) will cause the RTP packets to be buffered and only placed on the network path as part of a response to detected loss. This happens without any action being requied on the part of RTP senders.<a href="#section-1.2.2-2" class="pilcrow">¶</a></p>
+<p id="section-1.2.2-3">While the effect of QUIC's response to congestion means that some RTP packets will arrive at the receiver later than a user of the RTP flow might prefer, it is still preferable to "ceasing transmission" completely until the RTP sender has a reason to believe that restarting the flow will not result in congestion.<a href="#section-1.2.2-3" class="pilcrow">¶</a></p>
+<p id="section-1.2.2-4">Moreover, when a single QUIC connection is used to multiplex both RTP-RTCP and non-RTP packets as described in <a href="#single-path" class="auto internal xref">Section 1.2.5</a>, the QUIC connection will still be Internet-safe, with no coordination required.<a href="#section-1.2.2-4" class="pilcrow">¶</a></p>
 </section>
 </div>
+<div id="ra-quic-feedback">
+<section id="section-1.2.3">
+          <h4 id="name-rate-adaptation-based-on-qu">
+<a href="#section-1.2.3" class="section-number selfRef">1.2.3. </a><a href="#name-rate-adaptation-based-on-qu" class="section-name selfRef">Rate Adaptation Based on QUIC Feedback</a>
+          </h4>
+<p id="section-1.2.3-1">RTP makes use of a large number of RTP-specific feedback mechanisms because when RTP is carried directly over UDP, there is no other way to receive feedback. Some of these mechanisms are specific to the type of media RTP is sending, but others can be mapped from underlying QUIC implementations that are using this feedback to perform rate adaptation for any QUIC connection, regardless of the application reflected in the QUIC STREAM <span>[<a href="#RFC9000" class="cite xref">RFC9000</a>]</span> and DATAGRAM <span>[<a href="#RFC9221" class="cite xref">RFC9221</a>]</span> frames. This is described in (much) more detail in <a href="#congestion-control" class="auto internal xref">Section 6</a> on rate adaptation, and in <a href="#rtcp-mapping" class="auto internal xref">Section 7</a> on replacing RTCP and RTP header extensions with QUIC feedback.<a href="#section-1.2.3-1" class="pilcrow">¶</a></p>
+<p id="section-1.2.3-2">One word of caution is in order - RTP implementations may rely on at least some minimal periodic RTCP feedback, in order to determine that an RTP flow is still active, and is not causing sustained congestion (as described in <span>[<a href="#RFC8083" class="cite xref">RFC8083</a>]</span>, but since this "periodicity" is measured in seconds, the impact of this "duplicate" feedback on path bandwidth utilization is likely close to zero.<a href="#section-1.2.3-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="mtu-coal">
+<section id="section-1.2.4">
+          <h4 id="name-path-mtu-discovery-and-rtp-">
+<a href="#section-1.2.4" class="section-number selfRef">1.2.4. </a><a href="#name-path-mtu-discovery-and-rtp-" class="section-name selfRef">Path MTU Discovery and RTP Media Coalescence</a>
+          </h4>
+<p id="section-1.2.4-1">The minimum Path MTU supported by conformant QUIC implementations is 1200 bytes <span>[<a href="#RFC9000" class="cite xref">RFC9000</a>]</span>, and in addition, QUIC implementations allow senders to use either DPLPMTUD (<span>[<a href="#RFC8899" class="cite xref">RFC8899</a>]</span>) or PMTUD (<span>[<a href="#RFC1191" class="cite xref">RFC1191</a>]</span>, <span>[<a href="#RFC8201" class="cite xref">RFC8201</a>]</span>) to determine the actual MTU size that the receiver and path between sender and receiver support, which can be even larger.<a href="#section-1.2.4-1" class="pilcrow">¶</a></p>
+<p id="section-1.2.4-2">This is especially useful in certain conferencing topologies, where otherwise senders have no choice but to use the lowest path MTU for all conference participants, but even in point-to-point RTP sessions, this also allows senders to piggyback audio media in the same UDP packet as video media, for example, and also allows QUIC receivers to piggyback QUIC ACK frames on any QUIC frames being transmitted in the other direction.<a href="#section-1.2.4-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="single-path">
+<section id="section-1.2.5">
+          <h4 id="name-multiplexing-rtp-rtcp-and-n">
+<a href="#section-1.2.5" class="section-number selfRef">1.2.5. </a><a href="#name-multiplexing-rtp-rtcp-and-n" class="section-name selfRef">Multiplexing RTP, RTCP, and Non-RTP Flows on a Single QUIC Connection</a>
+          </h4>
+<p id="section-1.2.5-1">In order to conserve ports, especially at NATs and Firewalls, this specification defines a flow identifier, so that multiple RTP flows, RTCP flows, and non-RTP flows can be distinguished even if they are carried on the same QUIC connection. This is described in more detail in <a href="#multiplexing" class="auto internal xref">Section 5.1</a>.<a href="#section-1.2.5-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="multiple-paths">
-<section id="section-1.2.3">
+<section id="section-1.2.6">
           <h4 id="name-exploiting-multiple-connect">
-<a href="#section-1.2.3" class="section-number selfRef">1.2.3. </a><a href="#name-exploiting-multiple-connect" class="section-name selfRef">Exploiting Multiple Connections</a>
+<a href="#section-1.2.6" class="section-number selfRef">1.2.6. </a><a href="#name-exploiting-multiple-connect" class="section-name selfRef">Exploiting Multiple Connections</a>
           </h4>
-<p id="section-1.2.3-1">Although there is much interest in multiplexing flows on a single QUIC connection as described in <a href="#single-path" class="auto internal xref">Section 1.2.2.1</a>, QUIC also provides the capability of establishing and validating multiple paths for a single QUIC connection <span>[<a href="#RFC9000" class="cite xref">RFC9000</a>]</span>. Once multiple paths have been validated, a sender can migrate from one path to another with no additional signaling, allowing an endpoint to move from one endpoint address to another without interruption, as long as only a single path is in active use at any point in time.<a href="#section-1.2.3-1" class="pilcrow">¶</a></p>
-<p id="section-1.2.3-2">Connection migration may be desireable for a number of reasons, but to give one example, this allows a sender to distinguish between more costly cellular paths and less costly WiFi paths, with no action required from the application.<a href="#section-1.2.3-2" class="pilcrow">¶</a></p>
+<p id="section-1.2.6-1">Although there is much interest in multiplexing flows on a single QUIC connection as described in <a href="#single-path" class="auto internal xref">Section 1.2.5</a>, QUIC also provides the capability of establishing and validating multiple paths for a single QUIC connection <span>[<a href="#RFC9000" class="cite xref">RFC9000</a>]</span>. Once multiple paths have been validated, a sender can migrate from one path to another with no additional signaling, allowing an endpoint to move from one endpoint address to another without interruption, as long as only a single path is in active use at any point in time.<a href="#section-1.2.6-1" class="pilcrow">¶</a></p>
+<p id="section-1.2.6-2">Connection migration may be desireable for a number of reasons, but to give one example, this allows a sender to distinguish between more costly cellular paths and less costly WiFi paths, with no action required from the application.<a href="#section-1.2.6-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="new-quic">
-<section id="section-1.2.4">
+<section id="section-1.2.7">
           <h4 id="name-exploiting-new-quic-capabil">
-<a href="#section-1.2.4" class="section-number selfRef">1.2.4. </a><a href="#name-exploiting-new-quic-capabil" class="section-name selfRef">Exploiting New QUIC Capabilities</a>
+<a href="#section-1.2.7" class="section-number selfRef">1.2.7. </a><a href="#name-exploiting-new-quic-capabil" class="section-name selfRef">Exploiting New QUIC Capabilities</a>
           </h4>
-<p id="section-1.2.4-1">In addition to connection migration as described in <a href="#multiple-paths" class="auto internal xref">Section 1.2.3</a>, the capability of validating multiple paths for simultaneous active use is under active development in the IETF <span>[<a href="#I-D.draft-ietf-quic-multipath" class="cite xref">I-D.draft-ietf-quic-multipath</a>]</span>. We don't discuss Multipath QUIC further in this document, because the specification hasn't been approved yet, but it's one example of ways that RTP, a mature protocol, can exploit new transport capabilities as they become available.<a href="#section-1.2.4-1" class="pilcrow">¶</a></p>
+<p id="section-1.2.7-1">In addition to connection migration as described in <a href="#multiple-paths" class="auto internal xref">Section 1.2.6</a>, the capability of validating multiple paths for simultaneous active use is under active development in the IETF <span>[<a href="#I-D.draft-ietf-quic-multipath" class="cite xref">I-D.draft-ietf-quic-multipath</a>]</span>. We don't discuss Multipath QUIC further in this document, because the specification hasn't been approved yet, but it's one example of ways that RTP, a mature protocol, can exploit new transport capabilities as they become available.<a href="#section-1.2.7-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -3888,6 +3917,10 @@ in the "TLS Application-Layer Protocol Negotiation (ALPN) Protocol IDs" registry
 <dt id="RFC8015">[RFC8015]</dt>
         <dd>
 <span class="refAuthor">Singh, V.</span>, <span class="refAuthor">Perkins, C.</span>, <span class="refAuthor">Clark, A.</span>, and <span class="refAuthor">R. Huang</span>, <span class="refTitle">"RTP Control Protocol (RTCP) Extended Report (XR) Block for Independent Reporting of Burst/Gap Discard Metrics"</span>, <span class="seriesInfo">RFC 8015</span>, <span class="seriesInfo">DOI 10.17487/RFC8015</span>, <time datetime="2016-11" class="refDate">November 2016</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8015">https://www.rfc-editor.org/rfc/rfc8015</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC8083">[RFC8083]</dt>
+        <dd>
+<span class="refAuthor">Perkins, C.</span> and <span class="refAuthor">V. Singh</span>, <span class="refTitle">"Multimedia Congestion Control: Circuit Breakers for Unicast RTP Sessions"</span>, <span class="seriesInfo">RFC 8083</span>, <span class="seriesInfo">DOI 10.17487/RFC8083</span>, <time datetime="2017-03" class="refDate">March 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8083">https://www.rfc-editor.org/rfc/rfc8083</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC8085">[RFC8085]</dt>
         <dd>
