@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2023-07-23T00:21:02.229034+00:00",
+  "timestamp": "2023-07-25T00:20:34.398650+00:00",
   "repo": "mengelbart/rtp-over-quic-draft",
   "labels": [
     {
@@ -1678,7 +1678,7 @@
       "id": "I_kwDOFUmh7s5iK0bf",
       "title": "Add motivations for RoQ adoption",
       "url": "https://github.com/mengelbart/rtp-over-quic-draft/issues/77",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "SpencerDawkins",
       "authorAssociation": "COLLABORATOR",
       "assignees": [
@@ -1689,8 +1689,8 @@
       ],
       "body": "Add motivations for RQ work and adoption\r\n\r\nTransport-level encryption with RQ.\r\n\r\nUsing QUIC as it evolves (connection migration, and especially multipath QUIC).\r\n\r\nThinking about policy aspects of connection migration between interfaces (cheap WiFi vs expensive cellular).\r\n\r\nPotential connection sharing with other protocols over QUIC.\r\n\r\nQUIC path MTU discovery, especially in multiparty environments (today conference server has no option except using the lowest path MTU for all conference participants). \r\n\r\nACK piggybacking in QUIC if there are any QUIC frames going the other direction versus ACKs decreasing the available MTU for media. \r\n\r\nBeing clear about how RQ congestion control and flow control work.\r\n\r\nPossible advantage if audio is piggybacking on video in RQ - packaging multiple frames into a packet. \r\n\r\nThink about how multiple media quality variants would work - is there an advantage here?\r\n\r\nMultiplexing real-time and non-real-time flows. \r\n\r\nInteraction between QUIC congestion control and media congestion control. ",
       "createdAt": "2023-03-30T06:35:41Z",
-      "updatedAt": "2023-06-16T16:29:33Z",
-      "closedAt": null,
+      "updatedAt": "2023-07-23T21:35:46Z",
+      "closedAt": "2023-07-23T21:35:46Z",
       "comments": [
         {
           "author": "SpencerDawkins",
@@ -1720,7 +1720,7 @@
       "id": "I_kwDOFUmh7s5kglq1",
       "title": "Add RTCP messages from draft-ietf-avtcore-rtcp-green-metadata",
       "url": "https://github.com/mengelbart/rtp-over-quic-draft/issues/79",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "mengelbart",
       "authorAssociation": "OWNER",
       "assignees": [
@@ -1729,8 +1729,8 @@
       "labels": [],
       "body": "draft-ietf-avtcore-rtcp-green-metadata is not yet included in the list of feedback types",
       "createdAt": "2023-04-27T07:19:06Z",
-      "updatedAt": "2023-06-16T15:46:16Z",
-      "closedAt": null,
+      "updatedAt": "2023-07-23T20:44:50Z",
+      "closedAt": "2023-07-23T20:44:50Z",
       "comments": [
         {
           "author": "SpencerDawkins",
@@ -1881,7 +1881,7 @@
     {
       "number": 86,
       "id": "I_kwDOFUmh7s5ltlUH",
-      "title": "Batching RTP packets in single QUIC packet",
+      "title": "Coalescing RTP packets in single QUIC packet",
       "url": "https://github.com/mengelbart/rtp-over-quic-draft/issues/86",
       "state": "OPEN",
       "author": "mengelbart",
@@ -1892,7 +1892,7 @@
       ],
       "body": "Over UDP, every RTP packet gets sent in a UDP datagram. In QUIC, one could batch multiple small RTP packets together in a QUIC packet. This will probably happen automatically for streams but may depend on some scheduling for datagrams. That scheduling should take real-time requirements into account, i.e., try to optimize by batching, but also not delay packets too much.\r\n\r\nMaybe relevant: https://www.rfc-editor.org/rfc/rfc9000#section-13\r\n",
       "createdAt": "2023-05-11T19:51:13Z",
-      "updatedAt": "2023-06-16T16:02:44Z",
+      "updatedAt": "2023-07-23T21:51:24Z",
       "closedAt": null,
       "comments": [
         {
@@ -1944,7 +1944,7 @@
       "id": "I_kwDOFUmh7s5mDuup",
       "title": "List all QUIC extensions documents that might be useful for RoQ",
       "url": "https://github.com/mengelbart/rtp-over-quic-draft/issues/92",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "mengelbart",
       "authorAssociation": "OWNER",
       "assignees": [
@@ -1955,8 +1955,8 @@
       ],
       "body": "RoQ does not require any QUIC extensions, but there are a few extension documents referenced in the document, and it would be helpful to have a complete list of extensions that might be useful for RoQ. The list should include the timestamp draft(s) and the ENOUGH frame and maybe more.",
       "createdAt": "2023-05-16T15:26:17Z",
-      "updatedAt": "2023-06-16T15:44:49Z",
-      "closedAt": null,
+      "updatedAt": "2023-07-23T20:53:13Z",
+      "closedAt": "2023-07-23T20:53:13Z",
       "comments": []
     },
     {
@@ -1982,7 +1982,7 @@
       "id": "I_kwDOFUmh7s5mUaiC",
       "title": "Add header extensions to RTCP analysis",
       "url": "https://github.com/mengelbart/rtp-over-quic-draft/issues/95",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "mengelbart",
       "authorAssociation": "OWNER",
       "assignees": [
@@ -1991,8 +1991,8 @@
       "labels": [],
       "body": "In #71 we added a section about header extensions to the RTCP analysis, but it does not include a table of all header extensions we considered. I think it makes sense to add one, just like we did for the RTCP packets, too.",
       "createdAt": "2023-05-19T05:17:31Z",
-      "updatedAt": "2023-06-16T15:45:01Z",
-      "closedAt": null,
+      "updatedAt": "2023-07-23T23:03:44Z",
+      "closedAt": "2023-07-23T23:03:44Z",
       "comments": []
     },
     {
@@ -2000,7 +2000,7 @@
       "id": "I_kwDOFUmh7s5q87Zq",
       "title": "Reference new CLOSE_STREAM draft",
       "url": "https://github.com/mengelbart/rtp-over-quic-draft/issues/103",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "mengelbart",
       "authorAssociation": "OWNER",
       "assignees": [
@@ -2009,8 +2009,8 @@
       "labels": [],
       "body": "",
       "createdAt": "2023-07-07T21:10:36Z",
-      "updatedAt": "2023-07-07T21:10:36Z",
-      "closedAt": null,
+      "updatedAt": "2023-07-23T23:01:18Z",
+      "closedAt": "2023-07-23T23:01:18Z",
       "comments": []
     },
     {
@@ -2036,7 +2036,7 @@
       "id": "I_kwDOFUmh7s5r5MRf",
       "title": "Clean up introduction of \"RTP over QUIC\" and \"RoQ\" terms in the draft",
       "url": "https://github.com/mengelbart/rtp-over-quic-draft/issues/107",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "SpencerDawkins",
       "authorAssociation": "COLLABORATOR",
       "assignees": [
@@ -2045,8 +2045,8 @@
       "labels": [],
       "body": "ISTM that \"RTP over QUIC\" and \"RoQ\" should appear in the Abstract and Introduction, but neither does, and we don't actually say that we're going to be referring to \"RTP over QUIC\" as \"RoQ\" in the document. ",
       "createdAt": "2023-07-18T15:21:14Z",
-      "updatedAt": "2023-07-18T16:04:08Z",
-      "closedAt": null,
+      "updatedAt": "2023-07-23T21:01:52Z",
+      "closedAt": "2023-07-23T21:01:51Z",
       "comments": [
         {
           "author": "mengelbart",
@@ -2056,6 +2056,22 @@
           "updatedAt": "2023-07-18T16:04:08Z"
         }
       ]
+    },
+    {
+      "number": 111,
+      "id": "I_kwDOFUmh7s5sTJgO",
+      "title": "Check SHOULD requirements for ROQ receivers ",
+      "url": "https://github.com/mengelbart/rtp-over-quic-draft/issues/111",
+      "state": "OPEN",
+      "author": "SpencerDawkins",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "This is probably premature, but I noticed \r\n\r\n> To send RTP/RTCP packets over QUIC streams, a sender MUST open a\r\n> new unidirectional QUIC stream. Streams are unidirectional because there is no\r\n> synchronous relationship between sent and received RTP/RTCP packets. A peer that\r\n> receives a bidirectional stream with a flow identifier that is associated with\r\n> an RTP or RTCP stream, **SHOULD** stop reading from the stream and send a\r\n> STOP\\_SENDING frame with the application protocol error code set to\r\n> ROQ\\_STREAM\\_CREATION\\_ERROR.\r\n\r\nAs I noted in comments on PR #91, that's a fundamental violation of the protocol (\"MUST open a new unidirectional QUIC stream\"). If that's a MUST, ISTM that we need to either make detecting bidirectional ROQ connections a MUST, or explain what would be likely to happen if the receiver just decides to read from the stream and - what - never write to it? or start writing to it, in spite of the stream violating the protocol? \r\n\r\nBut this is actually just a reminder that we need to look at SHOULDs for receivers, and make sure that it makes sense for a receiver to ignore the SHOULD action, and explain at least some of the likely consequences if the receiver does so. \r\n\r\nAs long as we're still writing significant normative text, it may make sense to wait and check all the SHOULDs at once, later in the process. As long as we don't forget. ",
+      "createdAt": "2023-07-23T02:14:16Z",
+      "updatedAt": "2023-07-23T21:52:55Z",
+      "closedAt": null,
+      "comments": []
     }
   ],
   "pulls": [
@@ -4142,13 +4158,13 @@
       "labels": [],
       "body": "Actual codes are still missing to avoid redefining them multiple times if we add more codes.",
       "createdAt": "2023-05-16T13:19:57Z",
-      "updatedAt": "2023-07-22T22:38:57Z",
+      "updatedAt": "2023-07-23T21:29:52Z",
       "baseRepository": "mengelbart/rtp-over-quic-draft",
       "baseRefName": "main",
       "baseRefOid": "ee91e1f83f52a833a843aeda7cdbed06b4f7001d",
       "headRepository": "mengelbart/rtp-over-quic-draft",
       "headRefName": "fix/76/error-codes",
-      "headRefOid": "aef3eff6b75f3c9d4530fbc9ec74f0b6dc12375d",
+      "headRefOid": "9c22bf1f2c97e60c36b16c85de2e8d8278e61409",
       "closedAt": null,
       "mergedAt": null,
       "mergedBy": null,
@@ -4169,7 +4185,124 @@
           "updatedAt": "2023-07-03T12:28:48Z"
         }
       ],
-      "reviews": []
+      "reviews": [
+        {
+          "id": "PRR_kwDOFUmh7s5b66HI",
+          "commit": {
+            "abbreviatedOid": "aef3eff"
+          },
+          "author": "SpencerDawkins",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "Nice work! I apologize for the number of comments ...",
+          "createdAt": "2023-07-23T00:36:18Z",
+          "updatedAt": "2023-07-23T01:58:49Z",
+          "comments": [
+            {
+              "originalPosition": 50,
+              "body": "I know we talked about this before, but I'm now thinking more clearly. \r\n\r\n> When a RoQ sender receives a STOP\\_SENDING frame, the RoQ sender MUST open one \r\n> or more new QUIC streams to send new media frames. \r\n\r\nTo be pedantic, this is probably \r\n\r\n> When a RoQ sender receives a STOP\\_SENDING frame, the RoQ sender MUST open one\r\n> or more new QUIC streams **before sending** new media frames. ",
+              "createdAt": "2023-07-23T00:36:18Z",
+              "updatedAt": "2023-07-23T01:58:49Z"
+            },
+            {
+              "originalPosition": 65,
+              "body": "Hmmm. RFC 9000 says this:\r\n\r\n> An endpoint MUST treat the receipt of a frame of unknown type as a connection error of type FRAME_ENCODING_ERROR.\r\n\r\nWe just had a conversation about whether a \"frame of known type defined for an extension that has not been negotiated\" would be treated as \"a frame of unknown type\" or some other kind of error, but the high order bit is that I don't think the RTP receiver will ever see that datagram - the QUIC receiver will have already punted it as a connection error. ",
+              "createdAt": "2023-07-23T01:08:40Z",
+              "updatedAt": "2023-07-23T01:58:49Z"
+            },
+            {
+              "originalPosition": 81,
+              "body": "I think this is \"Either peer MAY close the connection for a variety of reasons.\"",
+              "createdAt": "2023-07-23T01:11:18Z",
+              "updatedAt": "2023-07-23T01:58:49Z"
+            },
+            {
+              "originalPosition": 113,
+              "body": "> : A receiving endpoint stopped reading a frame from a stream and requests new\r\n> frames be sent on new streams using STOP\\_SENDING \r\n\r\nI think that's technically correct, but if the following is also correct, it might be clearer. \r\n\r\n> : A receiving endpoint is using STOP\\_SENDING on the current stream to request new\r\n> frames be sent on new streams. ",
+              "createdAt": "2023-07-23T01:18:15Z",
+              "updatedAt": "2023-07-23T01:58:49Z"
+            },
+            {
+              "originalPosition": 119,
+              "body": "Perhaps \r\n\r\n> : An endpoint was unable to handle a flow identifier, e.g., because it was not\r\n> signalled or **because the endpoint** does not support multiplexing using arbitrary flow identifiers.",
+              "createdAt": "2023-07-23T01:20:26Z",
+              "updatedAt": "2023-07-23T01:58:49Z"
+            },
+            {
+              "originalPosition": 125,
+              "body": ":exploding_head: I'm lost on this one. Does \r\n\r\n> the connection properties that were negotiated when the connection was\r\n> established using transport parameters.\r\n\r\nrefer to QUIC transport parameters? If so, it would be good to say that, but we are using \"parameters\" to refer to ROC parameters, so I'm not sure what's being described. \r\n\r\nPlease advise. ",
+              "createdAt": "2023-07-23T01:28:44Z",
+              "updatedAt": "2023-07-23T01:58:49Z"
+            },
+            {
+              "originalPosition": 109,
+              "body": "The use of this error code in the document, in \r\n\r\n> To send RTP/RTCP packets over QUIC streams, a sender MUST open a\r\n> new unidirectional QUIC stream. Streams are unidirectional because there is no\r\n> synchronous relationship between sent and received RTP/RTCP packets. A peer that\r\n> receives a bidirectional stream with a flow identifier that is associated with\r\n> an RTP or RTCP stream, SHOULD stop reading from the stream and send a\r\n> STOP\\_SENDING frame with the application protocol error code set to\r\n> ROQ\\_STREAM\\_CREATION\\_ERROR.\r\n\r\ndescribes this situation as a fundamental protocol violation. I read \r\n\r\n> ROQ\\_STREAM\\_CREATION\\_ERROR (0x????):\r\n> : The endpoint detected that its peer created a stream that **it will not accept.**\r\n\r\nas more of a decision by the endpoint, rather than what the endpoint does to conform to the protocol specification. \r\n\r\nMaybe something like \r\n\r\n> ROQ\\_STREAM\\_CREATION\\_ERROR (0x????):\r\n> : The endpoint detected that its peer created a stream that **violates the ROQ protocol.**",
+              "createdAt": "2023-07-23T01:54:21Z",
+              "updatedAt": "2023-07-23T01:58:50Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOFUmh7s5b68lE",
+          "commit": {
+            "abbreviatedOid": "aef3eff"
+          },
+          "author": "mengelbart",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2023-07-23T03:21:26Z",
+          "updatedAt": "2023-07-23T03:21:26Z",
+          "comments": [
+            {
+              "originalPosition": 50,
+              "body": "That makes sense, but I will change this in #106 because it also changes this sentence.",
+              "createdAt": "2023-07-23T03:21:26Z",
+              "updatedAt": "2023-07-23T03:21:26Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOFUmh7s5b68q8",
+          "commit": {
+            "abbreviatedOid": "aef3eff"
+          },
+          "author": "mengelbart",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2023-07-23T03:29:42Z",
+          "updatedAt": "2023-07-23T03:29:42Z",
+          "comments": [
+            {
+              "originalPosition": 65,
+              "body": "I think we are talking about two different error cases. One problem is a peer sending a datagram frame in a connection that did not negotiate the use of QUIC datagrams. In that case, I agree that the QUIC receiver will react first, and the RTP receiver will never know about it. The case I intended to cover is that the two peers used some out-of-band signaling before setting up the QUIC connection, and in that signaling, they agreed to use QUIC datagrams, but then during the QUIC handshake, one of the peers does not send the transport parameter to negotiate datagrams. In that QUIC connection, datagrams are not allowed, so the peer that was expecting to be allowed to use datagrams can immediately close the connection. ",
+              "createdAt": "2023-07-23T03:29:42Z",
+              "updatedAt": "2023-07-23T03:29:42Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOFUmh7s5b68wp",
+          "commit": {
+            "abbreviatedOid": "aef3eff"
+          },
+          "author": "mengelbart",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2023-07-23T03:37:54Z",
+          "updatedAt": "2023-07-23T03:37:55Z",
+          "comments": [
+            {
+              "originalPosition": 125,
+              "body": "Yes, it refers to QUIC transport parameters. This was meant for the case I mentioned in a comment above, where peers agree on using QUIC datagrams out-of-band, but then one of them does not allow datagrams during the QUIC handshake. In that case, the other peer might like to say: \"Hey, we agreed on using datagrams, but now you don't allow me to use them so I just close the connection with a ROQ_SIGNALING_ERROR\". Does it help to say \"... established using QUIC transport parameters\"?",
+              "createdAt": "2023-07-23T03:37:54Z",
+              "updatedAt": "2023-07-23T03:37:55Z"
+            }
+          ]
+        }
+      ]
     },
     {
       "number": 94,
@@ -4449,24 +4582,26 @@
       "id": "PR_kwDOFUmh7s5UhgmP",
       "title": "Add green metadata to RTCP considerations",
       "url": "https://github.com/mengelbart/rtp-over-quic-draft/pull/99",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "mengelbart",
       "authorAssociation": "OWNER",
       "assignees": [],
       "labels": [],
       "body": "fix #79 ",
       "createdAt": "2023-07-03T12:55:23Z",
-      "updatedAt": "2023-07-03T12:55:24Z",
+      "updatedAt": "2023-07-23T20:44:49Z",
       "baseRepository": "mengelbart/rtp-over-quic-draft",
       "baseRefName": "main",
       "baseRefOid": "1e00eecd41353312fd66ab66b2536bc377d0d5c3",
       "headRepository": "mengelbart/rtp-over-quic-draft",
       "headRefName": "fix/79-green-metadata-rtcp",
       "headRefOid": "f610b7cf1e3510204321409a1dd6a857c7f5ef15",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "closedAt": "2023-07-23T20:44:49Z",
+      "mergedAt": "2023-07-23T20:44:49Z",
+      "mergedBy": "mengelbart",
+      "mergeCommit": {
+        "oid": "5dabd5d69037e6239c2a0d3bd0ca6643f299dbdc"
+      },
       "comments": [],
       "reviews": []
     },
@@ -4475,24 +4610,26 @@
       "id": "PR_kwDOFUmh7s5UiUz6",
       "title": "Add a list of considered header extensions",
       "url": "https://github.com/mengelbart/rtp-over-quic-draft/pull/100",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "mengelbart",
       "authorAssociation": "OWNER",
       "assignees": [],
       "labels": [],
       "body": "close #95 ",
       "createdAt": "2023-07-03T15:09:41Z",
-      "updatedAt": "2023-07-03T15:12:24Z",
+      "updatedAt": "2023-07-23T23:03:44Z",
       "baseRepository": "mengelbart/rtp-over-quic-draft",
       "baseRefName": "main",
-      "baseRefOid": "1e00eecd41353312fd66ab66b2536bc377d0d5c3",
+      "baseRefOid": "aa288626a71f637a3ec8ab7863a3340c6b8578a5",
       "headRepository": "mengelbart/rtp-over-quic-draft",
       "headRefName": "fix/95-rtp-header-extensions",
-      "headRefOid": "5ea9e83ed72c0b39b3719ea89dc5c15061692404",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "headRefOid": "0439b9ed19d00cf9d0f5c4943a3ddea6c66d3ac0",
+      "closedAt": "2023-07-23T23:03:43Z",
+      "mergedAt": "2023-07-23T23:03:43Z",
+      "mergedBy": "mengelbart",
+      "mergeCommit": {
+        "oid": "9dc75df5291583c21308ddf97051e7f34144773b"
+      },
       "comments": [],
       "reviews": []
     },
@@ -4501,24 +4638,26 @@
       "id": "PR_kwDOFUmh7s5Uiejl",
       "title": "Add an appendix to list optional QUIC extensions",
       "url": "https://github.com/mengelbart/rtp-over-quic-draft/pull/101",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "mengelbart",
       "authorAssociation": "OWNER",
       "assignees": [],
       "labels": [],
       "body": "close #92 ",
       "createdAt": "2023-07-03T15:33:40Z",
-      "updatedAt": "2023-07-03T15:33:57Z",
+      "updatedAt": "2023-07-23T20:53:13Z",
       "baseRepository": "mengelbart/rtp-over-quic-draft",
       "baseRefName": "main",
-      "baseRefOid": "1e00eecd41353312fd66ab66b2536bc377d0d5c3",
+      "baseRefOid": "ee91e1f83f52a833a843aeda7cdbed06b4f7001d",
       "headRepository": "mengelbart/rtp-over-quic-draft",
       "headRefName": "fix/92-list-quic-extensions",
-      "headRefOid": "2f25efbc08d5fbab70d1ad136b17392653ea332e",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "headRefOid": "253f0f68ad116dcfce8d721b6b2b36b1d19c67bf",
+      "closedAt": "2023-07-23T20:53:12Z",
+      "mergedAt": "2023-07-23T20:53:12Z",
+      "mergedBy": "mengelbart",
+      "mergeCommit": {
+        "oid": "c1b269a91e6e18d27e69aedfaed1c77a9fc72cd6"
+      },
       "comments": [],
       "reviews": []
     },
@@ -4628,24 +4767,26 @@
       "id": "PR_kwDOFUmh7s5VGzgr",
       "title": "Add proposal from e-mail discussion",
       "url": "https://github.com/mengelbart/rtp-over-quic-draft/pull/106",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "mengelbart",
       "authorAssociation": "OWNER",
       "assignees": [],
       "labels": [],
       "body": "",
       "createdAt": "2023-07-10T16:37:26Z",
-      "updatedAt": "2023-07-10T16:37:27Z",
+      "updatedAt": "2023-07-23T20:56:39Z",
       "baseRepository": "mengelbart/rtp-over-quic-draft",
       "baseRefName": "main",
-      "baseRefOid": "5ee2df7bae1af902318cd3caf76db6b502ba820c",
+      "baseRefOid": "ee91e1f83f52a833a843aeda7cdbed06b4f7001d",
       "headRepository": "mengelbart/rtp-over-quic-draft",
       "headRefName": "open-new-stream-after-stop-sending",
-      "headRefOid": "f9d8a6046e965418afa361e01b5c0c46a26883ba",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "headRefOid": "069d01a8edcaf07b6b058c2abed9d646cf068feb",
+      "closedAt": "2023-07-23T20:56:38Z",
+      "mergedAt": "2023-07-23T20:56:38Z",
+      "mergedBy": "mengelbart",
+      "mergeCommit": {
+        "oid": "e5b77f3cc371f9a6e6e3afa3dad395ee03b388ec"
+      },
       "comments": [],
       "reviews": []
     },
@@ -4654,24 +4795,26 @@
       "id": "PR_kwDOFUmh7s5Vzakn",
       "title": "Add references to close stream and enough drafts",
       "url": "https://github.com/mengelbart/rtp-over-quic-draft/pull/108",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "mengelbart",
       "authorAssociation": "OWNER",
       "assignees": [],
       "labels": [],
       "body": "Add references and a paragraph to explain how the CLOSE_STREAM and ENOUGH frames could be used.\r\n\r\nClose #103 ",
       "createdAt": "2023-07-18T16:07:30Z",
-      "updatedAt": "2023-07-18T16:07:31Z",
+      "updatedAt": "2023-07-23T23:01:18Z",
       "baseRepository": "mengelbart/rtp-over-quic-draft",
       "baseRefName": "main",
       "baseRefOid": "ee91e1f83f52a833a843aeda7cdbed06b4f7001d",
       "headRepository": "mengelbart/rtp-over-quic-draft",
       "headRefName": "fix/103-close-stream-enough",
-      "headRefOid": "377b9eaa8d62095e6f8da9922b2026712d340930",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "headRefOid": "9a849041eac94e2685c35034f637040f2a729c2b",
+      "closedAt": "2023-07-23T23:01:17Z",
+      "mergedAt": "2023-07-23T23:01:17Z",
+      "mergedBy": "mengelbart",
+      "mergeCommit": {
+        "oid": "d4e110464ecb592363d18d7064df24b2f26297c4"
+      },
       "comments": [],
       "reviews": []
     },
@@ -4680,7 +4823,7 @@
       "id": "PR_kwDOFUmh7s5V7Z0F",
       "title": "Add motivations section",
       "url": "https://github.com/mengelbart/rtp-over-quic-draft/pull/109",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "SpencerDawkins",
       "authorAssociation": "COLLABORATOR",
       "assignees": [
@@ -4689,18 +4832,28 @@
       "labels": [],
       "body": "@mengelbart and @gchandok - I'm sure I'm leaving motivations out, so I'd appreciate your comments on this PR even more than usual!\r\n\r\ncloses #77 ",
       "createdAt": "2023-07-19T19:37:05Z",
-      "updatedAt": "2023-07-23T00:20:04Z",
+      "updatedAt": "2023-07-23T21:35:46Z",
       "baseRepository": "mengelbart/rtp-over-quic-draft",
       "baseRefName": "main",
       "baseRefOid": "ee91e1f83f52a833a843aeda7cdbed06b4f7001d",
       "headRepository": "mengelbart/rtp-over-quic-draft",
       "headRefName": "issue-77",
-      "headRefOid": "c68d2c2a006ab5ea22b534cf86209c55856ea827",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
-      "comments": [],
+      "headRefOid": "49f76a05e20812b25c86e5abbb0b05ccc3f5bb99",
+      "closedAt": "2023-07-23T21:35:45Z",
+      "mergedAt": "2023-07-23T21:35:45Z",
+      "mergedBy": "SpencerDawkins",
+      "mergeCommit": {
+        "oid": "aa288626a71f637a3ec8ab7863a3340c6b8578a5"
+      },
+      "comments": [
+        {
+          "author": "SpencerDawkins",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Just FYI, I went back and thought about the motivations we had for QUIC when we chartered it for HTTP/3, and remembered that some of those motivations also apply for RTP. I also added cross-references to sections later in the document, to make me feel better about not including more details in the motivations themselves. \r\n\r\nShould I add a note that other people likely have other motivations in mind, and it would be great to add them?",
+          "createdAt": "2023-07-23T00:24:22Z",
+          "updatedAt": "2023-07-23T00:24:22Z"
+        }
+      ],
       "reviews": []
     },
     {
@@ -4708,7 +4861,7 @@
       "id": "PR_kwDOFUmh7s5V7eyS",
       "title": "Clean up \"RTP-over-QUIC\" terminology",
       "url": "https://github.com/mengelbart/rtp-over-quic-draft/pull/110",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "SpencerDawkins",
       "authorAssociation": "COLLABORATOR",
       "assignees": [
@@ -4717,17 +4870,19 @@
       "labels": [],
       "body": "I also added \"(RoQ)\" to the document title, to make this easier to spot for readers. \r\n\r\nfixes #107 ",
       "createdAt": "2023-07-19T19:53:33Z",
-      "updatedAt": "2023-07-20T07:33:23Z",
+      "updatedAt": "2023-07-23T21:01:51Z",
       "baseRepository": "mengelbart/rtp-over-quic-draft",
       "baseRefName": "main",
       "baseRefOid": "ee91e1f83f52a833a843aeda7cdbed06b4f7001d",
       "headRepository": "mengelbart/rtp-over-quic-draft",
       "headRefName": "issue-107",
       "headRefOid": "72e7c42677ce00d6fddf488792af04a96b976d59",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "closedAt": "2023-07-23T21:01:51Z",
+      "mergedAt": "2023-07-23T21:01:50Z",
+      "mergedBy": "mengelbart",
+      "mergeCommit": {
+        "oid": "d63930b23f69915675615a4e2fb5852da535de52"
+      },
       "comments": [],
       "reviews": [
         {
