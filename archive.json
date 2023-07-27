@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2023-07-25T00:20:34.398650+00:00",
+  "timestamp": "2023-07-27T00:17:58.925966+00:00",
   "repo": "mengelbart/rtp-over-quic-draft",
   "labels": [
     {
@@ -4158,7 +4158,7 @@
       "labels": [],
       "body": "Actual codes are still missing to avoid redefining them multiple times if we add more codes.",
       "createdAt": "2023-05-16T13:19:57Z",
-      "updatedAt": "2023-07-23T21:29:52Z",
+      "updatedAt": "2023-07-25T00:50:20Z",
       "baseRepository": "mengelbart/rtp-over-quic-draft",
       "baseRefName": "main",
       "baseRefOid": "ee91e1f83f52a833a843aeda7cdbed06b4f7001d",
@@ -4301,6 +4301,59 @@
               "updatedAt": "2023-07-23T03:37:55Z"
             }
           ]
+        },
+        {
+          "id": "PRR_kwDOFUmh7s5cDpi1",
+          "commit": {
+            "abbreviatedOid": "9c22bf1"
+          },
+          "author": "LPardue",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2023-07-25T00:37:53Z",
+          "updatedAt": "2023-07-25T00:37:54Z",
+          "comments": [
+            {
+              "originalPosition": 65,
+              "body": "@mengelbart's explanation makes sense to me",
+              "createdAt": "2023-07-25T00:37:53Z",
+              "updatedAt": "2023-07-25T00:37:54Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOFUmh7s5cDqIT",
+          "commit": {
+            "abbreviatedOid": "9c22bf1"
+          },
+          "author": "LPardue",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2023-07-25T00:42:29Z",
+          "updatedAt": "2023-07-25T00:42:29Z",
+          "comments": [
+            {
+              "originalPosition": 125,
+              "body": "It might help to rename the error to be like \"ROQ_REQUIREMENT_UNMET\" or \"ROQ_EXPECTATION_UNMET\" that would more clearly articulate the intent. I'd then change the text to say something like\r\n\r\n> Expectiations of the QUIC transport set by RoQ out-of-band signalling were not met by the QUIC connection.",
+              "createdAt": "2023-07-25T00:42:29Z",
+              "updatedAt": "2023-07-25T00:42:29Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOFUmh7s5cDrLo",
+          "commit": {
+            "abbreviatedOid": "9c22bf1"
+          },
+          "author": "LPardue",
+          "authorAssociation": "NONE",
+          "state": "CHANGES_REQUESTED",
+          "body": "This is all going in the correct direction. However some things need tweaking before you merge:\r\n\r\n* Define a new RoQ Error Code IANA registry e.g. like HTTP/3's https://www.iana.org/assignments/http3-parameters/http3-parameters.xhtml#http3-parameters-error-codes. Note that this will need to have registration procedures and you'll want to consider about greasing the code point space\r\n\r\n* Pick real values for the error codes. This is harder when you're not done and those errors might need to change. One technique is to pick values in the upper code space and then prior to publication switch them to lower values. But that might risk more churn than is really worth it.",
+          "createdAt": "2023-07-25T00:50:20Z",
+          "updatedAt": "2023-07-25T00:50:20Z",
+          "comments": []
         }
       ]
     },
