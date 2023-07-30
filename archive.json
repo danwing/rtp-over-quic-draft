@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2023-07-27T00:17:58.925966+00:00",
+  "timestamp": "2023-07-30T00:20:38.031635+00:00",
   "repo": "mengelbart/rtp-over-quic-draft",
   "labels": [
     {
@@ -82,6 +82,11 @@
       "name": "Not Yet",
       "description": "Text would depend on implementation/deployment experience",
       "color": "fbca04"
+    },
+    {
+      "name": "external doc",
+      "description": "Can likely be solved in another document",
+      "color": "c2e0c6"
     }
   ],
   "issues": [
@@ -115,11 +120,11 @@
       "labels": [
         "SDP",
         "NotJustRTP",
-        "IETF117"
+        "Not Yet"
       ],
       "body": "The RTP over QUIC puts a hard requirement on endpoints advertising their support for the QUIC datagram extension.\r\n\r\nIf endpoints use ALPN to select RTP over QUIC, but the QUIC transport parameters do not contain a `max_datagram_frame_size`, it is not clear what should happen. One approach would be to fail the connection at the point this is detected, such as rejcting the connection handshake. \r\n\r\nNot stating an expected way to handle this could lead to some interop problems.",
       "createdAt": "2022-06-26T16:29:35Z",
-      "updatedAt": "2023-05-17T16:38:22Z",
+      "updatedAt": "2023-07-27T22:40:18Z",
       "closedAt": null,
       "comments": [
         {
@@ -484,11 +489,13 @@
       "authorAssociation": "NONE",
       "assignees": [],
       "labels": [
-        "NotJustRTP"
+        "NotJustRTP",
+        "Not Yet",
+        "external doc"
       ],
       "body": "The spec does not currently describe how [SFrame](https://datatracker.ietf.org/doc/draft-ietf-sframe-enc/) is supported in RTP over QUIC, or what an RTP translator should do. One way to address this would be to add a section that would deal with the issues that come up when implementing [SFrame](https://datatracker.ietf.org/doc/draft-ietf-sframe-enc/) in RTP over QUIC.",
       "createdAt": "2022-08-03T18:56:51Z",
-      "updatedAt": "2023-03-20T16:47:01Z",
+      "updatedAt": "2023-07-27T22:42:56Z",
       "closedAt": null,
       "comments": [
         {
@@ -921,11 +928,12 @@
       ],
       "labels": [
         "SDP",
-        "IETF117"
+        "Not Yet",
+        "external doc"
       ],
       "body": "We need QUIC-ICE in order to support peer-to-peer operation, but some functionalities overlap between ICE and QUIC. For example,\r\n- QUIC validates addresses, and ICE nominates candidate pairs\r\n- QUIC Ping frames and ICE Keepalives\r\nAnd, of course, ICE prioritizes candidate pairs, which QUIC might have opinions about for connection migration. \r\n\r\nThat's probably an incomplete list. But we need to figure this out. ",
       "createdAt": "2022-12-14T16:43:15Z",
-      "updatedAt": "2023-06-16T16:40:42Z",
+      "updatedAt": "2023-07-27T22:41:35Z",
       "closedAt": null,
       "comments": [
         {
@@ -1400,7 +1408,7 @@
       "labels": [],
       "body": "We're starting with the idea that these types of traffic might not be using the same model for congestion control, but there's likely much more.",
       "createdAt": "2023-02-13T16:25:04Z",
-      "updatedAt": "2023-06-16T15:38:46Z",
+      "updatedAt": "2023-07-27T22:38:24Z",
       "closedAt": null,
       "comments": [
         {
@@ -1451,6 +1459,13 @@
           "body": "I think I agree mostly with what you're saying, but I am a bit lost about the P2P QUIC part. \r\n\r\nWe decided to define multiplexing using the flow identifier and the `rtp-mux-quic` ALPN because, as far as I know, there was nothing like P2P QUIC defined that would do these things for us. If that changed or will change, should we consider dropping multiplexing with non-RTP/RTCP data and relying on the P2P QUIC multiplexing and ALPN instead?",
           "createdAt": "2023-06-12T20:18:35Z",
           "updatedAt": "2023-06-12T20:18:35Z"
+        },
+        {
+          "author": "SpencerDawkins",
+          "authorAssociation": "COLLABORATOR",
+          "body": "@aboba and @mengelbart - I do think we have an semi-infinitely large number of levels of  multiplexing in RoC, and anything that we don't have to specify is going to help us focus on what we absolutely DO need to specify.\r\n\r\nI'm thinking we can defer this issue for now and see how [P2P QUIC](https://datatracker.ietf.org/doc/draft-thatcher-p2p-quic/) progresses. Thoughts?",
+          "createdAt": "2023-07-27T22:38:24Z",
+          "updatedAt": "2023-07-27T22:38:24Z"
         }
       ]
     },
@@ -1635,13 +1650,15 @@
       "state": "OPEN",
       "author": "gloinul",
       "authorAssociation": "NONE",
-      "assignees": [],
+      "assignees": [
+        "mengelbart"
+      ],
       "labels": [
-        "IETF117"
+        "NextInterim"
       ],
       "body": "So the QUIC connection carrying RTP will for now be point to point. However, as RTP has notion of RTP middleboxes that are used to create multiparty topologies there need to be better consideration for when one can do optimizations like reducing the rate of RTCP because the RTCP receiver related statistics will be known by QUIC sender. So if one can reduce the rate or even skip some RTCP reports is all dependent if the RTP middlebox that interconnects has full autonomy and can act on all aspects on the transport feedback. However, if the original sender in a system would monitor all receivers and actually adapt its general rates in a simulcast for example and the middlebox just selects between the simulcast versions then one would have to maintain RTCP reports that does cross reporting over the whole RTP session. \r\n\r\nSo I think you need to clarify for example in Section 6.1 that the system needs to decided on its need and use signalling to both configure the reports the system needs as well as the frequency of the RTCP reporting.  ",
       "createdAt": "2023-03-28T05:14:28Z",
-      "updatedAt": "2023-05-17T16:58:25Z",
+      "updatedAt": "2023-07-27T22:53:17Z",
       "closedAt": null,
       "comments": [
         {
@@ -1665,11 +1682,11 @@
         "mengelbart"
       ],
       "labels": [
-        "IETF117"
+        "NextInterim"
       ],
       "body": "Related to #13 but also applicable to the rest of the specification.\r\n\r\nRTP over QUIC is an application layer mapping for RTP applications. \r\n\r\nWhen using STOP_SENDING or RESET_STREAM, the code has to be an application-layer error code, and you don't have one. Without that, people will just pick random numbers (or worse, send 0 for everything). \r\n\r\nDefining codes isn't too hard, we should put some thought into gradeful or abrupt conditions that can be communicated via error codes",
       "createdAt": "2023-03-28T05:30:40Z",
-      "updatedAt": "2023-06-16T15:40:38Z",
+      "updatedAt": "2023-07-27T22:44:05Z",
       "closedAt": null,
       "comments": []
     },
@@ -1760,11 +1777,11 @@
         "SpencerDawkins"
       ],
       "labels": [
-        "IETF117"
+        "NextInterim"
       ],
       "body": "The tables in sections [6.5](https://mengelbart.github.io/rtp-over-quic-draft/draft-ietf-avtcore-rtp-over-quic.html#section-6.5) - [6.8](https://mengelbart.github.io/rtp-over-quic-draft/draft-ietf-avtcore-rtp-over-quic.html#section-6.8) contain a lot of information which is also explained in more detail in section [6.3](https://mengelbart.github.io/rtp-over-quic-draft/draft-ietf-avtcore-rtp-over-quic.html#section-6.3). I think we can reference the relevant subsections from the tables instead.",
       "createdAt": "2023-04-27T07:23:55Z",
-      "updatedAt": "2023-06-16T16:25:02Z",
+      "updatedAt": "2023-07-27T22:44:06Z",
       "closedAt": null,
       "comments": [
         {
@@ -1920,7 +1937,7 @@
       ],
       "body": "SCReAM, NADA, and GCC were specifically designed with RTP/RTCP in mind. Is it feasible to use one of these in the QUIC stack itself, or are there other alternatives that could be implemented directly in a QUIC stack to follow the recommendations given in [section 7.1](https://mengelbart.github.io/rtp-over-quic-draft/draft-ietf-avtcore-rtp-over-quic.html#section-7.1)? One requirement that all of the RMCAT algorithms have is that they need timestamps, which could be provided by one of the QUIC timestamp extension drafts.\r\n\r\nThis came up in discussion with Gurtej and again in https://github.com/mengelbart/rtp-over-quic-draft/pull/83#discussion_r1190525045\r\n",
       "createdAt": "2023-05-11T19:57:00Z",
-      "updatedAt": "2023-06-16T15:51:14Z",
+      "updatedAt": "2023-07-27T23:14:12Z",
       "closedAt": null,
       "comments": [
         {
@@ -1936,6 +1953,27 @@
           "body": "I agree with that. I think a PoC and some experiments exploring such an implementation would be nice. I had this on my list for some time now but didn't get to implement it yet. I don't know if we need it before changing any text, but it might give some insights that could be useful to document.",
           "createdAt": "2023-06-12T17:26:34Z",
           "updatedAt": "2023-06-12T17:26:34Z"
+        },
+        {
+          "author": "SpencerDawkins",
+          "authorAssociation": "COLLABORATOR",
+          "body": "I said I would send this out to @lpardue and @pthatcher as a question, and failed. I **promise, promise, promise** ...",
+          "createdAt": "2023-07-27T22:53:39Z",
+          "updatedAt": "2023-07-27T22:53:39Z"
+        },
+        {
+          "author": "LPardue",
+          "authorAssociation": "NONE",
+          "body": "I'm not sure what the question is - what can I help with?",
+          "createdAt": "2023-07-27T23:13:54Z",
+          "updatedAt": "2023-07-27T23:13:54Z"
+        },
+        {
+          "author": "SpencerDawkins",
+          "authorAssociation": "COLLABORATOR",
+          "body": "@goelvidhi - on this:\r\n\r\n> IMO, it would be ideal to implement a real time rate adaptation algorithm in the QUIC stack and then expose an API for bitrate estimation to the application/framework that uses that to call into encoder. I can take this issue but do we need a PoC before making this text change?\r\n\r\nI think a POC is a fine idea, but if we have a new congestion controller, that probably starts in [ICCRG](https://datatracker.ietf.org/rg/iccrg/about/), doesn't it?",
+          "createdAt": "2023-07-27T23:14:12Z",
+          "updatedAt": "2023-07-27T23:14:12Z"
         }
       ]
     },
@@ -1970,12 +2008,29 @@
       "assignees": [
         "SpencerDawkins"
       ],
-      "labels": [],
+      "labels": [
+        "NextInterim"
+      ],
       "body": "We may need a short section explaining the ROQ-specific tradeoffs",
       "createdAt": "2023-05-17T16:52:12Z",
-      "updatedAt": "2023-06-16T15:23:04Z",
+      "updatedAt": "2023-07-28T00:49:46Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "SpencerDawkins",
+          "authorAssociation": "COLLABORATOR",
+          "body": "@aboba asked if a sender had any restrictions on using streams, per-frame streams, and datagrams. I agree and think we should explicitly say something (\"silence is permission\"), and also consider interactions.",
+          "createdAt": "2023-07-27T22:47:14Z",
+          "updatedAt": "2023-07-27T22:47:14Z"
+        },
+        {
+          "author": "aboba",
+          "authorAssociation": "NONE",
+          "body": "I asked the question in the context of Peter's SDP negotiation slide, in which it wasn't clear what UDP/QUIC/RTP/AVPF meant exactly. For example, would an Answerer receiving this in the Offer interpret it to mean that it needs to be willing receive RTP over streams, datagrams and some mixture of both? Or is there a way for an Offerer to indicate that only requires the Answerer to support a subset of all potential transport modes (e.g. reliable streams OR datagrams).\n\nNote that in the same discussion we also talked about multiplexing, specifically whether \"a=mid\" referred to the SDES/MID RTP header extension or to a QUIC multiplexing-ID. I think raises the question about what BUNDLE over QUIC looks like. ",
+          "createdAt": "2023-07-28T00:46:47Z",
+          "updatedAt": "2023-07-28T00:49:46Z"
+        }
+      ]
     },
     {
       "number": 95,
@@ -2066,10 +2121,71 @@
       "author": "SpencerDawkins",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
-      "labels": [],
+      "labels": [
+        "Not Yet"
+      ],
       "body": "This is probably premature, but I noticed \r\n\r\n> To send RTP/RTCP packets over QUIC streams, a sender MUST open a\r\n> new unidirectional QUIC stream. Streams are unidirectional because there is no\r\n> synchronous relationship between sent and received RTP/RTCP packets. A peer that\r\n> receives a bidirectional stream with a flow identifier that is associated with\r\n> an RTP or RTCP stream, **SHOULD** stop reading from the stream and send a\r\n> STOP\\_SENDING frame with the application protocol error code set to\r\n> ROQ\\_STREAM\\_CREATION\\_ERROR.\r\n\r\nAs I noted in comments on PR #91, that's a fundamental violation of the protocol (\"MUST open a new unidirectional QUIC stream\"). If that's a MUST, ISTM that we need to either make detecting bidirectional ROQ connections a MUST, or explain what would be likely to happen if the receiver just decides to read from the stream and - what - never write to it? or start writing to it, in spite of the stream violating the protocol? \r\n\r\nBut this is actually just a reminder that we need to look at SHOULDs for receivers, and make sure that it makes sense for a receiver to ignore the SHOULD action, and explain at least some of the likely consequences if the receiver does so. \r\n\r\nAs long as we're still writing significant normative text, it may make sense to wait and check all the SHOULDs at once, later in the process. As long as we don't forget. ",
       "createdAt": "2023-07-23T02:14:16Z",
-      "updatedAt": "2023-07-23T21:52:55Z",
+      "updatedAt": "2023-07-27T22:49:59Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 112,
+      "id": "I_kwDOFUmh7s5szNHB",
+      "title": "RESET_STREAM and media dependencies",
+      "url": "https://github.com/mengelbart/rtp-over-quic-draft/issues/112",
+      "state": "OPEN",
+      "author": "mengelbart",
+      "authorAssociation": "OWNER",
+      "assignees": [
+        "mengelbart"
+      ],
+      "labels": [
+        "NextInterim"
+      ],
+      "body": "STOP_SENDING/RESET_STREAM currently does not allow sending media frames on a new QUIC stream if they were previously sent on a QUIC stream that received STOP_SENDING/RESET_STREAM. We need to figure out if that is a problem if there are dependencies between those media frames.",
+      "createdAt": "2023-07-27T23:20:10Z",
+      "updatedAt": "2023-07-27T23:20:10Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 113,
+      "id": "I_kwDOFUmh7s5szWt-",
+      "title": "Given that we are doing STOP\\_SENDING, do we need CLOSE\\_STREAM?",
+      "url": "https://github.com/mengelbart/rtp-over-quic-draft/issues/113",
+      "state": "OPEN",
+      "author": "SpencerDawkins",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [
+        "mengelbart"
+      ],
+      "labels": [
+        "NextInterim",
+        "external doc"
+      ],
+      "body": "Assuming that CLOSE|_STREAM moves forward ...",
+      "createdAt": "2023-07-27T23:56:46Z",
+      "updatedAt": "2023-07-28T00:01:59Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 114,
+      "id": "I_kwDOFUmh7s5szXzF",
+      "title": "Reality check on RoC DATAGRAM use, especially for RoQ over WebTransport",
+      "url": "https://github.com/mengelbart/rtp-over-quic-draft/issues/114",
+      "state": "OPEN",
+      "author": "SpencerDawkins",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [
+        "NextInterim"
+      ],
+      "body": "@SpencerDawkins and @mengelbart sait through some really interesting discussion at WEBTRAN about pooled connections ...",
+      "createdAt": "2023-07-28T00:00:44Z",
+      "updatedAt": "2023-07-28T00:00:44Z",
       "closedAt": null,
       "comments": []
     }
