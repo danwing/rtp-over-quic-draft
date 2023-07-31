@@ -5,9 +5,9 @@
 Audio/Video Transport Core Maintenance                            J. Ott
 Internet-Draft                                              M. Engelbart
 Intended status: Standards Track             Technical University Munich
-Expires: 24 January 2024                                      S. Dawkins
+Expires: 1 February 2024                                      S. Dawkins
                                                      Tencent America LLC
-                                                            23 July 2023
+                                                            31 July 2023
 
 
                              RTP over QUIC
@@ -48,7 +48,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 24 January 2024.
+   This Internet-Draft will expire on 1 February 2024.
 
 Copyright Notice
 
@@ -117,6 +117,7 @@ Table of Contents
    12. Security Considerations
    13. IANA Considerations
      13.1.  Registration of a RoQ Identification String
+     13.2.  RoQ Error Codes
    14. References
      14.1.  Normative References
      14.2.  Informative References
@@ -1810,6 +1811,40 @@ Table of Contents
 
    Specification:  This document
 
+13.2.  RoQ Error Codes
+
+   This document establishes a registry for RoQ error codes.
+
+   +===========================+========+=============+===============+
+   | Name                      | Value  | Description | Specification |
+   +===========================+========+=============+===============+
+   | ROQ_NO_ERROR              | 0x???? | No Error    | TODO: This    |
+   |                           |        |             | doc           |
+   +---------------------------+--------+-------------+---------------+
+   | ROQ_INTERNAL_ERROR        | 0x???? | Internal    | TODO: This    |
+   |                           |        | Error       | doc           |
+   +---------------------------+--------+-------------+---------------+
+   | ROQ_PACKET_ERROR          | 0x???? | Invalid     | TODO: This    |
+   |                           |        | payload     | doc           |
+   |                           |        | format      |               |
+   +---------------------------+--------+-------------+---------------+
+   | ROQ_STREAM_CREATION_ERROR | 0x???? | Invalid     | TODO: This    |
+   |                           |        | stream type | doc           |
+   +---------------------------+--------+-------------+---------------+
+   | ROQ_FRAME_CANCELLED       | 0x???? | Frame       | TODO: This    |
+   |                           |        | cancelled   | doc           |
+   +---------------------------+--------+-------------+---------------+
+   | ROQ_UNKNOWN_FLOW_ID       | 0x???? | Unknown     | TODO: This    |
+   |                           |        | Flow ID     | doc           |
+   +---------------------------+--------+-------------+---------------+
+   | ROQ_SIGNALING_ERROR       | 0x???? | Externally  | TODO: This    |
+   |                           |        | signalled   | doc           |
+   |                           |        | requirement |               |
+   |                           |        | unmet       |               |
+   +---------------------------+--------+-------------+---------------+
+
+                                 Table 6
+
 14.  References
 
 14.1.  Normative References
@@ -1991,9 +2026,9 @@ Table of Contents
    [I-D.draft-ietf-wish-whip]
               Murillo, S. G. and A. Gouaillard, "WebRTC-HTTP ingestion
               protocol (WHIP)", Work in Progress, Internet-Draft, draft-
-              ietf-wish-whip-08, 30 March 2023,
+              ietf-wish-whip-09, 24 July 2023,
               <https://datatracker.ietf.org/doc/html/draft-ietf-wish-
-              whip-08>.
+              whip-09>.
 
    [I-D.draft-thomson-quic-enough-00]
               Thomson, M., "Signaling That a QUIC Receiver Has Enough
