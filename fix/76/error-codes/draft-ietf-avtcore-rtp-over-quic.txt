@@ -914,7 +914,7 @@ Table of Contents
    successfully negotiated during the QUIC handshake.  If the use of an
    extension was signaled using a signaling protocol, but the extension
    was not negotiated during the QUIC handshake, a peer MAY close the
-   connection with the ROQ_SIGNALING_ERROR error code.
+   connection with the ROQ_EXPECTATION_UNMET error code.
 
    QUIC datagrams preserve frame boundaries.  Thus, a single RTP packet
    can be mapped to a single QUIC datagram without additional framing.
@@ -1941,10 +1941,9 @@ Table of Contents
       endpoint does not support multiplexing using arbitrary flow
       identifiers.
 
-   ROQ_SIGNALING_ERROR (0x????):  Parameters that were set during out of
-      band signaling are incompatible with the connection properties
-      that were negotiated when the connection was established using
-      QUIC transport parameters.
+   ROQ_EXPECTATION_UNMET (0x????):  Expectiations of the QUIC transport
+      set by RoQ out-of-band signalling were not met by the QUIC
+      connection.
 
 10.  API Considerations
 
@@ -2135,7 +2134,7 @@ Table of Contents
    | ROQ_UNKNOWN_FLOW_ID       | 0x???? | Unknown     | TODO: This    |
    |                           |        | Flow ID     | doc           |
    +---------------------------+--------+-------------+---------------+
-   | ROQ_SIGNALING_ERROR       | 0x???? | Externally  | TODO: This    |
+   | ROQ_EXPECTATION_UNMET     | 0x???? | Externally  | TODO: This    |
    |                           |        | signalled   | doc           |
    |                           |        | requirement |               |
    |                           |        | unmet       |               |

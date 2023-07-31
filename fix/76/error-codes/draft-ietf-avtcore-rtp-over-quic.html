@@ -2244,7 +2244,7 @@ extension to QUIC described in <span>[<a href="#RFC9221" class="cite xref">RFC92
 the use of the extension was successfully negotiated during the QUIC handshake.
 If the use of an extension was signaled using a signaling protocol, but the
 extension was not negotiated during the QUIC handshake, a peer MAY close the
-connection with the ROQ_SIGNALING_ERROR error code.<a href="#section-5.3-1" class="pilcrow">¶</a></p>
+connection with the ROQ_EXPECTATION_UNMET error code.<a href="#section-5.3-1" class="pilcrow">¶</a></p>
 <p id="section-5.3-2">QUIC datagrams preserve frame boundaries. Thus, a single RTP packet can be
 mapped to a single QUIC datagram without additional framing. Senders SHOULD
 consider the header overhead associated with QUIC datagrams and ensure that the
@@ -3691,11 +3691,10 @@ signalled or because the endpoint does not support multiplexing using arbitrary
 flow identifiers.<a href="#section-9-2.14.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
-<dt id="section-9-2.15">ROQ_SIGNALING_ERROR (0x????):</dt>
+<dt id="section-9-2.15">ROQ_EXPECTATION_UNMET (0x????):</dt>
         <dd style="margin-left: 1.5em" id="section-9-2.16">
-          <p id="section-9-2.16.1">Parameters that were set during out of band signaling are incompatible with
-the connection properties that were negotiated when the connection was
-established using QUIC transport parameters.<a href="#section-9-2.16.1" class="pilcrow">¶</a></p>
+          <p id="section-9-2.16.1">Expectiations of the QUIC transport set by RoQ out-of-band signalling were not
+met by the QUIC connection.<a href="#section-9-2.16.1" class="pilcrow">¶</a></p>
 </dd>
       <dd class="break"></dd>
 </dl>
@@ -3962,7 +3961,7 @@ in the "TLS Application-Layer Protocol Negotiation (ALPN) Protocol IDs" registry
               <td class="text-left" rowspan="1" colspan="1">TODO: This doc</td>
             </tr>
             <tr>
-              <td class="text-left" rowspan="1" colspan="1">ROQ_SIGNALING_ERROR</td>
+              <td class="text-left" rowspan="1" colspan="1">ROQ_EXPECTATION_UNMET</td>
               <td class="text-left" rowspan="1" colspan="1">0x????</td>
               <td class="text-left" rowspan="1" colspan="1">Externally signalled requirement unmet</td>
               <td class="text-left" rowspan="1" colspan="1">TODO: This doc</td>
