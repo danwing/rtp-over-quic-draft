@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2023-08-01T00:21:48.776975+00:00",
+  "timestamp": "2023-08-10T00:19:42.534204+00:00",
   "repo": "mengelbart/rtp-over-quic-draft",
   "labels": [
     {
@@ -2186,6 +2186,70 @@
       "body": "@SpencerDawkins and @mengelbart sait through some really interesting discussion at WEBTRAN about pooled connections ...",
       "createdAt": "2023-07-28T00:00:44Z",
       "updatedAt": "2023-07-28T00:00:44Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 115,
+      "id": "I_kwDOFUmh7s5tz1Ty",
+      "title": "Motivation: Exploiting Multiple Connections",
+      "url": "https://github.com/mengelbart/rtp-over-quic-draft/issues/115",
+      "state": "OPEN",
+      "author": "gchandok",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "Pasting the original text with some suggestions inline: \r\n\r\n1.2.6.  Exploiting Multiple Connections **[Migrating between multiple paths. Mention paths and not connections]**\t \t\t\r\n \t\t\r\n   Although there is much interest in multiplexing flows on a single\t \t\t\r\n   QUIC connection as described in Section 1.2.5, QUIC also provides the\t \t\t\r\n   capability of establishing and validating multiple paths for a single\t \t\t\r\n   QUIC connection [RFC9000].  Once multiple paths have been validated,\t \t\t\r\n   a sender can migrate from one path to another with no additional\t \t\t\r\n   signaling, allowing an endpoint to move from one endpoint address to\t \t\t\r\n   another without interruption, as long as only a single path is in\t \t\t\r\n   active use at any point in time.\t \t\t\r\n \t\t\r\n   Connection migration may be desireable for a number of reasons, but\t \t\t\r\n   to give one example, this allows a sender to distinguish between more\t \t\t\r\n   costly cellular paths and less costly WiFi paths, with no action\t \t\t\r\n   required from the application. **[RTP applications do need to know about path used being expensive/not since the application  may want to use a lower bitrate cap for an expensive path like cellular. So some action will be required from the application possibly at connection setup time to specify the caps in wants to use for each interface type]** ",
+      "createdAt": "2023-08-09T01:18:02Z",
+      "updatedAt": "2023-08-09T01:18:02Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 116,
+      "id": "I_kwDOFUmh7s5tz2Xx",
+      "title": "Reasoning for not mandating a rate adaptation algorithm",
+      "url": "https://github.com/mengelbart/rtp-over-quic-draft/issues/116",
+      "state": "OPEN",
+      "author": "gchandok",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "\r\n\r\nA rate adaptation algorithm can be plugged in to adapt the media\r\n    bitrate to the available bandwidth.  This document does not mandate\r\n|   any specific rate adaptation algorithm, _because the desired response\r\n|   to congestion can be application and codec-specific.  For example,\r\n|   adjusting quantization in response to congestion may work well in\r\n|   many cases, but if what's being shared is video that includes text,\r\n|   maintaining readability is important._\r\n|\r\n|   As of this writing, the IETF has produced two Experimental-track rate\r\n|   adaptation specifications, Network-Assisted Dynamic Adaptation (NADA)\r\n|   [RFC8698] and Self-Clocked Rate Adaptation for Multimedia (SCReAM)\r\n|   [RFC8298]. \r\n\r\n\r\n**Rate adaptation mechanisms like NADA/SCREAM don\u2019t necessarily mandate how the encoder handles the rate changes. That handling may be codec specific so makes sense to leave it out. So the argument and example (in italics) don\u2019t seem appropriate in this section. Rate adaptation mechanism RFCs you mention above talk about how the sending rate should be computed, what feedback is needed and how traffic should be paced / shaped which are not codec specific. You can just say that application may pick a rate adaptation mechanism of its choice and this document does not mandate it. That should be sufficient**",
+      "createdAt": "2023-08-09T01:24:54Z",
+      "updatedAt": "2023-08-09T01:24:54Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 117,
+      "id": "I_kwDOFUmh7s5tz2lx",
+      "title": "Suppressing QUIC signaling in favor of RTCP signaling",
+      "url": "https://github.com/mengelbart/rtp-over-quic-draft/issues/117",
+      "state": "OPEN",
+      "author": "gchandok",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "Because QUIC relies on certain frames being sent, it is\r\n   not possible to supress QUIC signaling in favor of RTCP signaling,\r\n\r\n**In Datagram mode, QUIC flow control and retransmissions are disabled. Also, this draft allows for congestion control to live in the application. So in this situation we should consider disabling ACK frames in the QUIC layer. What function do they provide? Those are probably the most common non-data frames that will be sent at quic layer**",
+      "createdAt": "2023-08-09T01:26:16Z",
+      "updatedAt": "2023-08-09T01:26:16Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 118,
+      "id": "I_kwDOFUmh7s5tz2uh",
+      "title": "Carrying SR NTP Timestamps at QUIC layer",
+      "url": "https://github.com/mengelbart/rtp-over-quic-draft/issues/118",
+      "state": "OPEN",
+      "author": "gchandok",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "_SR_ NTP timestamps: We cannot send NTP timestamps in the same\r\n      format the SRs use, but couldn't a QUIC timestamp extension\r\n      provide the same information?\r\n\r\n**SR really carries an RTP timestamp to NTP time mapping that is required for lip sync. This cannot solely be provided at the QUIC layer since it does not know about RTP timestamps**",
+      "createdAt": "2023-08-09T01:27:07Z",
+      "updatedAt": "2023-08-09T01:27:07Z",
       "closedAt": null,
       "comments": []
     }
